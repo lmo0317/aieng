@@ -21,6 +21,20 @@ const modelNames = {
 // Load current settings on page load
 async function loadSettings() {
     try {
+        // First check if user is logged in
+        const userResponse = await fetch('/api/user');
+        const userData = await userResponse.json();
+
+        if (!userData.loggedIn) {
+            // User is not logged in
+            statusIndicator.classList.add('inactive');
+            statusText.textContent = '로그인이 필요합니다';
+            currentKeyInfo.innerHTML = '<p>⚠️ 설정을 사용하려면 먼저 <a href="/">Google 로그인</a>이 필요합니다.</p>';
+            currentKeyInfo.classList.remove('hidden');
+            form.style.display = 'none';
+            return;
+        }
+
         const response = await fetch('/api/settings');
 
         if (response.status === 401) {

@@ -264,8 +264,13 @@ app.post('/api/settings', (req, res) => {
 
     const { glmApiKey, glmModel } = req.body;
 
+    console.log('POST /api/settings - User:', req.user.id, 'Body:', { glmApiKey: glmApiKey ? '***' : undefined, glmModel });
+
     db.get("SELECT * FROM settings WHERE userId = ?", [req.user.id], (err, row) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) {
+            console.error('DB GET Error:', err);
+            return res.status(500).json({ error: err.message });
+        }
 
         const updates = [];
         const values = [];
@@ -294,15 +299,30 @@ app.post('/api/settings', (req, res) => {
 
         if (row) {
             // Update existing
-            db.run(`UPDATE settings SET ${updates.join(', ')} WHERE userId = ?`, values, (updateErr) => {
-                if (updateErr) return res.status(500).json({ error: updateErr.message });
+            const sql = `UPDATE settings SET ${updates.join(', ')} WHERE userId = ?`;
+            console.log('Update SQL:', sql, 'Values:', values);
+            db.run(sql, values, function(updateErr) {
+                if (updateErr) {
+                    console.error('DB UPDATE Error:', updateErr);
+                    return res.status(500).json({ error: updateErr.message });
+                }
+                console.log('Update successful, rows affected:', this.changes);
                 res.json({ success: true, message: '설정이 업데이트되었습니다.' });
             });
         } else {
-            // Insert new
-            db.run("INSERT INTO settings (userId, glmApiKey, glmModel) VALUES (?, ?, ?)",
-                [req.user.id, glmApiKey?.trim() || null, glmModel || 'claude-3-5-sonnet-20240620'], (insertErr) => {
-                if (insertErr) return res.status(500).json({ error: insertErr.message });
+            // Insert new - need to have glmApiKey for new entries
+            if (!glmApiKey) {
+                return res.status(400).json({ error: 'API Key를 입력해주세요.' });
+            }
+            const sql = "INSERT INTO settings (userId, glmApiKey, glmModel) VALUES (?, ?, ?)";
+            const insertValues = [req.user.id, glmApiKey.trim(), glmModel || 'claude-3-5-sonnet-20240620'];
+            console.log('Insert SQL:', sql, 'Values:', [insertValues[0], '***', insertValues[2]]);
+            db.run(sql, insertValues, function(insertErr) {
+                if (insertErr) {
+                    console.error('DB INSERT Error:', insertErr);
+                    return res.status(500).json({ error: insertErr.message });
+                }
+                console.log('Insert successful, row ID:', this.lastID);
                 res.json({ success: true, message: '설정이 저장되었습니다.' });
             });
         }

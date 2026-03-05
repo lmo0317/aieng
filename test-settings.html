@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>테스트</title>
+</head>
+<body>
+    <h1>로그인 상태 확인</h1>
+    <button onclick="checkAuth()">인증 확인</button>
+    <button onclick="testSave()">저장 테스트</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/user');
+                const data = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('result').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function testSave() {
+            try {
+                const response = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ glmApiKey: 'test-key-12345', glmModel: 'glm-4.7-flash' })
+                });
+                const data = await response.json();
+                document.getElementById('result').textContent = `Status: ${response.status}\n` + JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('result').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
