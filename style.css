@@ -10,20 +10,9 @@ body {
     color: #333;
 }
 
-.usage-badge {
-    background-color: #ebf8ff;
-    color: #2b6cb0;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    border: 1px solid #bee3f8;
-    line-height: 1.5;
-}
-
 .header-section {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin-bottom: 20px;
 }
