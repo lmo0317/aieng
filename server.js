@@ -25,7 +25,7 @@ async function getGlobalSettings() {
                 groqApiKey: row?.groqApiKey || process.env.GROQ_API_KEY,
                 groqModel: row?.groqModel || 'llama-3.3-70b-versatile',
                 geminiApiKey: row?.geminiApiKey || process.env.GEMINI_API_KEY,
-                geminiModel: row?.geminiModel || 'gemini-2.0-flash-exp',
+                geminiModel: row?.geminiModel || 'gemini-1.5-flash',
                 provider: row?.provider || 'glm'
             });
         });
@@ -61,7 +61,7 @@ app.get('/api/settings', (req, res) => {
             model,
             glmModel: row?.glmModel || 'glm-4.7-flash',
             groqModel: row?.groqModel || 'llama-3.3-70b-versatile',
-            geminiModel: row?.geminiModel || 'gemini-2.0-flash-exp'
+            geminiModel: row?.geminiModel || 'gemini-1.5-flash'
         });
     });
 });
@@ -113,7 +113,7 @@ app.post('/api/settings', (req, res) => {
     }
 
     if (geminiModel !== undefined) {
-        if (!['gemini-2.0-flash-exp', 'gemini-2.0-flash-thinking-exp', 'gemini-1.5-pro', 'gemini-1.5-flash'].includes(geminiModel)) {
+        if (!['gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-1.5-pro', 'gemini-1.5-pro-001'].includes(geminiModel)) {
             return res.status(400).json({ error: '유효하지 않은 Gemini 모델입니다.' });
         }
         updates.push('geminiModel = ?');

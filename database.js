@@ -43,7 +43,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
                             migrations.push("ALTER TABLE global_settings ADD COLUMN geminiApiKey TEXT");
                         }
                         if (!columnNames.includes('geminiModel')) {
-                            migrations.push("ALTER TABLE global_settings ADD COLUMN geminiModel TEXT DEFAULT 'gemini-2.0-flash-exp'");
+                            migrations.push("ALTER TABLE global_settings ADD COLUMN geminiModel TEXT DEFAULT 'gemini-1.5-flash'");
                         }
 
                         // Execute migrations sequentially, then insert default row

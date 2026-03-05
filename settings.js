@@ -42,12 +42,12 @@ const providerConfig = {
         apiKeyLabel: 'Gemini API Key',
         apiKeyPlaceholder: 'AIza...',
         apiKeyHelp: 'API Key는 <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>에서 발급받을 수 있습니다.',
-        modelHelp: '💡 <strong>Gemini 2.0 Flash</strong>는 최신의 고성능 모델입니다.',
+        modelHelp: '💡 <strong>Gemini 1.5 Flash</strong>는 빠르고 정확한 모델입니다.',
         models: [
-            { value: 'gemini-2.0-flash-exp', label: 'Gemini 2.0 Flash (권장)' },
-            { value: 'gemini-2.0-flash-thinking-exp', label: 'Gemini 2.0 Flash Thinking' },
+            { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash (권장)' },
+            { value: 'gemini-1.5-flash-8b', label: 'Gemini 1.5 Flash 8B' },
             { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
-            { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' }
+            { value: 'gemini-1.5-pro-001', label: 'Gemini 1.5 Pro 001' }
         ]
     }
 };
@@ -58,10 +58,10 @@ const modelNames = {
     'llama-3.3-70b-versatile': 'Llama 3.3 70B',
     'mixtral-8x7b-32768': 'Mixtral 8x7b',
     'gemma2-9b-it': 'Gemma 2 9B',
-    'gemini-2.0-flash-exp': 'Gemini 2.0 Flash',
-    'gemini-2.0-flash-thinking-exp': 'Gemini 2.0 Flash Thinking',
+    'gemini-1.5-flash': 'Gemini 1.5 Flash',
+    'gemini-1.5-flash-8b': 'Gemini 1.5 Flash 8B',
     'gemini-1.5-pro': 'Gemini 1.5 Pro',
-    'gemini-1.5-flash': 'Gemini 1.5 Flash'
+    'gemini-1.5-pro-001': 'Gemini 1.5 Pro 001'
 };
 
 const modelBadgeClasses = {
@@ -70,10 +70,10 @@ const modelBadgeClasses = {
     'llama-3.3-70b-versatile': 'groq',
     'mixtral-8x7b-32768': 'groq',
     'gemma2-9b-it': 'groq',
-    'gemini-2.0-flash-exp': 'gemini-flash',
-    'gemini-2.0-flash-thinking-exp': 'gemini-thinking',
+    'gemini-1.5-flash': 'gemini-flash',
+    'gemini-1.5-flash-8b': 'gemini',
     'gemini-1.5-pro': 'gemini-pro',
-    'gemini-1.5-flash': 'gemini'
+    'gemini-1.5-pro-001': 'gemini'
 };
 
 let currentProvider = 'glm';
@@ -111,7 +111,7 @@ async function loadSettings() {
             } else if (currentProvider === 'groq') {
                 defaultModel = 'llama-3.3-70b-versatile';
             } else if (currentProvider === 'gemini') {
-                defaultModel = 'gemini-2.0-flash-exp';
+                defaultModel = 'gemini-1.5-flash';
             }
             modelPreview.textContent = modelNames[defaultModel];
             updateModelBadge(defaultModel);
