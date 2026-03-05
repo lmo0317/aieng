@@ -106,7 +106,9 @@ app.get('/api/dev/user', (req, res) => {
 
 app.get('/api/user', (req, res) => {
     // Check both passport session and custom session
-    const user = req.user || req.session?.user;
+    const user = req.user || (req.session && req.session.user);
+
+    console.log('/api/user - req.user:', req.user, 'req.session.user:', req.session ? req.session.user : 'no session');
 
     if (user) {
         res.json({ loggedIn: true, user: user });
@@ -285,11 +287,17 @@ app.get('/api/usage', async (req, res) => {
 
 // Settings API endpoints
 app.get('/api/settings', (req, res) => {
-    if (!req.isAuthenticated()) {
+    // Check both passport and custom session
+    const user = req.user || (req.session && req.session.user);
+
+    if (!user) {
+        console.log('/api/settings - Unauthorized: no user found');
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    db.get("SELECT glmApiKey, glmModel FROM settings WHERE userId = ?", [req.user.id], (err, row) => {
+    console.log('/api/settings - User:', user.id);
+
+    db.get("SELECT glmApiKey, glmModel FROM settings WHERE userId = ?", [user.id], (err, row) => {
         if (err) return res.status(500).json({ error: err.message });
 
         res.json({
@@ -301,15 +309,19 @@ app.get('/api/settings', (req, res) => {
 });
 
 app.post('/api/settings', (req, res) => {
-    if (!req.isAuthenticated()) {
+    // Check both passport and custom session
+    const user = req.user || (req.session && req.session.user);
+
+    if (!user) {
+        console.log('POST /api/settings - Unauthorized: no user found');
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const { glmApiKey, glmModel } = req.body;
 
-    console.log('POST /api/settings - User:', req.user.id, 'Body:', { glmApiKey: glmApiKey ? '***' : undefined, glmModel });
+    console.log('POST /api/settings - User:', user.id, 'Body:', { glmApiKey: glmApiKey ? '***' : undefined, glmModel });
 
-    db.get("SELECT * FROM settings WHERE userId = ?", [req.user.id], (err, row) => {
+    db.get("SELECT * FROM settings WHERE userId = ?", [user.id], (err, row) => {
         if (err) {
             console.error('DB GET Error:', err);
             return res.status(500).json({ error: err.message });
@@ -338,7 +350,7 @@ app.post('/api/settings', (req, res) => {
             return res.status(400).json({ error: '업데이트할 항목이 없습니다.' });
         }
 
-        values.push(req.user.id);
+        values.push(user.id);
 
         if (row) {
             // Update existing
@@ -358,7 +370,7 @@ app.post('/api/settings', (req, res) => {
                 return res.status(400).json({ error: 'API Key를 입력해주세요.' });
             }
             const sql = "INSERT INTO settings (userId, glmApiKey, glmModel) VALUES (?, ?, ?)";
-            const insertValues = [req.user.id, glmApiKey.trim(), glmModel || 'claude-3-5-sonnet-20240620'];
+            const insertValues = [user.id, glmApiKey.trim(), glmModel || 'claude-3-5-sonnet-20240620'];
             console.log('Insert SQL:', sql, 'Values:', [insertValues[0], '***', insertValues[2]]);
             db.run(sql, insertValues, function(insertErr) {
                 if (insertErr) {
@@ -373,11 +385,14 @@ app.post('/api/settings', (req, res) => {
 });
 
 app.delete('/api/settings', (req, res) => {
-    if (!req.isAuthenticated()) {
+    // Check both passport and custom session
+    const user = req.user || (req.session && req.session.user);
+
+    if (!user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    db.run("DELETE FROM settings WHERE userId = ?", [req.user.id], (err) => {
+    db.run("DELETE FROM settings WHERE userId = ?", [user.id], (err) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ success: true, message: 'API Key가 삭제되었습니다.' });
     });
