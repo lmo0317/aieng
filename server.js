@@ -284,14 +284,14 @@ function generatePrompt(topic, difficulty) {
       {
         "en": "I love coding in JavaScript because it is versatile.",
         "ko": "나는 자바스크립트로 코딩하는 것을 좋아합니다.\\n왜냐하면 그것은 다재다능하기 때문입니다.",
-        "analysis": "I(주어) / love(동사, 현재시제) / coding(동명사, 목적어) / in(전치사) / JavaScript(명사) / because(접속사) / it(주어) / is(be동사, 현재시제) / versatile(형용사 보어)\\n🎯 핵심 문법: 접속사 because로 연결된 복합 문장\\n이 문장은 접속사 because로 연결된 두 개의 독립절입니다.\\n\\n[첫 번째 절]\\n주어: I / 동사: love(현재시제 일반동사) / 목적어: coding(동명사)\\n\\n[두 번째 절]\\n주어: it / 동사: is(be동사 현재형) / 보어: versatile(it의 상태를 설명)\\n\\n전체 문장은 현재시제 능동태 평서문입니다.",
+        "analysis": "I(주어) / love(동사, 현재시제) / coding(동명사, 목적어) / in(전치사) / JavaScript(목적어) / because(접속사) / it(주어) / is(be동사, 현재시제) / versatile(형용사 보어)\\n🎯 핵심 문법: 접속사 because로 연결된 복합문\\nbecause가 두 개의 독립절을 연결합니다.\\n\\n[절 1] 주어: I, 동사: love, 목적어: coding\\n[절 2] 주어: it, 동사: is, 보어: versatile\\n\\n형태: 현재시제, 능동태, 평서문",
         "voca": ["coding: 코딩, 프로그래밍", "versatile: 다재다능한, 다용도의"]
       },
       {
         "en": "Monkey D. Luffy has a unique ability to stretch his body.",
         "ko": "몽키 D. 루피는 자신의 몸을 늘릴 수 있는 특별한 능력을 가지고 있습니다.",
-        "analysis": "Monkey D. Luffy(주어, 고유명사) / has(동사, 현재시제, 3단일단수) / a(관형사) / unique(형용사) / ability(목적어) / to stretch(부정사, ability 수식) / his(소유격 형용사) / body(목적어)\\n🎯 핵심 문법: 3인칭 단수 주어와 일반동사의 수 일치\\nMonkey D. Luffy가 3인칭 단수 주어이므로 동사 has가 3단일 형태로 쓰였습니다.\\n\\n[문장 구조]\\n주어: Monkey D. Luffy / 동사: has(가지고 있다) / 목적어: ability(능력)\\n\\nto stretch(늘리기 위해)는 부정사구로 ability를 수식합니다. stretch의 목적어는 his body(그의 몸)입니다.\\n\\n이 문장은 현재시제 능동태 평서문입니다.",
-        "voca": ["unique: 독특한, 유일한", "ability: 능력", "stretch: 늘리다, 펴다", "body: 몸, 신체"]
+        "analysis": "Monkey D. Luffy(주어) / has(동사, 현재시제, 3인칭단수) / a(관형사) / unique(형용사) / ability(목적어) / to stretch(부정사) / his(소유격) / body(목적어)\\n🎯 핵심 문법: 3인칭 단수 주어와 동사의 수 일치\\nMonkey D. Luffy는 3인칭 단수 주어이므로 동사 has가 단수형태로 쓰였습니다.\\n\\n[문장 구조]\\n주어: Monkey D. Luffy / 동사: has / 목적어: ability\\n수식어구: to stretch his body (부정사구)\\n\\n형태: 현재시제, 능동태, 평서문",
+        "voca": ["unique: 독특한, 유일한", "ability: 능력", "stretch: 늘리다, 펴다"]
       }
     ]
     `;
