@@ -17,13 +17,15 @@ app.use(express.static(path.join(__dirname)));
 // Helper function to get global settings
 async function getGlobalSettings() {
     return new Promise((resolve, reject) => {
-        db.get("SELECT glmApiKey, glmModel, groqApiKey, groqModel, provider FROM global_settings WHERE id = 1", (err, row) => {
+        db.get("SELECT glmApiKey, glmModel, groqApiKey, groqModel, geminiApiKey, geminiModel, provider FROM global_settings WHERE id = 1", (err, row) => {
             if (err) reject(err);
             else resolve({
                 glmApiKey: row?.glmApiKey || process.env.GLM_API_KEY,
                 glmModel: row?.glmModel || 'glm-4.7-flash',
                 groqApiKey: row?.groqApiKey || process.env.GROQ_API_KEY,
                 groqModel: row?.groqModel || 'llama-3.3-70b-versatile',
+                geminiApiKey: row?.geminiApiKey || process.env.GEMINI_API_KEY,
+                geminiModel: row?.geminiModel || 'gemini-2.0-flash-exp',
                 provider: row?.provider || 'glm'
             });
         });
@@ -32,7 +34,7 @@ async function getGlobalSettings() {
 
 // Global Settings API endpoints
 app.get('/api/settings', (req, res) => {
-    db.get("SELECT glmApiKey, glmModel, groqApiKey, groqModel, provider FROM global_settings WHERE id = 1", (err, row) => {
+    db.get("SELECT glmApiKey, glmModel, groqApiKey, groqModel, geminiApiKey, geminiModel, provider FROM global_settings WHERE id = 1", (err, row) => {
         if (err) return res.status(500).json({ error: err.message });
 
         const provider = row?.provider || 'glm';
@@ -46,6 +48,10 @@ app.get('/api/settings', (req, res) => {
             hasApiKey = !!row?.groqApiKey;
             apiKeyPreview = row?.groqApiKey;
             model = row?.groqModel;
+        } else if (provider === 'gemini') {
+            hasApiKey = !!row?.geminiApiKey;
+            apiKeyPreview = row?.geminiApiKey;
+            model = row?.geminiModel;
         }
 
         res.json({
@@ -54,13 +60,14 @@ app.get('/api/settings', (req, res) => {
             apiKeyPreview: apiKeyPreview || null,
             model,
             glmModel: row?.glmModel || 'glm-4.7-flash',
-            groqModel: row?.groqModel || 'llama-3.3-70b-versatile'
+            groqModel: row?.groqModel || 'llama-3.3-70b-versatile',
+            geminiModel: row?.geminiModel || 'gemini-2.0-flash-exp'
         });
     });
 });
 
 app.post('/api/settings', (req, res) => {
-    const { glmApiKey, glmModel, groqApiKey, groqModel, provider } = req.body;
+    const { glmApiKey, glmModel, groqApiKey, groqModel, geminiApiKey, geminiModel, provider } = req.body;
 
     const updates = [];
     const values = [];
@@ -97,8 +104,24 @@ app.post('/api/settings', (req, res) => {
         values.push(groqModel);
     }
 
+    if (geminiApiKey !== undefined) {
+        if (!geminiApiKey || typeof geminiApiKey !== 'string' || geminiApiKey.trim().length === 0) {
+            return res.status(400).json({ error: '유효한 Gemini API Key를 입력해주세요.' });
+        }
+        updates.push('geminiApiKey = ?');
+        values.push(geminiApiKey.trim());
+    }
+
+    if (geminiModel !== undefined) {
+        if (!['gemini-2.0-flash-exp', 'gemini-2.0-flash-thinking-exp', 'gemini-1.5-pro', 'gemini-1.5-flash'].includes(geminiModel)) {
+            return res.status(400).json({ error: '유효하지 않은 Gemini 모델입니다.' });
+        }
+        updates.push('geminiModel = ?');
+        values.push(geminiModel);
+    }
+
     if (provider !== undefined) {
-        if (!['glm', 'groq'].includes(provider)) {
+        if (!['glm', 'groq', 'gemini'].includes(provider)) {
             return res.status(400).json({ error: '유효하지 않은 공급자입니다.' });
         }
         updates.push('provider = ?');
@@ -127,7 +150,7 @@ app.delete('/api/settings', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
 
         const provider = row?.provider || 'glm';
-        const column = provider === 'glm' ? 'glmApiKey' : 'groqApiKey';
+        const column = provider === 'glm' ? 'glmApiKey' : provider === 'groq' ? 'groqApiKey' : 'geminiApiKey';
 
         db.run(`UPDATE global_settings SET ${column} = NULL WHERE id = 1`, (err) => {
             if (err) return res.status(500).json({ error: err.message });
@@ -160,6 +183,22 @@ app.post('/api/generate', async (req, res) => {
             temperature: 0.7,
             max_tokens: 4096
         };
+    } else if (provider === 'gemini') {
+        API_KEY = settings.geminiApiKey;
+        MODEL = settings.geminiModel;
+        API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+        headers = {
+            "Content-Type": "application/json"
+        };
+        requestBody = {
+            contents: [{
+                parts: [{ text: generatePrompt(topic, difficulty) }]
+            }],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 4096
+            }
+        };
     } else {
         // Default to GLM
         API_KEY = settings.glmApiKey;
@@ -189,6 +228,8 @@ app.post('/api/generate', async (req, res) => {
         let content;
         if (provider === 'groq') {
             content = response.data.choices[0].message.content;
+        } else if (provider === 'gemini') {
+            content = response.data.candidates[0].content.parts[0].text;
         } else {
             content = response.data.content[0].text;
         }
@@ -306,6 +347,16 @@ app.get('/api/usage', async (req, res) => {
         if (provider === 'groq') {
             // Groq doesn't have a public usage API
             return res.json({
+                error: 'Groq는 사용량 확인 기능을 제공하지 않습니다.',
+                provider: 'groq'
+            });
+        } else if (provider === 'gemini') {
+            // Gemini doesn't have a simple public usage API
+            return res.json({
+                error: 'Gemini는 사용량 확인 기능을 제공하지 않습니다.',
+                provider: 'gemini'
+            });
+        } else {
                 error: 'Groq는 사용량 확인 기능을 제공하지 않습니다.',
                 provider: 'groq'
             });

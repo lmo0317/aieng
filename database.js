@@ -39,6 +39,12 @@ const db = new sqlite3.Database(dbPath, (err) => {
                         if (!columnNames.includes('provider')) {
                             migrations.push("ALTER TABLE global_settings ADD COLUMN provider TEXT DEFAULT 'glm'");
                         }
+                        if (!columnNames.includes('geminiApiKey')) {
+                            migrations.push("ALTER TABLE global_settings ADD COLUMN geminiApiKey TEXT");
+                        }
+                        if (!columnNames.includes('geminiModel')) {
+                            migrations.push("ALTER TABLE global_settings ADD COLUMN geminiModel TEXT DEFAULT 'gemini-2.0-flash-exp'");
+                        }
 
                         // Execute migrations sequentially, then insert default row
                         if (migrations.length > 0) {

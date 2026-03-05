@@ -200,6 +200,22 @@
     background-color: #f6ad55;
 }
 
+.model-badge.gemini-flash {
+    background-color: #4285f4;
+}
+
+.model-badge.gemini-thinking {
+    background-color: #9334e6;
+}
+
+.model-badge.gemini-pro {
+    background-color: #1a73e8;
+}
+
+.model-badge.gemini {
+    background-color: #5f6368;
+}
+
 .form-group input:focus,
 .form-group select:focus {
     outline: none;

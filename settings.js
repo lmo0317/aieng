@@ -36,6 +36,19 @@ const providerConfig = {
             { value: 'mixtral-8x7b-32768', label: 'Mixtral 8x7b' },
             { value: 'gemma2-9b-it', label: 'Gemma 2 9B' }
         ]
+    },
+    gemini: {
+        name: 'Gemini',
+        apiKeyLabel: 'Gemini API Key',
+        apiKeyPlaceholder: 'AIza...',
+        apiKeyHelp: 'API Key는 <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>에서 발급받을 수 있습니다.',
+        modelHelp: '💡 <strong>Gemini 2.0 Flash</strong>는 최신의 고성능 모델입니다.',
+        models: [
+            { value: 'gemini-2.0-flash-exp', label: 'Gemini 2.0 Flash (권장)' },
+            { value: 'gemini-2.0-flash-thinking-exp', label: 'Gemini 2.0 Flash Thinking' },
+            { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
+            { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' }
+        ]
     }
 };
 
@@ -44,7 +57,11 @@ const modelNames = {
     'glm-4.7': 'GLM-4.7',
     'llama-3.3-70b-versatile': 'Llama 3.3 70B',
     'mixtral-8x7b-32768': 'Mixtral 8x7b',
-    'gemma2-9b-it': 'Gemma 2 9B'
+    'gemma2-9b-it': 'Gemma 2 9B',
+    'gemini-2.0-flash-exp': 'Gemini 2.0 Flash',
+    'gemini-2.0-flash-thinking-exp': 'Gemini 2.0 Flash Thinking',
+    'gemini-1.5-pro': 'Gemini 1.5 Pro',
+    'gemini-1.5-flash': 'Gemini 1.5 Flash'
 };
 
 const modelBadgeClasses = {
@@ -52,7 +69,11 @@ const modelBadgeClasses = {
     'glm-4.7': 'glm',
     'llama-3.3-70b-versatile': 'groq',
     'mixtral-8x7b-32768': 'groq',
-    'gemma2-9b-it': 'groq'
+    'gemma2-9b-it': 'groq',
+    'gemini-2.0-flash-exp': 'gemini-flash',
+    'gemini-2.0-flash-thinking-exp': 'gemini-thinking',
+    'gemini-1.5-pro': 'gemini-pro',
+    'gemini-1.5-flash': 'gemini'
 };
 
 let currentProvider = 'glm';
