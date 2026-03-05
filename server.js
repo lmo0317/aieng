@@ -72,8 +72,8 @@ app.get('/auth/google/callback',
         res.redirect('/');
     });
 
-// Dev login (for testing without OAuth)
-app.get('/auth/dev', (req, res, next) => {
+// Dev login (for testing without OAuth) - simplified version
+app.get('/auth/dev', (req, res) => {
     const mockUser = {
         id: 'dev-user-123',
         name: '개발자',
@@ -81,10 +81,15 @@ app.get('/auth/dev', (req, res, next) => {
         picture: 'https://via.placeholder.com/50'
     };
 
-    // Log in the mock user
-    req.login(mockUser, (err) => {
-        if (err) return next(err);
-        return res.redirect('/');
+    // Set user in session directly
+    req.session.user = mockUser;
+    req.session.save((err) => {
+        if (err) {
+            console.error('Session save error:', err);
+            return res.status(500).send('Login failed');
+        }
+        console.log('Dev login successful for user:', mockUser.name);
+        res.redirect('/');
     });
 });
 
@@ -100,8 +105,11 @@ app.get('/api/dev/user', (req, res) => {
 });
 
 app.get('/api/user', (req, res) => {
-    if (req.isAuthenticated()) {
-        res.json({ loggedIn: true, user: req.user });
+    // Check both passport session and custom session
+    const user = req.user || req.session?.user;
+
+    if (user) {
+        res.json({ loggedIn: true, user: user });
     } else {
         res.json({ loggedIn: false });
     }
@@ -110,7 +118,12 @@ app.get('/api/user', (req, res) => {
 app.post('/api/logout', (req, res) => {
     req.logout((err) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ success: true });
+
+        // Also clear custom session
+        req.session.destroy((sessionErr) => {
+            if (sessionErr) console.error('Session destroy error:', sessionErr);
+            res.json({ success: true });
+        });
     });
 });
 
@@ -143,9 +156,11 @@ app.post('/api/generate', async (req, res) => {
     // Get API key for user
     let GLM_API_KEY;
     let GLM_MODEL;
-    if (req.isAuthenticated()) {
-        GLM_API_KEY = await getApiKeyForUser(req.user.id);
-        GLM_MODEL = await getModelForUser(req.user.id);
+    const user = req.user || req.session?.user;
+
+    if (user) {
+        GLM_API_KEY = await getApiKeyForUser(user.id);
+        GLM_MODEL = await getModelForUser(user.id);
     } else {
         GLM_API_KEY = process.env.GLM_API_KEY;
         GLM_MODEL = 'claude-3-5-sonnet-20240620';
@@ -212,8 +227,9 @@ app.post('/api/generate', async (req, res) => {
 
         const sentences = JSON.parse(content);
 
-        if (req.isAuthenticated()) {
-            const userId = req.user.id;
+        const user = req.user || req.session?.user;
+        if (user) {
+            const userId = user.id;
             const sentencesStr = JSON.stringify(sentences);
             db.get("SELECT * FROM progress WHERE userId = ?", [userId], (err, row) => {
                 if (!row) {
