@@ -26,6 +26,13 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 sentences TEXT,
                 FOREIGN KEY(userId) REFERENCES users(id)
             )`);
+
+            // Create Settings table
+            db.run(`CREATE TABLE IF NOT EXISTS settings (
+                userId TEXT PRIMARY KEY,
+                glmApiKey TEXT,
+                FOREIGN KEY(userId) REFERENCES users(id)
+            )`);
         });
     }
 });

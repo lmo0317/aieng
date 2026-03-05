@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설정 - AIEng</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ 설정</h1>
+            <a href="/" class="back-btn">← 홈으로</a>
+        </div>
+
+        <div class="settings-card">
+            <h2>API Key 설정</h2>
+            <p class="description">
+                z.ai API Key를 입력하면 AI 학습 기능을 사용할 수 있습니다.<br>
+                API Key는 안전하게 저장되며, 본인만 접근할 수 있습니다.
+            </p>
+
+            <div class="api-status" id="api-status">
+                <span class="status-indicator"></span>
+                <span class="status-text">확인 중...</span>
+            </div>
+
+            <form id="settings-form" class="settings-form">
+                <div class="form-group">
+                    <label for="api-key">z.ai API Key</label>
+                    <input
+                        type="password"
+                        id="api-key"
+                        placeholder="sk-..."
+                        autocomplete="off"
+                        required
+                    >
+                    <small class="help-text">
+                        API Key는 <a href="https://open.bigmodel.cn/usercenter/apikeys" target="_blank">z.ai 콘솔</a>에서 발급받을 수 있습니다.
+                    </small>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">저장</button>
+                    <button type="button" id="delete-btn" class="btn-danger hidden">API Key 삭제</button>
+                </div>
+            </form>
+
+            <div class="current-key-info hidden" id="current-key-info">
+                <p><strong>현재 설정된 API Key:</strong> <code id="key-preview"></code></p>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h3>ℹ️ 안내</h3>
+            <ul>
+                <li>API Key를 설정하면 환경 변수보다 우선적으로 적용됩니다.</li>
+                <li>API Key는 암호화되어 데이터베이스에 저장됩니다.</li>
+                <li>로그인한 사용자만 API Key를 설정할 수 있습니다.</li>
+                <li>API Key 삭제 시 환경 변수 설정으로 돌아갑니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="settings.js"></script>
+</body>
+
+</html>

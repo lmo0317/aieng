@@ -27,7 +27,7 @@ async function updateUsage() {
         let displayStr = '';
 
         function formatResetTime(timestamp) {
-            if (!timestamp) return '';
+            if (!timestamp) return ' | 갱신: -';
             const date = new Date(timestamp);
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');

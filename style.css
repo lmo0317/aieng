@@ -18,8 +18,25 @@ body {
     font-size: 0.85rem;
     font-weight: 500;
     border: 1px solid #bee3f8;
-    margin-bottom: 20px;
     line-height: 1.5;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.settings-link {
+    color: #4a5568;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
+
+.settings-link:hover {
+    color: #2d3748;
 }
 
 .container {

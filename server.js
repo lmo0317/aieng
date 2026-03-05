@@ -88,13 +88,34 @@ app.post('/api/logout', (req, res) => {
 });
 
 
-const GLM_API_KEY = process.env.GLM_API_KEY;
-
-// 사용자님의 로그에 확인된 Anthropic 호환 엔드포인트입니다.
 const GLM_API_URL = "https://api.z.ai/api/anthropic/v1/messages";
+
+// Helper function to get API key for a user
+async function getApiKeyForUser(userId) {
+    return new Promise((resolve, reject) => {
+        db.get("SELECT glmApiKey FROM settings WHERE userId = ?", [userId], (err, row) => {
+            if (err) reject(err);
+            else resolve(row ? row.glmApiKey : process.env.GLM_API_KEY);
+        });
+    });
+}
 
 app.post('/api/generate', async (req, res) => {
     const { topic, difficulty } = req.body;
+
+    // Get API key for user
+    let GLM_API_KEY;
+    if (req.isAuthenticated()) {
+        GLM_API_KEY = await getApiKeyForUser(req.user.id);
+    } else {
+        GLM_API_KEY = process.env.GLM_API_KEY;
+    }
+
+    if (!GLM_API_KEY) {
+        return res.status(400).json({
+            error: 'API Key가 설정되지 않았습니다. 설정 페이지에서 API Key를 입력해주세요.'
+        });
+    }
 
     const prompt = `
     주제: ${topic}
@@ -104,7 +125,7 @@ app.post('/api/generate', async (req, res) => {
     * level3: 중/고등학교 수준의 어휘, 수식어구 및 접속사가 포함된 꽤 긴 문장 (중급)
     * level4: 성인 영어 시험(TOEIC/IELTS) 수준의 고급 어휘와 복잡한 구조 (고급)
     * level5: 현지인이 자주 사용하는 관용구나 은유, 최상위 학술/전문 어휘가 포함된 복합 문장 (원어민 수준)
-    
+
     위 주제와 선택된 난이도 수준에 정확히 맞는 영어 문장 10개를 생성해 주세요.
     각 문장에 대해 다음 정보를 포함하는 JSON 배열 형식으로 응답해 주세요:
     1. "en": 영어 문장
@@ -179,6 +200,18 @@ app.post('/api/generate', async (req, res) => {
 
 app.get('/api/usage', async (req, res) => {
     try {
+        // Get API key for user
+        let GLM_API_KEY;
+        if (req.isAuthenticated()) {
+            GLM_API_KEY = await getApiKeyForUser(req.user.id);
+        } else {
+            GLM_API_KEY = process.env.GLM_API_KEY;
+        }
+
+        if (!GLM_API_KEY) {
+            return res.json({ error: 'API Key가 설정되지 않았습니다.' });
+        }
+
         const response = await axios.get(
             "https://api.z.ai/api/monitor/usage/quota/limit",
             {
@@ -193,6 +226,65 @@ app.get('/api/usage', async (req, res) => {
         console.error('Usage Fetch Error:', error.message);
         res.status(500).json({ error: 'Failed to fetch usage info' });
     }
+});
+
+// Settings API endpoints
+app.get('/api/settings', (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    db.get("SELECT glmApiKey FROM settings WHERE userId = ?", [req.user.id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        // Don't expose the full API key, just show if it's set
+        res.json({
+            hasApiKey: !!row?.glmApiKey,
+            // Only show first 8 and last 4 characters for verification
+            apiKeyPreview: row?.glmApiKey ? `${row.glmApiKey.substring(0, 8)}...${row.glmApiKey.substring(row.glmApiKey.length - 4)}` : null
+        });
+    });
+});
+
+app.post('/api/settings', (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { glmApiKey } = req.body;
+
+    if (!glmApiKey || typeof glmApiKey !== 'string' || glmApiKey.trim().length === 0) {
+        return res.status(400).json({ error: '유효한 API Key를 입력해주세요.' });
+    }
+
+    db.get("SELECT * FROM settings WHERE userId = ?", [req.user.id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (row) {
+            // Update existing
+            db.run("UPDATE settings SET glmApiKey = ? WHERE userId = ?", [glmApiKey.trim(), req.user.id], (updateErr) => {
+                if (updateErr) return res.status(500).json({ error: updateErr.message });
+                res.json({ success: true, message: 'API Key가 업데이트되었습니다.' });
+            });
+        } else {
+            // Insert new
+            db.run("INSERT INTO settings (userId, glmApiKey) VALUES (?, ?)", [req.user.id, glmApiKey.trim()], (insertErr) => {
+                if (insertErr) return res.status(500).json({ error: insertErr.message });
+                res.json({ success: true, message: 'API Key가 저장되었습니다.' });
+            });
+        }
+    });
+});
+
+app.delete('/api/settings', (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    db.run("DELETE FROM settings WHERE userId = ?", [req.user.id], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, message: 'API Key가 삭제되었습니다.' });
+    });
 });
 
 app.get('/api/progress', (req, res) => {
