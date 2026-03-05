@@ -72,6 +72,33 @@ app.get('/auth/google/callback',
         res.redirect('/');
     });
 
+// Dev login (for testing without OAuth)
+app.get('/auth/dev', (req, res) => {
+    const mockUser = {
+        id: 'dev-user-123',
+        name: '개발자',
+        email: 'dev@example.com',
+        picture: 'https://via.placeholder.com/50'
+    };
+
+    // Log in the mock user
+    req.login(mockUser, (err) => {
+        if (err) return next(err);
+        return res.redirect('/');
+    });
+});
+
+app.get('/api/dev/user', (req, res) => {
+    res.json({
+        loggedIn: true,
+        user: {
+            id: 'dev-user-123',
+            name: '개발자',
+            email: 'dev@example.com'
+        }
+    });
+});
+
 app.get('/api/user', (req, res) => {
     if (req.isAuthenticated()) {
         res.json({ loggedIn: true, user: req.user });

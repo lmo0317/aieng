@@ -62,6 +62,18 @@ body {
     color: #3182ce;
 }
 
+.dev-login-link {
+    color: #e53e3e;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.2s;
+    font-weight: 500;
+}
+
+.dev-login-link:hover {
+    color: #c53030;
+}
+
 .container {
     position: relative;
     background-color: #fff;
