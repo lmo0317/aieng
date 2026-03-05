@@ -73,7 +73,7 @@ app.get('/auth/google/callback',
     });
 
 // Dev login (for testing without OAuth)
-app.get('/auth/dev', (req, res) => {
+app.get('/auth/dev', (req, res, next) => {
     const mockUser = {
         id: 'dev-user-123',
         name: '개발자',
