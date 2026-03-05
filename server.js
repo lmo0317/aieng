@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'secret_key_5tak9eng',
+    secret: process.env.SESSION_SECRET || 'secret_key_aieng',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false } // HTTPS환경이라면 true로 설정
