@@ -27,7 +27,7 @@ async function loadSettings() {
             statusIndicator.classList.add('active');
             statusText.textContent = 'API Key가 설정됨';
             currentKeyInfo.classList.remove('hidden');
-            keyPreview.textContent = data.apiKeyPreview;
+            keyPreview.textContent = data.apiKeyPreview; // 서버에서 전체 키를 보내줌
             deleteBtn.classList.remove('hidden');
         } else {
             statusIndicator.classList.remove('inactive');
