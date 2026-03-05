@@ -11,28 +11,66 @@ const modelPreview = document.getElementById('model-preview');
 const currentModelBadge = document.getElementById('current-model-badge');
 const toast = document.getElementById('toast');
 const usageInfo = document.getElementById('usage-info');
+const providerTabs = document.querySelectorAll('.provider-tab');
+
+const providerConfig = {
+    glm: {
+        name: 'z.ai (GLM)',
+        apiKeyLabel: 'z.ai API Key',
+        apiKeyPlaceholder: 'sk-...',
+        apiKeyHelp: 'API Key는 <a href="https://open.bigmodel.cn/usercenter/apikeys" target="_blank">z.ai 콘솔</a>에서 발급받을 수 있습니다.',
+        modelHelp: '💡 <strong>GLM-4.7-Flash</strong>는 무료로 사용할 수 있는 모델입니다.',
+        models: [
+            { value: 'glm-4.7-flash', label: 'GLM-4.7-Flash (무료, 권장)' },
+            { value: 'glm-4.7', label: 'GLM-4.7' }
+        ]
+    },
+    groq: {
+        name: 'Groq',
+        apiKeyLabel: 'Groq API Key',
+        apiKeyPlaceholder: 'gsk_...',
+        apiKeyHelp: 'API Key는 <a href="https://console.groq.com/keys" target="_blank">Groq 콘솔</a>에서 발급받을 수 있습니다.',
+        modelHelp: '💡 Groq는 매우 빠른 추론 속도를 제공합니다.',
+        models: [
+            { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (권장)' },
+            { value: 'mixtral-8x7b-32768', label: 'Mixtral 8x7b' },
+            { value: 'gemma2-9b-it', label: 'Gemma 2 9B' }
+        ]
+    }
+};
 
 const modelNames = {
     'glm-4.7-flash': 'GLM-4.7-Flash (무료)',
-    'glm-4.7': 'GLM-4.7'
+    'glm-4.7': 'GLM-4.7',
+    'llama-3.3-70b-versatile': 'Llama 3.3 70B',
+    'mixtral-8x7b-32768': 'Mixtral 8x7b',
+    'gemma2-9b-it': 'Gemma 2 9B'
 };
 
 const modelBadgeClasses = {
     'glm-4.7-flash': 'flash',
-    'glm-4.7': 'glm'
+    'glm-4.7': 'glm',
+    'llama-3.3-70b-versatile': 'groq',
+    'mixtral-8x7b-32768': 'groq',
+    'gemma2-9b-it': 'groq'
 };
+
+let currentProvider = 'glm';
 
 async function loadSettings() {
     try {
         const response = await fetch('/api/settings');
         const data = await response.json();
 
+        currentProvider = data.provider || 'glm';
+        updateProviderUI(currentProvider);
+
         if (data.hasApiKey) {
             statusIndicator.classList.remove('inactive');
             statusIndicator.classList.add('active');
             statusText.textContent = 'API Key가 설정됨';
             currentKeyInfo.classList.remove('hidden');
-            keyPreview.textContent = data.apiKeyPreview; // 서버에서 전체 키를 보내줌
+            keyPreview.textContent = data.apiKeyPreview;
             deleteBtn.classList.remove('hidden');
         } else {
             statusIndicator.classList.remove('inactive');
@@ -46,8 +84,14 @@ async function loadSettings() {
             modelPreview.textContent = modelNames[data.model] || data.model;
             updateModelBadge(data.model);
         } else {
-            modelPreview.textContent = modelNames['glm-4.7-flash'];
-            updateModelBadge('glm-4.7-flash');
+            let defaultModel;
+            if (currentProvider === 'glm') {
+                defaultModel = 'glm-4.7-flash';
+            } else if (currentProvider === 'groq') {
+                defaultModel = 'llama-3.3-70b-versatile';
+            }
+            modelPreview.textContent = modelNames[defaultModel];
+            updateModelBadge(defaultModel);
         }
     } catch (error) {
         console.error('Failed to load settings:', error);
@@ -63,6 +107,11 @@ async function loadUsage() {
 
         if (data.error) {
             usageInfo.textContent = data.error;
+            return;
+        }
+
+        if (data.provider === 'groq') {
+            usageInfo.textContent = 'Groq는 사용량 확인 기능을 제공하지 않습니다.';
             return;
         }
 
@@ -127,6 +176,47 @@ async function loadUsage() {
     }
 }
 
+function updateProviderUI(provider) {
+    const config = providerConfig[provider];
+
+    // Update tab styles
+    providerTabs.forEach(tab => {
+        if (tab.dataset.provider === provider) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+
+    // Update form labels and help text
+    document.getElementById('api-key-label').textContent = config.apiKeyLabel;
+    apiKeyInput.placeholder = config.apiKeyPlaceholder;
+    document.getElementById('api-key-help').innerHTML = config.apiKeyHelp;
+    document.getElementById('model-help').innerHTML = config.modelHelp;
+
+    // Update model options
+    modelSelect.innerHTML = config.models.map(model =>
+        `<option value="${model.value}">${model.label}</option>`
+    ).join('');
+
+    // Clear input and hide current key info
+    apiKeyInput.value = '';
+    currentKeyInfo.classList.add('hidden');
+    deleteBtn.classList.add('hidden');
+}
+
+// Provider tab click handlers
+providerTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const newProvider = tab.dataset.provider;
+        currentProvider = newProvider;
+        updateProviderUI(newProvider);
+        statusIndicator.classList.remove('active');
+        statusIndicator.classList.add('inactive');
+        statusText.textContent = 'API Key가 설정되지 않음';
+    });
+});
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -138,16 +228,22 @@ form.addEventListener('submit', async (e) => {
         return;
     }
 
+    const requestBody = { provider: currentProvider };
+    if (currentProvider === 'glm') {
+        requestBody.glmApiKey = apiKey;
+        requestBody.glmModel = model;
+    } else if (currentProvider === 'groq') {
+        requestBody.groqApiKey = apiKey;
+        requestBody.groqModel = model;
+    }
+
     try {
         const response = await fetch('/api/settings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                glmApiKey: apiKey,
-                glmModel: model
-            })
+            body: JSON.stringify(requestBody)
         });
 
         const data = await response.json();
