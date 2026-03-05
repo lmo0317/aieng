@@ -13,13 +13,13 @@ const db = new sqlite3.Database(dbPath, (err) => {
             db.run(`CREATE TABLE IF NOT EXISTS global_settings (
                 id INTEGER PRIMARY KEY CHECK (id = 1),
                 glmApiKey TEXT,
-                glmModel TEXT DEFAULT 'claude-3-5-sonnet-20240620'
+                glmModel TEXT DEFAULT 'glm-4.7-flash'
             )`, (err) => {
                 if (err) {
                     console.error('Error creating global_settings table:', err.message);
                 } else {
                     // Insert default row if not exists
-                    db.run(`INSERT OR IGNORE INTO global_settings (id) VALUES (1)`);
+                    db.run(`INSERT OR IGNORE INTO global_settings (id, glmModel) VALUES (1, 'glm-4.7-flash')`);
                 }
             });
 
