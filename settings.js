@@ -110,6 +110,8 @@ async function loadSettings() {
                 defaultModel = 'glm-4.7-flash';
             } else if (currentProvider === 'groq') {
                 defaultModel = 'llama-3.3-70b-versatile';
+            } else if (currentProvider === 'gemini') {
+                defaultModel = 'gemini-2.0-flash-exp';
             }
             modelPreview.textContent = modelNames[defaultModel];
             updateModelBadge(defaultModel);
@@ -133,6 +135,11 @@ async function loadUsage() {
 
         if (data.provider === 'groq') {
             usageInfo.textContent = 'Groq는 사용량 확인 기능을 제공하지 않습니다.';
+            return;
+        }
+
+        if (data.provider === 'gemini') {
+            usageInfo.textContent = 'Gemini는 사용량 확인 기능을 제공하지 않습니다.';
             return;
         }
 
@@ -256,6 +263,9 @@ form.addEventListener('submit', async (e) => {
     } else if (currentProvider === 'groq') {
         requestBody.groqApiKey = apiKey;
         requestBody.groqModel = model;
+    } else if (currentProvider === 'gemini') {
+        requestBody.geminiApiKey = apiKey;
+        requestBody.geminiModel = model;
     }
 
     try {
