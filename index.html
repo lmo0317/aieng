@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5tak9Eng - 영어 공부 프로젝트</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div id="usage-info" class="usage-badge">API 사용량 확인 중...</div>
+        <h1>5tak9Eng 📚</h1>
+        <p>좋아하는 주제를 입력하고 난이도를 선택해 보세요!</p>
+
+        <div class="setup-section">
+            <input type="text" id="topic" placeholder="예: 축구, 여행, 요리, 인공지능">
+            <select id="difficulty">
+                <option value="level1">레벨 1 (Level 1 - 왕초보)</option>
+                <option value="level2">레벨 2 (Level 2 - 초보)</option>
+                <option value="level3" selected>레벨 3 (Level 3 - 중급)</option>
+                <option value="level4">레벨 4 (Level 4 - 고급)</option>
+                <option value="level5">레벨 5 (Level 5 - 원어민 수준)</option>
+            </select>
+            <button id="start-btn">학습 시작</button>
+        </div>
+
+        <div id="learning-section" class="hidden">
+            <div class="progress">오늘의 학습: <span id="current-count">0</span> / 10</div>
+            <div id="content-card" class="card">
+                <div class="english-sentence" id="sentence-en">문장을 불러오는 중...</div>
+                <div class="korean-sentence hidden" id="sentence-ko"></div>
+                <div class="analysis-section hidden" id="analysis"></div>
+                <div class="voca-section hidden" id="voca"></div>
+            </div>
+            <div class="controls">
+                <button id="reveal-btn">정답 및 분석 보기</button>
+                <button id="next-btn" class="hidden">다음 문장</button>
+                <button id="finish-btn" class="hidden">오늘의 학습 완료!</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
