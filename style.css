@@ -1,46 +1,10 @@
-body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    margin: 0;
-    padding-top: 50px;
-    color: #333;
-}
-
 .header-section {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 15px;
     margin-bottom: 20px;
 }
 
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.user-name {
-    font-weight: 500;
-    color: #2d3748;
-}
-
-.logout-btn {
-    padding: 5px 15px;
-    font-size: 0.9rem;
-    background-color: #e2e8f0;
-    color: #4a5568;
-}
-
-.logout-btn:hover {
-    background-color: #cbd5e0;
-}
-
-.login-link,
 .settings-link {
     color: #4a5568;
     text-decoration: none;
@@ -48,30 +12,8 @@ body {
     transition: color 0.2s;
 }
 
-.login-link {
-    color: #4299e1;
-    font-weight: 500;
-}
-
-.login-link:hover,
 .settings-link:hover {
     color: #2d3748;
-}
-
-.login-link:hover {
-    color: #3182ce;
-}
-
-.dev-login-link {
-    color: #e53e3e;
-    text-decoration: none;
-    font-size: 1rem;
-    transition: color 0.2s;
-    font-weight: 500;
-}
-
-.dev-login-link:hover {
-    color: #c53030;
 }
 
 .container {

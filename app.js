@@ -12,45 +12,7 @@ const currentCountSpan = document.getElementById('current-count');
 const sentenceEn = document.getElementById('sentence-en');
 const sentenceKo = document.getElementById('sentence-ko');
 const analysisDiv = document.getElementById('analysis');
-
 const vocaDiv = document.getElementById('voca');
-
-const userInfo = document.getElementById('user-info');
-const userName = document.getElementById('user-name');
-const loginLink = document.getElementById('login-link');
-const logoutBtn = document.getElementById('logout-btn');
-
-// Check login status
-async function checkLoginStatus() {
-    try {
-        const response = await fetch('/api/user');
-        const data = await response.json();
-
-        if (data.loggedIn) {
-            userInfo.classList.remove('hidden');
-            loginLink.classList.add('hidden');
-            userName.textContent = `${data.user.name}님`;
-        } else {
-            userInfo.classList.add('hidden');
-            loginLink.classList.remove('hidden');
-        }
-    } catch (error) {
-        console.error('Failed to check login status:', error);
-    }
-}
-
-// Logout
-logoutBtn.addEventListener('click', async () => {
-    try {
-        await fetch('/api/logout', { method: 'POST' });
-        window.location.reload();
-    } catch (error) {
-        console.error('Logout failed:', error);
-    }
-});
-
-// Initial login check
-checkLoginStatus();
 
 startBtn.addEventListener('click', async () => {
     const topic = document.getElementById('topic').value;
@@ -114,7 +76,6 @@ function showSentence() {
 }
 
 function formatAnalysis(analysis) {
-    // LLM이 줄바꿈으로 준 내용을 HTML로 변환
     return analysis.replace(/\n/g, '<br>');
 }
 

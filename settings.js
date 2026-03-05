@@ -11,37 +11,15 @@ const modelPreview = document.getElementById('model-preview');
 const toast = document.getElementById('toast');
 const usageInfo = document.getElementById('usage-info');
 
-// Model display names
 const modelNames = {
     'claude-3-5-sonnet-20240620': 'Claude 3.5 Sonnet (기본)',
     'glm-4.7-flash': 'GLM-4.7-Flash (무료)',
     'glm-4.7': 'GLM-4.7'
 };
 
-// Load current settings on page load
 async function loadSettings() {
     try {
-        // First check if user is logged in
-        const userResponse = await fetch('/api/user');
-        const userData = await userResponse.json();
-
-        if (!userData.loggedIn) {
-            // User is not logged in
-            statusIndicator.classList.add('inactive');
-            statusText.textContent = '로그인이 필요합니다';
-            currentKeyInfo.innerHTML = '<p>⚠️ 설정을 사용하려면 먼저 <a href="/">Google 로그인</a>이 필요합니다.</p>';
-            currentKeyInfo.classList.remove('hidden');
-            form.style.display = 'none';
-            return;
-        }
-
         const response = await fetch('/api/settings');
-
-        if (response.status === 401) {
-            window.location.href = '/';
-            return;
-        }
-
         const data = await response.json();
 
         if (data.hasApiKey) {
@@ -71,7 +49,6 @@ async function loadSettings() {
     }
 }
 
-// Load usage information
 async function loadUsage() {
     try {
         const response = await fetch('/api/usage');
@@ -149,8 +126,8 @@ form.addEventListener('submit', async (e) => {
     const apiKey = apiKeyInput.value.trim();
     const model = modelSelect.value;
 
-    if (!apiKey && modelSelect.value === 'claude-3-5-sonnet-20240620') {
-        showToast('변경할 설정이 없습니다', 'error');
+    if (!apiKey) {
+        showToast('API Key를 입력해주세요', 'error');
         return;
     }
 
@@ -161,7 +138,7 @@ form.addEventListener('submit', async (e) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                glmApiKey: apiKey || undefined,
+                glmApiKey: apiKey,
                 glmModel: model
             })
         });
@@ -216,6 +193,5 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Initial load
 loadSettings();
 loadUsage();

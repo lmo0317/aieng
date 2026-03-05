@@ -3,9 +3,6 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
-const session = require('express-session');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('./database');
 
 dotenv.config();
@@ -17,156 +14,87 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'secret_key_aieng',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false } // HTTPS환경이라면 true로 설정
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser((user, done) => {
-    done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-    db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
-        done(err, row);
-    });
-});
-
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || 'your-client-id',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-client-secret',
-    callbackURL: "/auth/google/callback"
-},
-    (accessToken, refreshToken, profile, done) => {
-        const { id, displayName, emails, photos } = profile;
-        const email = emails && emails.length > 0 ? emails[0].value : '';
-        const picture = photos && photos.length > 0 ? photos[0].value : '';
-
-        db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
-            if (err) return done(err);
-            if (!row) {
-                db.run("INSERT INTO users (id, name, email, picture) VALUES (?, ?, ?, ?)",
-                    [id, displayName, email, picture], (insertErr) => {
-                        if (insertErr) return done(insertErr);
-                        return done(null, { id, name: displayName, email, picture });
-                    });
-            } else {
-                return done(null, row);
-            }
+// Helper function to get global settings
+async function getGlobalSettings() {
+    return new Promise((resolve, reject) => {
+        db.get("SELECT glmApiKey, glmModel FROM global_settings WHERE id = 1", (err, row) => {
+            if (err) reject(err);
+            else resolve({
+                apiKey: row?.glmApiKey || process.env.GLM_API_KEY,
+                model: row?.glmModel || 'claude-3-5-sonnet-20240620'
+            });
         });
-    }
-));
-
-// Auth Routes
-app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
-    (req, res) => {
-        res.redirect('/');
     });
+}
 
-// Dev login (for testing without OAuth) - simplified version
-app.get('/auth/dev', (req, res) => {
-    const mockUser = {
-        id: 'dev-user-123',
-        name: '개발자',
-        email: 'dev@example.com',
-        picture: 'https://via.placeholder.com/50'
-    };
-
-    // Set user in session directly
-    req.session.user = mockUser;
-    req.session.save((err) => {
-        if (err) {
-            console.error('Session save error:', err);
-            return res.status(500).send('Login failed');
-        }
-        console.log('Dev login successful for user:', mockUser.name);
-        res.redirect('/');
-    });
-});
-
-app.get('/api/dev/user', (req, res) => {
-    res.json({
-        loggedIn: true,
-        user: {
-            id: 'dev-user-123',
-            name: '개발자',
-            email: 'dev@example.com'
-        }
-    });
-});
-
-app.get('/api/user', (req, res) => {
-    // Check both passport session and custom session
-    const user = req.user || (req.session && req.session.user);
-
-    console.log('/api/user - req.user:', req.user, 'req.session.user:', req.session ? req.session.user : 'no session');
-
-    if (user) {
-        res.json({ loggedIn: true, user: user });
-    } else {
-        res.json({ loggedIn: false });
-    }
-});
-
-app.post('/api/logout', (req, res) => {
-    req.logout((err) => {
+// Global Settings API endpoints
+app.get('/api/settings', (req, res) => {
+    db.get("SELECT glmApiKey, glmModel FROM global_settings WHERE id = 1", (err, row) => {
         if (err) return res.status(500).json({ error: err.message });
 
-        // Also clear custom session
-        req.session.destroy((sessionErr) => {
-            if (sessionErr) console.error('Session destroy error:', sessionErr);
-            res.json({ success: true });
+        res.json({
+            hasApiKey: !!row?.glmApiKey,
+            apiKeyPreview: row?.glmApiKey ? `${row.glmApiKey.substring(0, 8)}...${row.glmApiKey.substring(row.glmApiKey.length - 4)}` : null,
+            model: row?.glmModel || 'claude-3-5-sonnet-20240620'
         });
     });
 });
 
+app.post('/api/settings', (req, res) => {
+    const { glmApiKey, glmModel } = req.body;
 
-const GLM_API_URL = "https://api.z.ai/api/anthropic/v1/messages";
+    const updates = [];
+    const values = [];
 
-// Helper function to get API key for a user
-async function getApiKeyForUser(userId) {
-    return new Promise((resolve, reject) => {
-        db.get("SELECT glmApiKey FROM settings WHERE userId = ?", [userId], (err, row) => {
-            if (err) reject(err);
-            else resolve(row ? row.glmApiKey : process.env.GLM_API_KEY);
-        });
+    if (glmApiKey !== undefined) {
+        if (!glmApiKey || typeof glmApiKey !== 'string' || glmApiKey.trim().length === 0) {
+            return res.status(400).json({ error: '유효한 API Key를 입력해주세요.' });
+        }
+        updates.push('glmApiKey = ?');
+        values.push(glmApiKey.trim());
+    }
+
+    if (glmModel !== undefined) {
+        if (!['claude-3-5-sonnet-20240620', 'glm-4.7-flash', 'glm-4.7'].includes(glmModel)) {
+            return res.status(400).json({ error: '유효하지 않은 모델입니다.' });
+        }
+        updates.push('glmModel = ?');
+        values.push(glmModel);
+    }
+
+    if (updates.length === 0) {
+        return res.status(400).json({ error: '업데이트할 항목이 없습니다.' });
+    }
+
+    values.push(1); // id = 1 for global settings
+
+    const sql = `UPDATE global_settings SET ${updates.join(', ')} WHERE id = ?`;
+    db.run(sql, values, function(updateErr) {
+        if (updateErr) {
+            console.error('DB UPDATE Error:', updateErr);
+            return res.status(500).json({ error: updateErr.message });
+        }
+        console.log('Global settings updated successfully');
+        res.json({ success: true, message: '설정이 저장되었습니다.' });
     });
-}
+});
 
-// Helper function to get model for a user
-async function getModelForUser(userId) {
-    return new Promise((resolve, reject) => {
-        db.get("SELECT glmModel FROM settings WHERE userId = ?", [userId], (err, row) => {
-            if (err) reject(err);
-            else resolve(row ? row.glmModel : 'claude-3-5-sonnet-20240620');
-        });
+app.delete('/api/settings', (req, res) => {
+    db.run("UPDATE global_settings SET glmApiKey = NULL WHERE id = 1", (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, message: 'API Key가 삭제되었습니다.' });
     });
-}
+});
 
+// Generate API
 app.post('/api/generate', async (req, res) => {
     const { topic, difficulty } = req.body;
 
-    // Get API key for user
-    let GLM_API_KEY;
-    let GLM_MODEL;
-    const user = req.user || req.session?.user;
-
-    if (user) {
-        GLM_API_KEY = await getApiKeyForUser(user.id);
-        GLM_MODEL = await getModelForUser(user.id);
-    } else {
-        GLM_API_KEY = process.env.GLM_API_KEY;
-        GLM_MODEL = 'claude-3-5-sonnet-20240620';
-    }
+    // Get global settings
+    const settings = await getGlobalSettings();
+    const GLM_API_KEY = settings.apiKey;
+    const GLM_MODEL = settings.model;
+    const GLM_API_URL = "https://api.z.ai/api/anthropic/v1/messages";
 
     if (!GLM_API_KEY) {
         return res.status(400).json({
@@ -219,31 +147,13 @@ app.post('/api/generate', async (req, res) => {
             }
         );
 
-        // Anthropic 응답 구조에서 텍스트 추출
         let content = response.data.content[0].text;
-
         const jsonMatch = content.match(/\[[\s\S]*\]/);
         if (jsonMatch) {
             content = jsonMatch[0];
         }
 
         const sentences = JSON.parse(content);
-
-        const user = req.user || req.session?.user;
-        if (user) {
-            const userId = user.id;
-            const sentencesStr = JSON.stringify(sentences);
-            db.get("SELECT * FROM progress WHERE userId = ?", [userId], (err, row) => {
-                if (!row) {
-                    db.run("INSERT INTO progress (userId, topic, difficulty, currentCount, sentences) VALUES (?, ?, ?, ?, ?)",
-                        [userId, topic, difficulty, 0, sentencesStr]);
-                } else {
-                    db.run("UPDATE progress SET topic = ?, difficulty = ?, currentCount = ?, sentences = ? WHERE userId = ?",
-                        [topic, difficulty, 0, sentencesStr, userId]);
-                }
-            });
-        }
-
         res.json({ sentences });
 
     } catch (error) {
@@ -255,15 +165,11 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
+// Usage API
 app.get('/api/usage', async (req, res) => {
     try {
-        // Get API key for user
-        let GLM_API_KEY;
-        if (req.isAuthenticated()) {
-            GLM_API_KEY = await getApiKeyForUser(req.user.id);
-        } else {
-            GLM_API_KEY = process.env.GLM_API_KEY;
-        }
+        const settings = await getGlobalSettings();
+        const GLM_API_KEY = settings.apiKey;
 
         if (!GLM_API_KEY) {
             return res.json({ error: 'API Key가 설정되지 않았습니다.' });
@@ -283,145 +189,6 @@ app.get('/api/usage', async (req, res) => {
         console.error('Usage Fetch Error:', error.message);
         res.status(500).json({ error: 'Failed to fetch usage info' });
     }
-});
-
-// Settings API endpoints
-app.get('/api/settings', (req, res) => {
-    // Check both passport and custom session
-    const user = req.user || (req.session && req.session.user);
-
-    if (!user) {
-        console.log('/api/settings - Unauthorized: no user found');
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    console.log('/api/settings - User:', user.id);
-
-    db.get("SELECT glmApiKey, glmModel FROM settings WHERE userId = ?", [user.id], (err, row) => {
-        if (err) return res.status(500).json({ error: err.message });
-
-        res.json({
-            hasApiKey: !!row?.glmApiKey,
-            apiKeyPreview: row?.glmApiKey ? `${row.glmApiKey.substring(0, 8)}...${row.glmApiKey.substring(row.glmApiKey.length - 4)}` : null,
-            model: row?.glmModel || 'claude-3-5-sonnet-20240620'
-        });
-    });
-});
-
-app.post('/api/settings', (req, res) => {
-    // Check both passport and custom session
-    const user = req.user || (req.session && req.session.user);
-
-    if (!user) {
-        console.log('POST /api/settings - Unauthorized: no user found');
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const { glmApiKey, glmModel } = req.body;
-
-    console.log('POST /api/settings - User:', user.id, 'Body:', { glmApiKey: glmApiKey ? '***' : undefined, glmModel });
-
-    db.get("SELECT * FROM settings WHERE userId = ?", [user.id], (err, row) => {
-        if (err) {
-            console.error('DB GET Error:', err);
-            return res.status(500).json({ error: err.message });
-        }
-
-        const updates = [];
-        const values = [];
-
-        if (glmApiKey !== undefined) {
-            if (!glmApiKey || typeof glmApiKey !== 'string' || glmApiKey.trim().length === 0) {
-                return res.status(400).json({ error: '유효한 API Key를 입력해주세요.' });
-            }
-            updates.push('glmApiKey = ?');
-            values.push(glmApiKey.trim());
-        }
-
-        if (glmModel !== undefined) {
-            if (!['claude-3-5-sonnet-20240620', 'glm-4.7-flash', 'glm-4.7'].includes(glmModel)) {
-                return res.status(400).json({ error: '유효하지 않은 모델입니다.' });
-            }
-            updates.push('glmModel = ?');
-            values.push(glmModel);
-        }
-
-        if (updates.length === 0) {
-            return res.status(400).json({ error: '업데이트할 항목이 없습니다.' });
-        }
-
-        values.push(user.id);
-
-        if (row) {
-            // Update existing
-            const sql = `UPDATE settings SET ${updates.join(', ')} WHERE userId = ?`;
-            console.log('Update SQL:', sql, 'Values:', values);
-            db.run(sql, values, function(updateErr) {
-                if (updateErr) {
-                    console.error('DB UPDATE Error:', updateErr);
-                    return res.status(500).json({ error: updateErr.message });
-                }
-                console.log('Update successful, rows affected:', this.changes);
-                res.json({ success: true, message: '설정이 업데이트되었습니다.' });
-            });
-        } else {
-            // Insert new - need to have glmApiKey for new entries
-            if (!glmApiKey) {
-                return res.status(400).json({ error: 'API Key를 입력해주세요.' });
-            }
-            const sql = "INSERT INTO settings (userId, glmApiKey, glmModel) VALUES (?, ?, ?)";
-            const insertValues = [user.id, glmApiKey.trim(), glmModel || 'claude-3-5-sonnet-20240620'];
-            console.log('Insert SQL:', sql, 'Values:', [insertValues[0], '***', insertValues[2]]);
-            db.run(sql, insertValues, function(insertErr) {
-                if (insertErr) {
-                    console.error('DB INSERT Error:', insertErr);
-                    return res.status(500).json({ error: insertErr.message });
-                }
-                console.log('Insert successful, row ID:', this.lastID);
-                res.json({ success: true, message: '설정이 저장되었습니다.' });
-            });
-        }
-    });
-});
-
-app.delete('/api/settings', (req, res) => {
-    // Check both passport and custom session
-    const user = req.user || (req.session && req.session.user);
-
-    if (!user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    db.run("DELETE FROM settings WHERE userId = ?", [user.id], (err) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ success: true, message: 'API Key가 삭제되었습니다.' });
-    });
-});
-
-app.get('/api/progress', (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    db.get("SELECT * FROM progress WHERE userId = ?", [req.user.id], (err, row) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (row && row.sentences) {
-            row.sentences = JSON.parse(row.sentences);
-            res.json({ hasProgress: true, progress: row });
-        } else {
-            res.json({ hasProgress: false });
-        }
-    });
-});
-
-app.post('/api/progress', (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const { currentCount } = req.body;
-    db.run("UPDATE progress SET currentCount = ? WHERE userId = ?", [currentCount, req.user.id], (err) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ success: true });
-    });
 });
 
 app.listen(PORT, () => {

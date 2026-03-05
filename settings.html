@@ -25,9 +25,8 @@
         <div class="settings-card">
             <h2>API Key 설정</h2>
             <p class="description">
-                ⚠️ <strong>Google 로그인</strong> 후 이용하실 수 있습니다.<br>
                 z.ai API Key를 입력하면 AI 학습 기능을 사용할 수 있습니다.<br>
-                API Key는 안전하게 저장되며, 본인만 접근할 수 있습니다.
+                API Key는 서버 전체 설정으로 저장됩니다.
             </p>
 
             <div class="api-status" id="api-status">
@@ -76,10 +75,9 @@
         <div class="info-card">
             <h3>ℹ️ 안내</h3>
             <ul>
-                <li>API Key를 설정하면 환경 변수보다 우선적으로 적용됩니다.</li>
-                <li>API Key는 암호화되어 데이터베이스에 저장됩니다.</li>
-                <li>로그인한 사용자만 API Key를 설정할 수 있습니다.</li>
-                <li>API Key 삭제 시 환경 변수 설정으로 돌아갑니다.</li>
+                <li>API Key와 모델은 서버 전체 설정으로 저장됩니다.</li>
+                <li>모든 사용자가 동일한 설정을 사용합니다.</li>
+                <li>API Key는 데이터베이스에 안전하게 저장됩니다.</li>
                 <li><strong>모델별 특징:</strong>
                     <ul>
                         <li>Claude 3.5 Sonnet: 고성능 영어/한국어 모델</li>
