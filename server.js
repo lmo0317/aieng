@@ -100,15 +100,28 @@ async function getApiKeyForUser(userId) {
     });
 }
 
+// Helper function to get model for a user
+async function getModelForUser(userId) {
+    return new Promise((resolve, reject) => {
+        db.get("SELECT glmModel FROM settings WHERE userId = ?", [userId], (err, row) => {
+            if (err) reject(err);
+            else resolve(row ? row.glmModel : 'claude-3-5-sonnet-20240620');
+        });
+    });
+}
+
 app.post('/api/generate', async (req, res) => {
     const { topic, difficulty } = req.body;
 
     // Get API key for user
     let GLM_API_KEY;
+    let GLM_MODEL;
     if (req.isAuthenticated()) {
         GLM_API_KEY = await getApiKeyForUser(req.user.id);
+        GLM_MODEL = await getModelForUser(req.user.id);
     } else {
         GLM_API_KEY = process.env.GLM_API_KEY;
+        GLM_MODEL = 'claude-3-5-sonnet-20240620';
     }
 
     if (!GLM_API_KEY) {
@@ -149,8 +162,7 @@ app.post('/api/generate', async (req, res) => {
         const response = await axios.post(
             GLM_API_URL,
             {
-                // z.ai의 Anthropic 호환 모드 모델명입니다.
-                model: "claude-3-5-sonnet-20240620",
+                model: GLM_MODEL,
                 max_tokens: 4096,
                 messages: [{ role: "user", content: prompt }]
             },
@@ -234,14 +246,13 @@ app.get('/api/settings', (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    db.get("SELECT glmApiKey FROM settings WHERE userId = ?", [req.user.id], (err, row) => {
+    db.get("SELECT glmApiKey, glmModel FROM settings WHERE userId = ?", [req.user.id], (err, row) => {
         if (err) return res.status(500).json({ error: err.message });
 
-        // Don't expose the full API key, just show if it's set
         res.json({
             hasApiKey: !!row?.glmApiKey,
-            // Only show first 8 and last 4 characters for verification
-            apiKeyPreview: row?.glmApiKey ? `${row.glmApiKey.substring(0, 8)}...${row.glmApiKey.substring(row.glmApiKey.length - 4)}` : null
+            apiKeyPreview: row?.glmApiKey ? `${row.glmApiKey.substring(0, 8)}...${row.glmApiKey.substring(row.glmApiKey.length - 4)}` : null,
+            model: row?.glmModel || 'claude-3-5-sonnet-20240620'
         });
     });
 });
@@ -251,26 +262,48 @@ app.post('/api/settings', (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { glmApiKey } = req.body;
-
-    if (!glmApiKey || typeof glmApiKey !== 'string' || glmApiKey.trim().length === 0) {
-        return res.status(400).json({ error: '유효한 API Key를 입력해주세요.' });
-    }
+    const { glmApiKey, glmModel } = req.body;
 
     db.get("SELECT * FROM settings WHERE userId = ?", [req.user.id], (err, row) => {
         if (err) return res.status(500).json({ error: err.message });
 
+        const updates = [];
+        const values = [];
+
+        if (glmApiKey !== undefined) {
+            if (!glmApiKey || typeof glmApiKey !== 'string' || glmApiKey.trim().length === 0) {
+                return res.status(400).json({ error: '유효한 API Key를 입력해주세요.' });
+            }
+            updates.push('glmApiKey = ?');
+            values.push(glmApiKey.trim());
+        }
+
+        if (glmModel !== undefined) {
+            if (!['claude-3-5-sonnet-20240620', 'glm-4.7-flash', 'glm-4.7'].includes(glmModel)) {
+                return res.status(400).json({ error: '유효하지 않은 모델입니다.' });
+            }
+            updates.push('glmModel = ?');
+            values.push(glmModel);
+        }
+
+        if (updates.length === 0) {
+            return res.status(400).json({ error: '업데이트할 항목이 없습니다.' });
+        }
+
+        values.push(req.user.id);
+
         if (row) {
             // Update existing
-            db.run("UPDATE settings SET glmApiKey = ? WHERE userId = ?", [glmApiKey.trim(), req.user.id], (updateErr) => {
+            db.run(`UPDATE settings SET ${updates.join(', ')} WHERE userId = ?`, values, (updateErr) => {
                 if (updateErr) return res.status(500).json({ error: updateErr.message });
-                res.json({ success: true, message: 'API Key가 업데이트되었습니다.' });
+                res.json({ success: true, message: '설정이 업데이트되었습니다.' });
             });
         } else {
             // Insert new
-            db.run("INSERT INTO settings (userId, glmApiKey) VALUES (?, ?)", [req.user.id, glmApiKey.trim()], (insertErr) => {
+            db.run("INSERT INTO settings (userId, glmApiKey, glmModel) VALUES (?, ?, ?)",
+                [req.user.id, glmApiKey?.trim() || null, glmModel || 'claude-3-5-sonnet-20240620'], (insertErr) => {
                 if (insertErr) return res.status(500).json({ error: insertErr.message });
-                res.json({ success: true, message: 'API Key가 저장되었습니다.' });
+                res.json({ success: true, message: '설정이 저장되었습니다.' });
             });
         }
     });

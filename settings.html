@@ -16,6 +16,12 @@
             <a href="/" class="back-btn">← 홈으로</a>
         </div>
 
+        <!-- API 사용량 표시 -->
+        <div class="usage-card">
+            <h2>📊 API 사용량</h2>
+            <div id="usage-info" class="usage-display">사용량 확인 중...</div>
+        </div>
+
         <div class="settings-card">
             <h2>API Key 설정</h2>
             <p class="description">
@@ -36,10 +42,21 @@
                         id="api-key"
                         placeholder="sk-..."
                         autocomplete="off"
-                        required
                     >
                     <small class="help-text">
                         API Key는 <a href="https://open.bigmodel.cn/usercenter/apikeys" target="_blank">z.ai 콘솔</a>에서 발급받을 수 있습니다.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="model-select">AI 모델 선택</label>
+                    <select id="model-select" class="model-select">
+                        <option value="claude-3-5-sonnet-20240620">Claude 3.5 Sonnet (기본)</option>
+                        <option value="glm-4.7-flash">GLM-4.7-Flash (무료)</option>
+                        <option value="glm-4.7">GLM-4.7</option>
+                    </select>
+                    <small class="help-text">
+                        💡 <strong>GLM-4.7-Flash</strong>는 무료로 사용할 수 있는 모델입니다.
                     </small>
                 </div>
 
@@ -51,6 +68,7 @@
 
             <div class="current-key-info hidden" id="current-key-info">
                 <p><strong>현재 설정된 API Key:</strong> <code id="key-preview"></code></p>
+                <p><strong>현재 선택된 모델:</strong> <span id="model-preview"></span></p>
             </div>
         </div>
 
@@ -61,6 +79,13 @@
                 <li>API Key는 암호화되어 데이터베이스에 저장됩니다.</li>
                 <li>로그인한 사용자만 API Key를 설정할 수 있습니다.</li>
                 <li>API Key 삭제 시 환경 변수 설정으로 돌아갑니다.</li>
+                <li><strong>모델별 특징:</strong>
+                    <ul>
+                        <li>Claude 3.5 Sonnet: 고성능 영어/한국어 모델</li>
+                        <li>GLM-4.7-Flash: 빠른 응답 속도, 무료 사용 가능</li>
+                        <li>GLM-4.7: 균형 잡힌 성능</li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>

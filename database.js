@@ -31,6 +31,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
             db.run(`CREATE TABLE IF NOT EXISTS settings (
                 userId TEXT PRIMARY KEY,
                 glmApiKey TEXT,
+                glmModel TEXT DEFAULT 'claude-3-5-sonnet-20240620',
                 FOREIGN KEY(userId) REFERENCES users(id)
             )`);
         });

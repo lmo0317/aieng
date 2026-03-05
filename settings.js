@@ -1,12 +1,22 @@
 const form = document.getElementById('settings-form');
 const apiKeyInput = document.getElementById('api-key');
+const modelSelect = document.getElementById('model-select');
 const deleteBtn = document.getElementById('delete-btn');
 const apiStatus = document.getElementById('api-status');
 const statusIndicator = apiStatus.querySelector('.status-indicator');
 const statusText = apiStatus.querySelector('.status-text');
 const currentKeyInfo = document.getElementById('current-key-info');
 const keyPreview = document.getElementById('key-preview');
+const modelPreview = document.getElementById('model-preview');
 const toast = document.getElementById('toast');
+const usageInfo = document.getElementById('usage-info');
+
+// Model display names
+const modelNames = {
+    'claude-3-5-sonnet-20240620': 'Claude 3.5 Sonnet (기본)',
+    'glm-4.7-flash': 'GLM-4.7-Flash (무료)',
+    'glm-4.7': 'GLM-4.7'
+};
 
 // Load current settings on page load
 async function loadSettings() {
@@ -21,7 +31,7 @@ async function loadSettings() {
         const data = await response.json();
 
         if (data.hasApiKey) {
-            statusIndicator.classList.remove('active');
+            statusIndicator.classList.remove('inactive');
             statusIndicator.classList.add('active');
             statusText.textContent = 'API Key가 설정됨';
             currentKeyInfo.classList.remove('hidden');
@@ -33,6 +43,13 @@ async function loadSettings() {
             currentKeyInfo.classList.add('hidden');
             deleteBtn.classList.add('hidden');
         }
+
+        if (data.model) {
+            modelSelect.value = data.model;
+            modelPreview.textContent = modelNames[data.model] || data.model;
+        } else {
+            modelPreview.textContent = modelNames['claude-3-5-sonnet-20240620'];
+        }
     } catch (error) {
         console.error('Failed to load settings:', error);
         statusIndicator.classList.add('inactive');
@@ -40,13 +57,86 @@ async function loadSettings() {
     }
 }
 
+// Load usage information
+async function loadUsage() {
+    try {
+        const response = await fetch('/api/usage');
+        const data = await response.json();
+
+        if (data.error) {
+            usageInfo.textContent = data.error;
+            return;
+        }
+
+        let displayStr = '';
+
+        function formatResetTime(timestamp) {
+            if (!timestamp) return ' | 갱신: -';
+            const date = new Date(timestamp);
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return ` | 갱신: ${month}.${day} ${hours}:${minutes}`;
+        }
+
+        let limitsArray = null;
+        if (data.data && data.data.limits) {
+            limitsArray = data.data.limits;
+        } else if (data.limits) {
+            limitsArray = data.limits;
+        }
+
+        if (limitsArray && limitsArray.length > 0) {
+            let strParts = limitsArray.map(lim => {
+                let label = '';
+                if (lim.type === 'TIME_LIMIT') {
+                    label = 'Monthly';
+                } else if (lim.type === 'TOKENS_LIMIT') {
+                    label = '5 Hours';
+                } else {
+                    label = 'Quota';
+                }
+
+                const consumed = lim.consumed ?? lim.currentValue ?? 0;
+                let limitStr = lim.limit ?? lim.usage;
+                const resetStr = formatResetTime(lim.nextResetTime);
+
+                let displayVal = '';
+                if (lim.percentage !== undefined) {
+                    displayVal = `${lim.percentage}%`;
+                } else if (limitStr !== undefined && limitStr !== '?') {
+                    displayVal = `${Math.round((consumed / limitStr) * 100)}%`;
+                } else {
+                    displayVal = `${consumed}`;
+                }
+
+                return `<strong>[${label}]</strong> ${displayVal}${resetStr}`;
+            });
+
+            displayStr = strParts.reverse().join('<br>');
+            usageInfo.innerHTML = displayStr;
+        } else if (data.consumed !== undefined || data.currentValue !== undefined) {
+            const consumed = data.consumed ?? data.currentValue ?? 0;
+            const limit = data.limit ?? data.usage ?? '?';
+            usageInfo.innerHTML = `사용: ${consumed} / ${limit}`;
+        } else {
+            usageInfo.textContent = '사용량 정보 분석 중...';
+        }
+    } catch (error) {
+        console.error('Failed to fetch usage:', error);
+        usageInfo.textContent = '사용량 확인 실패';
+    }
+}
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const apiKey = apiKeyInput.value.trim();
+    const model = modelSelect.value;
 
-    if (!apiKey) {
-        showToast('API Key를 입력해주세요', 'error');
+    if (!apiKey && modelSelect.value === 'claude-3-5-sonnet-20240620') {
+        showToast('변경할 설정이 없습니다', 'error');
         return;
     }
 
@@ -56,7 +146,10 @@ form.addEventListener('submit', async (e) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ glmApiKey: apiKey })
+            body: JSON.stringify({
+                glmApiKey: apiKey || undefined,
+                glmModel: model
+            })
         });
 
         const data = await response.json();
@@ -65,6 +158,7 @@ form.addEventListener('submit', async (e) => {
             showToast(data.message, 'success');
             apiKeyInput.value = '';
             await loadSettings();
+            await loadUsage();
         } else {
             showToast(data.error || '저장에 실패했습니다', 'error');
         }
@@ -89,6 +183,7 @@ deleteBtn.addEventListener('click', async () => {
         if (response.ok) {
             showToast(data.message, 'success');
             await loadSettings();
+            await loadUsage();
         } else {
             showToast(data.error || '삭제에 실패했습니다', 'error');
         }
@@ -109,3 +204,4 @@ function showToast(message, type = 'success') {
 
 // Initial load
 loadSettings();
+loadUsage();
