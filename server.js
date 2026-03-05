@@ -21,7 +21,7 @@ async function getGlobalSettings() {
             if (err) reject(err);
             else resolve({
                 apiKey: row?.glmApiKey || process.env.GLM_API_KEY,
-                model: row?.glmModel || 'claude-3-5-sonnet-20240620'
+                model: row?.glmModel || 'glm-4.7-flash'
             });
         });
     });
@@ -35,7 +35,7 @@ app.get('/api/settings', (req, res) => {
         res.json({
             hasApiKey: !!row?.glmApiKey,
             apiKeyPreview: row?.glmApiKey || null, // 전체 키를 그대로 전송
-            model: row?.glmModel || 'claude-3-5-sonnet-20240620'
+            model: row?.glmModel || 'glm-4.7-flash'
         });
     });
 });
