@@ -13,13 +13,11 @@ const toast = document.getElementById('toast');
 const usageInfo = document.getElementById('usage-info');
 
 const modelNames = {
-    'claude-3-5-sonnet-20240620': 'Claude 3.5 Sonnet (기본)',
     'glm-4.7-flash': 'GLM-4.7-Flash (무료)',
     'glm-4.7': 'GLM-4.7'
 };
 
 const modelBadgeClasses = {
-    'claude-3-5-sonnet-20240620': 'claude',
     'glm-4.7-flash': 'flash',
     'glm-4.7': 'glm'
 };
@@ -48,8 +46,8 @@ async function loadSettings() {
             modelPreview.textContent = modelNames[data.model] || data.model;
             updateModelBadge(data.model);
         } else {
-            modelPreview.textContent = modelNames['claude-3-5-sonnet-20240620'];
-            updateModelBadge('claude-3-5-sonnet-20240620');
+            modelPreview.textContent = modelNames['glm-4.7-flash'];
+            updateModelBadge('glm-4.7-flash');
         }
     } catch (error) {
         console.error('Failed to load settings:', error);

@@ -55,7 +55,7 @@ app.post('/api/settings', (req, res) => {
     }
 
     if (glmModel !== undefined) {
-        if (!['claude-3-5-sonnet-20240620', 'glm-4.7-flash', 'glm-4.7'].includes(glmModel)) {
+        if (!['glm-4.7-flash', 'glm-4.7'].includes(glmModel)) {
             return res.status(400).json({ error: '유효하지 않은 모델입니다.' });
         }
         updates.push('glmModel = ?');

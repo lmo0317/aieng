@@ -156,10 +156,6 @@
     background-color: #ed8936;
 }
 
-.model-badge.claude {
-    background-color: #4299e1;
-}
-
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
