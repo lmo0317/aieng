@@ -50,11 +50,14 @@
 
                 <div class="form-group">
                     <label for="model-select">AI 모델 선택</label>
-                    <select id="model-select" class="model-select">
-                        <option value="claude-3-5-sonnet-20240620">Claude 3.5 Sonnet (기본)</option>
-                        <option value="glm-4.7-flash">GLM-4.7-Flash (무료)</option>
-                        <option value="glm-4.7">GLM-4.7</option>
-                    </select>
+                    <div class="model-select-wrapper">
+                        <select id="model-select" class="model-select">
+                            <option value="claude-3-5-sonnet-20240620">Claude 3.5 Sonnet (기본)</option>
+                            <option value="glm-4.7-flash">GLM-4.7-Flash (무료)</option>
+                            <option value="glm-4.7">GLM-4.7</option>
+                        </select>
+                        <span id="current-model-badge" class="model-badge"></span>
+                    </div>
                     <small class="help-text">
                         💡 <strong>GLM-4.7-Flash</strong>는 무료로 사용할 수 있는 모델입니다.
                     </small>

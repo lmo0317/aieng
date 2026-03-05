@@ -8,6 +8,7 @@ const statusText = apiStatus.querySelector('.status-text');
 const currentKeyInfo = document.getElementById('current-key-info');
 const keyPreview = document.getElementById('key-preview');
 const modelPreview = document.getElementById('model-preview');
+const currentModelBadge = document.getElementById('current-model-badge');
 const toast = document.getElementById('toast');
 const usageInfo = document.getElementById('usage-info');
 
@@ -15,6 +16,12 @@ const modelNames = {
     'claude-3-5-sonnet-20240620': 'Claude 3.5 Sonnet (기본)',
     'glm-4.7-flash': 'GLM-4.7-Flash (무료)',
     'glm-4.7': 'GLM-4.7'
+};
+
+const modelBadgeClasses = {
+    'claude-3-5-sonnet-20240620': 'claude',
+    'glm-4.7-flash': 'flash',
+    'glm-4.7': 'glm'
 };
 
 async function loadSettings() {
@@ -39,8 +46,10 @@ async function loadSettings() {
         if (data.model) {
             modelSelect.value = data.model;
             modelPreview.textContent = modelNames[data.model] || data.model;
+            updateModelBadge(data.model);
         } else {
             modelPreview.textContent = modelNames['claude-3-5-sonnet-20240620'];
+            updateModelBadge('claude-3-5-sonnet-20240620');
         }
     } catch (error) {
         console.error('Failed to load settings:', error);
@@ -192,6 +201,16 @@ function showToast(message, type = 'success') {
         toast.classList.add('hidden');
     }, 3000);
 }
+
+function updateModelBadge(model) {
+    currentModelBadge.textContent = `현재: ${modelNames[model] || model}`;
+    currentModelBadge.className = 'model-badge ' + (modelBadgeClasses[model] || '');
+}
+
+// 모델 선택 시 배지 업데이트
+modelSelect.addEventListener('change', () => {
+    updateModelBadge(modelSelect.value);
+});
 
 loadSettings();
 loadUsage();
