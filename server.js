@@ -357,10 +357,6 @@ app.get('/api/usage', async (req, res) => {
                 provider: 'gemini'
             });
         } else {
-                error: 'Groq는 사용량 확인 기능을 제공하지 않습니다.',
-                provider: 'groq'
-            });
-        } else {
             const GLM_API_KEY = settings.glmApiKey;
 
             if (!GLM_API_KEY) {
