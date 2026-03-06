@@ -54,11 +54,26 @@ async function fetchSentences(topic, difficulty) {
         });
 
         const data = await response.json();
+        
+        if (!response.ok) {
+            console.error('API Error:', data);
+            sentenceEn.textContent = `오류 발생: ${data.error || '알 수 없는 오류가 발생했습니다.'}`;
+            if (data.details) {
+                console.error('Error details:', data.details);
+            }
+            return;
+        }
+
+        if (!data.sentences || !Array.isArray(data.sentences)) {
+            throw new Error('올바른 문장 데이터를 받지 못했습니다.');
+        }
+
         sentences = data.sentences;
         currentCount = 0;
+        showSentence();
     } catch (error) {
         console.error('Error fetching sentences:', error);
-        sentenceEn.textContent = '문장을 불러오는데 실패했습니다. 서버를 확인해 주세요.';
+        sentenceEn.textContent = '문장을 불러오는데 실패했습니다. ' + (error.message || '서버를 확인해 주세요.');
     }
 }
 
@@ -72,25 +87,24 @@ function showSentence() {
     sentenceEn.textContent = current.en;
     sentenceKo.innerHTML = formatAnalysis(current.ko);
 
-    // analysis에서 품사 분석과 설명 분리
-    const analysisText = current.analysis;
-    const newlineIndex = analysisText.indexOf('\n');
-
-    if (newlineIndex !== -1) {
-        // 첫 번째 줄: 품사 분석
-        const posaAnalysis = analysisText.substring(0, newlineIndex);
-        // 두 번째 줄부터: 문장 설명 (남은 \n 제거)
-        const sentenceExplanation = analysisText.substring(newlineIndex + 1).replace(/\n/g, '');
-
-        analysisDiv.innerHTML = `<strong>📝 품사 분석:</strong><br/>${posaAnalysis}`;
-        explanationDiv.innerHTML = `<strong>💡 문장 설명:</strong><br/>${sentenceExplanation}`;
+    // 새롭게 정리된 요구사항에 맞춘 필드 매핑
+    
+    // 3. 품사 분석
+    if (current.parts_of_speech) {
+        analysisDiv.innerHTML = `<strong>📝 품사 분석:</strong><br/>${current.parts_of_speech}`;
     } else {
-        // 분리가 안 된 경우 (구버전 호환)
-        analysisDiv.innerHTML = `<strong>📝 품사 분석:</strong><br/>${analysisText}`;
+        analysisDiv.innerHTML = '';
+    }
+
+    // 4. 해석 설명
+    if (current.explanation) {
+        explanationDiv.innerHTML = `<strong>💡 문장 설명:</strong><br/>${formatAnalysis(current.explanation)}`;
+    } else {
         explanationDiv.innerHTML = '';
     }
 
-    if (current.voca && current.voca.length > 0) {
+    // 5. 단어 및 숙어
+    if (current.voca && Array.isArray(current.voca) && current.voca.length > 0) {
         vocaDiv.innerHTML = `<strong>📖 단어/표현 정리:</strong><br/>` + current.voca.join('<br/>');
     } else {
         vocaDiv.innerHTML = '';
