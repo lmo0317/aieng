@@ -165,6 +165,17 @@ button:hover {
     margin-bottom: 1rem;
 }
 
+.structure-section {
+    background-color: #e6fffa;
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #234e52;
+    margin-bottom: 1rem;
+    border: 1px solid #b2f5ea;
+}
+
 .explanation-section {
     background-color: #edf2f7;
     padding: 1rem;

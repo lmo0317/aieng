@@ -13,6 +13,7 @@ const currentCountSpan = document.getElementById('current-count');
 const sentenceEn = document.getElementById('sentence-en');
 const sentenceKo = document.getElementById('sentence-ko');
 const analysisDiv = document.getElementById('analysis');
+const structureDiv = document.getElementById('structure');
 const explanationDiv = document.getElementById('explanation');
 const vocaDiv = document.getElementById('voca');
 const ttsBtn = document.getElementById('tts-btn');
@@ -106,6 +107,13 @@ function showSentence() {
         analysisDiv.innerHTML = '';
     }
 
+    // 3.5 문장 형식 및 구조 분석
+    if (current.sentence_structure) {
+        structureDiv.innerHTML = `<strong>🧩 문장 구조:</strong><br/>${current.sentence_structure}`;
+    } else {
+        structureDiv.innerHTML = '';
+    }
+
     // 4. 해석 설명
     if (current.explanation) {
         explanationDiv.innerHTML = `<strong>💡 문장 설명:</strong><br/>${formatAnalysis(current.explanation)}`;
@@ -122,6 +130,7 @@ function showSentence() {
 
     sentenceKo.classList.add('hidden');
     analysisDiv.classList.add('hidden');
+    structureDiv.classList.add('hidden');
     explanationDiv.classList.add('hidden');
     vocaDiv.classList.add('hidden');
     revealBtn.classList.remove('hidden');
@@ -171,6 +180,7 @@ ttsBtn.addEventListener('click', () => {
 revealBtn.addEventListener('click', () => {
     sentenceKo.classList.remove('hidden');
     analysisDiv.classList.remove('hidden');
+    structureDiv.classList.remove('hidden');
     explanationDiv.classList.remove('hidden');
     if (vocaDiv.innerHTML !== '') {
         vocaDiv.classList.remove('hidden');
@@ -198,6 +208,7 @@ function finishLearning() {
     sentenceEn.textContent = '모든 학습이 완료되었습니다!';
     sentenceKo.classList.add('hidden');
     analysisDiv.classList.add('hidden');
+    structureDiv.classList.add('hidden');
     explanationDiv.classList.add('hidden');
     vocaDiv.classList.add('hidden');
     nextBtn.classList.add('hidden');
