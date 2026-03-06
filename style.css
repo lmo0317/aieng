@@ -107,12 +107,41 @@ button:hover {
     text-align: left;
 }
 
+.english-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 10px;
+}
+
 .english-sentence {
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 1rem;
     color: #1a202c;
     line-height: 1.4;
+    flex: 1;
+}
+
+.tts-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    margin-top: -5px;
+    border-radius: 50%;
+    transition: transform 0.2s, background-color 0.2s;
+    color: #4299e1;
+}
+
+.tts-btn:hover {
+    background-color: #ebf8ff;
+    transform: scale(1.1);
+}
+
+.tts-btn:active {
+    transform: scale(0.95);
 }
 
 .korean-sentence {

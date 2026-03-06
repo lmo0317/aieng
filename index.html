@@ -32,7 +32,10 @@
             <button id="home-btn" class="home-btn">🏠 홈으로</button>
             <div class="progress">오늘의 학습: <span id="current-count">0</span> / 10</div>
             <div id="content-card" class="card">
-                <div class="english-sentence" id="sentence-en">문장을 불러오는 중...</div>
+                <div class="english-container">
+                    <div class="english-sentence" id="sentence-en">문장을 불러오는 중...</div>
+                    <button id="tts-btn" class="tts-btn hidden" title="문장 읽기">🔊</button>
+                </div>
                 <div class="korean-sentence hidden" id="sentence-ko"></div>
                 <div class="analysis-section hidden" id="analysis"></div>
                 <div class="explanation-section hidden" id="explanation"></div>

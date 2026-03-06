@@ -15,6 +15,7 @@ const sentenceKo = document.getElementById('sentence-ko');
 const analysisDiv = document.getElementById('analysis');
 const explanationDiv = document.getElementById('explanation');
 const vocaDiv = document.getElementById('voca');
+const ttsBtn = document.getElementById('tts-btn');
 
 homeBtn.addEventListener('click', () => {
     // Reset state
@@ -25,6 +26,9 @@ homeBtn.addEventListener('click', () => {
     // Switch sections
     learningSection.classList.add('hidden');
     setupSection.classList.remove('hidden');
+    
+    // Stop any playing audio
+    window.speechSynthesis.cancel();
 });
 
 startBtn.addEventListener('click', async () => {
@@ -38,6 +42,7 @@ startBtn.addEventListener('click', async () => {
 
     setupSection.classList.add('hidden');
     learningSection.classList.remove('hidden');
+    ttsBtn.classList.add('hidden');
 
     await fetchSentences(topic, difficulty);
     showSentence();
@@ -83,9 +88,14 @@ function showSentence() {
         return;
     }
 
+    // Stop previous audio
+    window.speechSynthesis.cancel();
+
     const current = sentences[currentCount];
     sentenceEn.textContent = current.en;
     sentenceKo.innerHTML = formatAnalysis(current.ko);
+    
+    ttsBtn.classList.remove('hidden');
 
     // 새롭게 정리된 요구사항에 맞춘 필드 매핑
     
@@ -140,6 +150,23 @@ function formatPartsOfSpeech(text) {
     
     return `<div class="pos-text-container">${formattedHtml}</div>`;
 }
+
+// TTS (Text-to-Speech) 기능
+ttsBtn.addEventListener('click', () => {
+    if (currentCount >= sentences.length) return;
+    
+    const current = sentences[currentCount];
+    if (!current || !current.en) return;
+
+    // 이미 읽고 있다면 취소
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(current.en);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.9; // 살짝 천천히 읽어주기 (학습용)
+    
+    window.speechSynthesis.speak(utterance);
+});
 
 revealBtn.addEventListener('click', () => {
     sentenceKo.classList.remove('hidden');
