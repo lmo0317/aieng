@@ -91,7 +91,7 @@ function showSentence() {
     
     // 3. 품사 분석
     if (current.parts_of_speech) {
-        analysisDiv.innerHTML = `<strong>📝 품사 분석:</strong><br/>${current.parts_of_speech}`;
+        analysisDiv.innerHTML = `<strong>📝 품사 분석:</strong><br/>${formatPartsOfSpeech(current.parts_of_speech)}`;
     } else {
         analysisDiv.innerHTML = '';
     }
@@ -122,6 +122,23 @@ function showSentence() {
 
 function formatAnalysis(analysis) {
     return analysis.replace(/\n/g, '<br>');
+}
+
+function formatPartsOfSpeech(text) {
+    if (!text) return '';
+    const parts = text.split('/').map(p => p.trim()).filter(p => p);
+    
+    const formattedHtml = parts.map(part => {
+        const match = part.match(/(.+?)\((.+?)\)/);
+        if (match) {
+            const word = match[1].trim();
+            const role = match[2].trim();
+            return `<span class="pos-text-item"><span class="pos-word">${word}</span> <span class="pos-role">(${role})</span></span>`;
+        }
+        return `<span class="pos-text-item"><span class="pos-word">${part}</span></span>`;
+    }).join('<span class="pos-separator"> / </span>');
+    
+    return `<div class="pos-text-container">${formattedHtml}</div>`;
 }
 
 revealBtn.addEventListener('click', () => {

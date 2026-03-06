@@ -170,3 +170,31 @@ button:hover {
     color: #718096;
     margin-bottom: 10px;
 }
+
+/* 품사 텍스트 스타일 */
+.pos-text-container {
+    margin-top: 10px;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.pos-text-item {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.pos-word {
+    font-weight: 600;
+    color: #2b6cb0;
+}
+
+.pos-role {
+    font-size: 0.9em;
+    color: #718096;
+}
+
+.pos-separator {
+    color: #cbd5e0;
+    margin: 0 4px;
+}
+
