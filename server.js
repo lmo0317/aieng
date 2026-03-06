@@ -85,7 +85,7 @@ app.post('/api/settings', (req, res) => {
     }
 
     if (geminiModel !== undefined) {
-        const validGeminiModels = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+        const validGeminiModels = ['gemini-2.5-flash'];
         if (!validGeminiModels.includes(geminiModel)) {
             return res.status(400).json({ error: `유효하지 않은 Gemini 모델입니다: ${geminiModel}` });
         }
