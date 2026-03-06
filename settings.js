@@ -15,15 +15,18 @@ const currentModelBadge = document.getElementById('current-model-badge');
 const toast = document.getElementById('toast');
 
 const models = [
-    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' }
+    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (안정 버전)' }
 ];
 
 const modelNames = {
-    'gemini-2.5-flash': 'Gemini 2.5 Flash'
+    'gemini-2.5-flash': 'Gemini 2.5 Flash',
+    'gemini-2.0-flash': 'Gemini 2.0 Flash'
 };
 
 const modelBadgeClasses = {
-    'gemini-2.5-flash': 'gemini-flash'
+    'gemini-2.5-flash': 'gemini-flash',
+    'gemini-2.0-flash': 'gemini-flash'
 };
 
 // Initialize model select options
