@@ -15,14 +15,17 @@ const currentModelBadge = document.getElementById('current-model-badge');
 const toast = document.getElementById('toast');
 
 const models = [
+    { value: 'gemini-3.1-flash-lite-preview', label: 'Gemini 3.1 Flash Lite (최신/속도최적)' },
     { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' }
 ];
 
 const modelNames = {
+    'gemini-3.1-flash-lite-preview': 'Gemini 3.1 Flash Lite',
     'gemini-2.5-flash': 'Gemini 2.5 Flash'
 };
 
 const modelBadgeClasses = {
+    'gemini-3.1-flash-lite-preview': 'gemini-flash',
     'gemini-2.5-flash': 'gemini-flash'
 };
 
