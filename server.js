@@ -237,20 +237,19 @@ app.get('/api/usage', (req, res) => {
     });
 });
 
-// Trends API - 다양한 카테고리(경제, 연예, 스포츠, 기술) 뉴스 골고루 수집
+// Trends API - 다양한 카테고리(경제, 연예, 스포츠, 기술) 뉴스 골고루 수집 및 정제
 app.get('/api/trends', async (req, res) => {
-    // 에러 발생 시 사용할 기본 트랜드 데이터 (새로운 객체 구조에 맞춤)
     const fallbacks = [
-        { category: 'TEC', title: 'ChatGPT를 활용한 효율적인 영어 학습법' },
-        { category: 'BIZ', title: '2026년 세계 경제 전망과 주요 투자 트랜드' },
-        { category: 'SPT', title: '유럽 챔피언스리그 결승전 주요 관전 포인트' },
-        { category: 'ENT', title: '올해 가장 기대되는 넷플릭스 오리지널 시리즈' },
-        { category: 'TEC', title: '인공지능 기술이 바꾸는 우리의 미래 일상' },
-        { category: 'BIZ', title: '애플과 테슬라의 차세대 제품 출시 소식' },
-        { category: 'SPT', title: '손흥민 선수의 최근 경기 활약상 및 인터뷰' },
-        { category: 'ENT', title: '글로벌 차트를 점령한 K-POP 아티스트 뉴스' },
-        { category: 'TOP', title: '해외 여행객을 위한 실시간 날씨 및 여행지 추천' },
-        { category: 'TEC', title: '최신 스마트폰 카메라 성능 비교 및 리뷰' }
+        { category: 'TEC', title: '인공지능(AI) 기술이 바꾸는 우리의 미래 일상과 직업의 변화' },
+        { category: 'BIZ', title: '2026년 세계 경제 전망: 금리 인하와 글로벌 시장의 새로운 투자 기회' },
+        { category: 'SPT', title: '유럽 챔피언스리그 결승전: 전 세계 축구 팬들이 주목하는 관전 포인트' },
+        { category: 'ENT', title: 'K-콘텐츠의 글로벌 흥행 소식과 새롭게 공개되는 넷플릭스 기대작' },
+        { category: 'TEC', title: '스마트폰 이후의 혁신: 차세대 웨어러블 기기와 증강현실(AR) 기술 동향' },
+        { category: 'BIZ', title: '애플과 테슬라의 신제품 발표가 시장에 미치는 영향과 소비자 반응' },
+        { category: 'SPT', title: '손흥민 선수의 최근 경기 활약상과 팀 내 리더십에 대한 현지 언론 평가' },
+        { category: 'ENT', title: '빌보드 차트를 점령한 K-POP 아티스트들의 성과와 향후 활동 계획' },
+        { category: 'TOP', title: '친환경 여행과 지속 가능한 관광: 전 세계 여행자들이 선택한 새로운 방식' },
+        { category: 'TEC', title: '사이버 보안의 중요성: 개인 정보를 안전하게 지키는 생활 속 디지털 습관' }
     ];
     
     const categories = [
@@ -264,12 +263,12 @@ app.get('/api/trends', async (req, res) => {
     try {
         const results = await Promise.allSettled(
             categories.map(cat => axios.get(cat.url, { 
-                timeout: 5000, // 대기 시간을 5초로 연장
+                timeout: 5000, 
                 headers: { 'User-Agent': 'Mozilla/5.0' } 
             }))
         );
 
-        let allKeywords = [];
+        let allTrends = [];
 
         results.forEach((result, index) => {
             if (result.status === 'fulfilled') {
@@ -278,7 +277,7 @@ app.get('/api/trends', async (req, res) => {
                 const titleMatches = xml.match(/<title>(.*?)<\/title>/g) || [];
                 
                 const categoryTitles = titleMatches
-                    .slice(1, 4) 
+                    .slice(1, 10) // 수집 범위를 10개로 확대
                     .map(m => {
                         let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
                         title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
@@ -286,21 +285,41 @@ app.get('/api/trends', async (req, res) => {
                             category: categoryName,
                             title: title.trim()
                         };
+                    })
+                    .filter(item => {
+                        // "Google 뉴스" 및 기타 무의미한 제목 필터링 (로직 오류 수정)
+                        const genericTerms = ['Google 뉴스', 'Google News', '속보', '오늘의 뉴스', '게시판', '종합', '동영상'];
+                        const isGeneric = genericTerms.some(term => item.title.includes(term));
+                        return item.title.length > 10 && !isGeneric;
                     });
                 
-                allKeywords = [...allKeywords, ...categoryTitles];
+                allTrends = [...allTrends, ...categoryTitles];
             }
         });
 
-        // 랜덤하게 섞고 10개 추출
-        let trends = allKeywords.sort(() => Math.random() - 0.5).slice(0, 10);
+        // 제목 기준 중복 제거 및 무의미한 기사 추가 필터링
+        const uniqueTitles = new Map();
+        allTrends.forEach(item => {
+            if (!uniqueTitles.has(item.title) && !item.title.startsWith('Google')) {
+                uniqueTitles.set(item.title, item);
+            }
+        });
+        
+        let finalTrends = Array.from(uniqueTitles.values());
 
-        // 데이터가 부족하면 fallback 데이터로 보충
-        if (trends.length < 5) {
-            trends = fallbacks;
+        // 무작위로 섞기
+        finalTrends = finalTrends.sort(() => Math.random() - 0.5);
+
+        // 부족한 경우 fallback으로 채우기 (최소 10개 보장)
+        if (finalTrends.length < 10) {
+            const extra = fallbacks.filter(f => !uniqueTitles.has(f.title));
+            finalTrends = [...finalTrends, ...extra];
         }
+        
+        // 정확히 10개만 추출
+        finalTrends = finalTrends.slice(0, 10);
 
-        res.json({ trends });
+        res.json({ trends: finalTrends });
     } catch (error) {
         console.error('Trends API Error (Using Fallback):', error.message);
         res.json({ trends: fallbacks });
