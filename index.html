@@ -86,7 +86,68 @@
             </div>
         </div>
     </div>
+
+    <!-- AI 음성 대화 버튼 -->
+    <button id="ai-chat-btn" class="ai-chat-btn" aria-label="AI 음성 대화 시작">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+    </button>
+
+    <!-- 채팅 모달 -->
+    <div id="chat-modal" class="chat-modal hidden" role="dialog" aria-labelledby="chat-modal-title" aria-modal="true">
+        <div class="chat-modal-overlay"></div>
+        <div class="chat-modal-container">
+            <div class="chat-modal-header">
+                <h2 id="chat-modal-title">AI 음성 대화</h2>
+                <button id="chat-close-btn" class="chat-close-btn" aria-label="대화창 닫기">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+                <div class="chat-welcome-message">
+                    안녕하세요! 저는 AI 음성 대화 어시스턴트입니다.
+                    <br><br>
+                    마이크 버튼을 눌러 음성으로 대화하거나,
+                    텍스트로 메시지를 입력하세요.
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="chat-status-indicator hidden" id="chat-status-indicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text" id="chat-status-text">듣고 있는 중...</span>
+                </div>
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="메시지를 입력하세요..." aria-label="메시지 입력">
+                    <button id="chat-mic-btn" class="chat-mic-btn" aria-label="음성 입력 시작" title="음성 입력">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    </button>
+                    <button id="chat-send-btn" class="chat-send-btn" aria-label="메시지 전송" title="전송">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
+    <script src="chat.js"></script>
 </body>
 
 </html>

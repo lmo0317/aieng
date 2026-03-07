@@ -8,7 +8,8 @@
       "Bash(\"/c/Program Files/nodejs/npm\" install:*)",
       "Bash(taskkill:*)",
       "Bash(sqlite3:*)",
-      "Bash(where node:*)"
+      "Bash(where node:*)",
+      "Bash(git rebase:*)"
     ]
   }
 }

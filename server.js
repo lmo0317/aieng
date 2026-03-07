@@ -4,6 +4,11 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const db = require('./database');
+const {
+    handleChatRequest,
+    handleClearSession,
+    handleGetHistory
+} = require('./chat-api');
 
 dotenv.config();
 
@@ -246,6 +251,11 @@ app.get('/api/usage', (req, res) => {
     });
 });
 
+// Chat API - Gemini 2.5 Flash 스트리밍 채팅
+app.post('/api/chat', handleChatRequest);
+app.delete('/api/chat/:sessionId', handleClearSession);
+app.get('/api/chat/:sessionId/history', handleGetHistory);
+
 // History API - 복습용 데이터 목록 조회
 app.get('/api/history', (req, res) => {
     db.all("SELECT id, topic, difficulty, createdAt FROM learning_history ORDER BY createdAt DESC", (err, rows) => {
@@ -260,7 +270,7 @@ app.get('/api/history/:id', (req, res) => {
     db.get("SELECT * FROM learning_history WHERE id = ?", [id], (err, row) => {
         if (err) return res.status(500).json({ error: err.message });
         if (!row) return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
-        
+
         res.json({
             id: row.id,
             topic: row.topic,
@@ -294,7 +304,7 @@ app.get('/api/trends', async (req, res) => {
         { category: 'TOP', title: '친환경 여행과 지속 가능한 관광: 전 세계 여행자들이 선택한 새로운 방식' },
         { category: 'TEC', title: '사이버 보안의 중요성: 개인 정보를 안전하게 지키는 생활 속 디지털 습관' }
     ];
-    
+
     const categories = [
         { name: 'TOP', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
         { name: 'BIZ', url: 'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ko&gl=KR&ceid=KR:ko' },
@@ -305,9 +315,9 @@ app.get('/api/trends', async (req, res) => {
 
     try {
         const results = await Promise.allSettled(
-            categories.map(cat => axios.get(cat.url, { 
-                timeout: 5000, 
-                headers: { 'User-Agent': 'Mozilla/5.0' } 
+            categories.map(cat => axios.get(cat.url, {
+                timeout: 5000,
+                headers: { 'User-Agent': 'Mozilla/5.0' }
             }))
         );
 
@@ -318,7 +328,7 @@ app.get('/api/trends', async (req, res) => {
                 const categoryName = categories[index].name;
                 const xml = result.value.data;
                 const titleMatches = xml.match(/<title>(.*?)<\/title>/g) || [];
-                
+
                 const categoryTitles = titleMatches
                     .slice(1, 10) // 수집 범위를 10개로 확대
                     .map(m => {
@@ -335,7 +345,7 @@ app.get('/api/trends', async (req, res) => {
                         const isGeneric = genericTerms.some(term => item.title.includes(term));
                         return item.title.length > 10 && !isGeneric;
                     });
-                
+
                 allTrends = [...allTrends, ...categoryTitles];
             }
         });
@@ -347,7 +357,7 @@ app.get('/api/trends', async (req, res) => {
                 uniqueTitles.set(item.title, item);
             }
         });
-        
+
         let finalTrends = Array.from(uniqueTitles.values());
 
         // 무작위로 섞기
@@ -358,7 +368,7 @@ app.get('/api/trends', async (req, res) => {
             const extra = fallbacks.filter(f => !uniqueTitles.has(f.title));
             finalTrends = [...finalTrends, ...extra];
         }
-        
+
         // 정확히 10개만 추출
         finalTrends = finalTrends.slice(0, 10);
 
