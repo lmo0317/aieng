@@ -658,6 +658,9 @@ button:active {
     margin-top: 15px;
     font-size: 1.05rem;
     line-height: 2;
+    display: flex;
+    flex-wrap: wrap; /* 핵심: 품사 태그가 화면 너비를 넘어가면 다음 줄로 자동 줄바꿈 */
+    gap: 8px; /* 태그 간격 */
 }
 
 .pos-text-item {
@@ -667,8 +670,8 @@ button:active {
     padding: 4px 10px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    margin: 4px 6px 4px 0;
     box-shadow: var(--shadow-sm);
+    white-space: nowrap; /* 태그 내부 텍스트는 줄바꿈 방지 */
 }
 
 .pos-word {
@@ -684,6 +687,87 @@ button:active {
 }
 
 .pos-separator {
-    color: #cbd5e0;
-    margin: 0 6px;
+    display: none; /* flex-wrap을 사용하므로 기존 '/' 구분자는 숨김 처리 */
+}
+
+/* 모바일 반응형 전면 최적화 */
+@media (max-width: 900px) {
+    body {
+        overflow-x: hidden; /* 모바일에서 화면 흔들림(가로 스크롤) 완벽 차단 */
+    }
+
+    .container {
+        width: 100%;
+        max-width: 100vw;
+        margin: 0;
+        border-radius: 0;
+        padding: 1.5rem 1rem;
+        box-shadow: none;
+        box-sizing: border-box; /* 패딩이 너비를 넘지 않도록 설정 */
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .setup-container {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .setup-left, .setup-right {
+        width: 100%;
+        flex: none;
+        box-sizing: border-box;
+    }
+
+    .setup-right {
+        height: 350px;
+        order: 2; /* 모바일에서는 입력창이 먼저 보이도록 배치 */
+    }
+
+    textarea {
+        min-height: 180px;
+        font-size: 1.05rem;
+        padding: 16px;
+    }
+
+    .start-btn {
+        padding: 16px;
+        font-size: 1.1rem;
+    }
+
+    .card {
+        padding: 1.5rem;
+        margin-top: 1rem;
+        border-radius: 16px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .english-sentence {
+        font-size: 1.4rem;
+        word-break: keep-all; /* 단어 단위로 줄바꿈하여 가독성 유지 */
+    }
+
+    .korean-sentence {
+        font-size: 1.1rem;
+    }
+
+    .controls {
+        flex-direction: column; /* 버튼들을 세로로 배치 */
+        width: 100%;
+        gap: 12px;
+    }
+
+    .controls button {
+        width: 100%;
+        min-width: 0;
+        padding: 16px; /* 터치하기 쉽도록 높이 유지 */
+    }
+
+    .analysis-section, .structure-section, .explanation-section, .voca-section {
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
 }

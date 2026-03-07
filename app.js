@@ -25,17 +25,74 @@ const trendsContainer = document.getElementById('trends-container');
 const topicInput = document.getElementById('topic');
 
 const navReview = document.getElementById('nav-review');
+const navHome = document.getElementById('nav-home');
 const backToMain = document.getElementById('back-to-main');
 
-// 섹션 전환 유틸리티
-function showSection(sectionId) {
+// 학습 상태 초기화 함수
+function resetLearningState() {
+    currentCount = 0;
+    sentences = [];
+    
+    // UI 텍스트 초기화
+    sentenceEn.textContent = '문장을 불러오는 중...';
+    sentenceKo.innerHTML = '';
+    analysisDiv.innerHTML = '';
+    structureDiv.innerHTML = '';
+    explanationDiv.innerHTML = '';
+    vocaDiv.innerHTML = '';
+    
+    // UI 노출 상태 초기화
+    sentenceKo.classList.add('hidden');
+    analysisDiv.classList.add('hidden');
+    structureDiv.classList.add('hidden');
+    explanationDiv.classList.add('hidden');
+    vocaDiv.classList.add('hidden');
+    
+    revealBtn.classList.remove('hidden');
+    nextBtn.classList.add('hidden');
+    finishBtn.classList.add('hidden');
+    ttsBtn.classList.add('hidden');
+    
+    currentCountSpan.textContent = '0';
+    
+    // TTS 중단
+    window.speechSynthesis.cancel();
+}
+
+// 섹션 전환 유틸리티 (히스토리 지원)
+function showSection(sectionId, pushState = true) {
+    // 학습 화면에서 나갈 때 상태 초기화
+    if (sectionId === 'setup-section' || sectionId === 'review-section') {
+        resetLearningState();
+    }
+
     [setupSection, reviewSection, learningSection].forEach(section => {
         if (section) section.classList.add('hidden');
     });
+    
     const target = document.getElementById(sectionId);
     if (target) target.classList.remove('hidden');
+    
     window.speechSynthesis.cancel();
+
+    // 브라우저 뒤로가기 버튼 지원을 위해 상태 저장
+    if (pushState) {
+        history.pushState({ sectionId }, '', '');
+    }
 }
+
+// 브라우저 뒤로가기/앞으로가기 버튼 감지
+window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.sectionId) {
+        showSection(event.state.sectionId, false);
+    } else {
+        // 초기 상태 (메인화면)
+        showSection('setup-section', false);
+    }
+});
+
+// 초기 실행 시 현재 상태 저장
+history.replaceState({ sectionId: 'setup-section' }, '', '');
 
 // 트랜드 불러오기
 async function fetchTrends() {
@@ -167,6 +224,11 @@ async function deleteHistory(id) {
 fetchTrends();
 
 // 내비게이션 이벤트
+navHome.addEventListener('click', (e) => {
+    e.preventDefault();
+    showSection('setup-section');
+});
+
 navReview.addEventListener('click', (e) => {
     e.preventDefault();
     showSection('review-section');
