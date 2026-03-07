@@ -107,6 +107,15 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 sentences TEXT,
                 FOREIGN KEY(userId) REFERENCES users(id)
             )`);
+
+            // Create Learning History table for Review feature
+            db.run(`CREATE TABLE IF NOT EXISTS learning_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                topic TEXT,
+                difficulty TEXT,
+                sentences TEXT,
+                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`);
         });
     }
 });

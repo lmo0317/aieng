@@ -218,6 +218,15 @@ app.post('/api/generate', async (req, res) => {
             }
         }
 
+        // 학습 히스토리 저장 (복습 기능을 위해)
+        db.run("INSERT INTO learning_history (topic, difficulty, sentences) VALUES (?, ?, ?)", 
+            [topic, difficulty, JSON.stringify(sentences)], 
+            function(err) {
+                if (err) console.error('History Save Error:', err.message);
+                else console.log(`Learning session saved to history with ID: ${this.lastID}`);
+            }
+        );
+
         res.json({ sentences });
 
     } catch (error) {
@@ -234,6 +243,40 @@ app.get('/api/usage', (req, res) => {
     res.json({
         error: 'Gemini는 현재 사용량 확인 기능을 제공하지 않습니다.',
         provider: 'gemini'
+    });
+});
+
+// History API - 복습용 데이터 목록 조회
+app.get('/api/history', (req, res) => {
+    db.all("SELECT id, topic, difficulty, createdAt FROM learning_history ORDER BY createdAt DESC", (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ history: rows });
+    });
+});
+
+// History Detail API - 특정 복습 데이터 상세 조회 (문장 포함)
+app.get('/api/history/:id', (req, res) => {
+    const { id } = req.params;
+    db.get("SELECT * FROM learning_history WHERE id = ?", [id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+        
+        res.json({
+            id: row.id,
+            topic: row.topic,
+            difficulty: row.difficulty,
+            sentences: JSON.parse(row.sentences),
+            createdAt: row.createdAt
+        });
+    });
+});
+
+// History Delete API - 복습 데이터 삭제
+app.delete('/api/history/:id', (req, res) => {
+    const { id } = req.params;
+    db.run("DELETE FROM learning_history WHERE id = ?", [id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, message: '기록이 삭제되었습니다.' });
     });
 });
 

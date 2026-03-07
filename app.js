@@ -1,8 +1,11 @@
 let currentCount = 0;
 let sentences = [];
 
-const setupSection = document.querySelector('.setup-section');
+const setupSection = document.getElementById('setup-section');
+const reviewSection = document.getElementById('review-section');
 const learningSection = document.getElementById('learning-section');
+const historyList = document.getElementById('history-list');
+
 const startBtn = document.getElementById('start-btn');
 const homeBtn = document.getElementById('home-btn');
 const revealBtn = document.getElementById('reveal-btn');
@@ -20,6 +23,19 @@ const ttsBtn = document.getElementById('tts-btn');
 
 const trendsContainer = document.getElementById('trends-container');
 const topicInput = document.getElementById('topic');
+
+const navReview = document.getElementById('nav-review');
+const backToMain = document.getElementById('back-to-main');
+
+// 섹션 전환 유틸리티
+function showSection(sectionId) {
+    [setupSection, reviewSection, learningSection].forEach(section => {
+        if (section) section.classList.add('hidden');
+    });
+    const target = document.getElementById(sectionId);
+    if (target) target.classList.remove('hidden');
+    window.speechSynthesis.cancel();
+}
 
 // 트랜드 불러오기
 async function fetchTrends() {
@@ -58,32 +74,107 @@ function renderTrends(trends) {
         
         card.addEventListener('click', () => {
             topicInput.value = item.title;
-            // 모든 카드에서 active 클래스 제거 후 현재 카드에 추가
             document.querySelectorAll('.trend-card').forEach(c => c.classList.remove('active'));
             card.classList.add('active');
-            
             topicInput.focus();
         });
         trendsContainer.appendChild(card);
     });
 }
 
-// 페이지 로드 시 트랜드 실행
+// 히스토리 불러오기
+async function fetchHistory() {
+    historyList.innerHTML = '<div class="history-loading">학습 기록을 불러오는 중...</div>';
+    try {
+        const response = await fetch('/api/history');
+        const data = await response.json();
+        
+        if (data.history && data.history.length > 0) {
+            renderHistory(data.history);
+        } else {
+            historyList.innerHTML = '<div class="history-empty">아직 학습 기록이 없습니다. 새로운 학습을 시작해 보세요!</div>';
+        }
+    } catch (error) {
+        console.error('Error fetching history:', error);
+        historyList.innerHTML = '<div class="history-empty">기록을 불러오지 못했습니다.</div>';
+    }
+}
+
+function renderHistory(history) {
+    historyList.innerHTML = '';
+    history.forEach(item => {
+        const date = new Date(item.createdAt).toLocaleDateString('ko-KR', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        
+        const card = document.createElement('div');
+        card.className = 'history-item';
+        card.innerHTML = `
+            <div class="history-info">
+                <div class="history-topic">${item.topic}</div>
+                <div class="history-meta">
+                    <span class="history-difficulty">${item.difficulty.toUpperCase()}</span>
+                    <span class="history-date">📅 ${date}</span>
+                </div>
+            </div>
+            <button class="delete-history-btn" title="삭제">🗑️</button>
+        `;
+        
+        card.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-history-btn')) return;
+            loadHistoryDetail(item.id);
+        });
+        
+        card.querySelector('.delete-history-btn').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (confirm('이 학습 기록을 삭제하시겠습니까?')) {
+                await deleteHistory(item.id);
+            }
+        });
+        
+        historyList.appendChild(card);
+    });
+}
+
+async function loadHistoryDetail(id) {
+    try {
+        const response = await fetch(`/api/history/${id}`);
+        if (!response.ok) throw new Error('데이터를 가져오지 못했습니다.');
+        
+        const data = await response.json();
+        sentences = data.sentences;
+        currentCount = 0;
+        
+        showSection('learning-section');
+        showSentence();
+    } catch (error) {
+        alert('복습 데이터를 불러오는 데 실패했습니다.');
+    }
+}
+
+async function deleteHistory(id) {
+    try {
+        const response = await fetch(`/api/history/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+            fetchHistory();
+        }
+    } catch (error) {
+        alert('삭제 중 오류가 발생했습니다.');
+    }
+}
+
+// 초기화
 fetchTrends();
 
-homeBtn.addEventListener('click', () => {
-    // 상태 리셋
-    currentCount = 0;
-    sentences = [];
-    topicInput.value = '';
-
-    // 섹션 전환
-    learningSection.classList.add('hidden');
-    setupSection.classList.remove('hidden');
-    
-    // 재생 중인 오디오 중단
-    window.speechSynthesis.cancel();
+// 내비게이션 이벤트
+navReview.addEventListener('click', (e) => {
+    e.preventDefault();
+    showSection('review-section');
+    fetchHistory();
 });
+
+if (backToMain) backToMain.addEventListener('click', () => showSection('setup-section'));
+if (homeBtn) homeBtn.addEventListener('click', () => showSection('setup-section'));
 
 startBtn.addEventListener('click', async () => {
     const topic = topicInput.value;
@@ -94,8 +185,7 @@ startBtn.addEventListener('click', async () => {
         return;
     }
 
-    setupSection.classList.add('hidden');
-    learningSection.classList.remove('hidden');
+    showSection('learning-section');
     ttsBtn.classList.add('hidden');
 
     await fetchSentences(topic, difficulty);
@@ -146,7 +236,6 @@ function showSentence() {
     
     ttsBtn.classList.remove('hidden');
 
-    // 분석 섹션들 데이터 채우기
     if (current.parts_of_speech) {
         analysisDiv.innerHTML = `<strong>📝 품사 구조 분석:</strong><br/>${formatPartsOfSpeech(current.parts_of_speech)}`;
     } else {
@@ -171,7 +260,6 @@ function showSentence() {
         vocaDiv.innerHTML = '';
     }
 
-    // 초기 상태 설정
     sentenceKo.classList.add('hidden');
     analysisDiv.classList.add('hidden');
     structureDiv.classList.add('hidden');
@@ -183,7 +271,6 @@ function showSentence() {
 
     currentCountSpan.textContent = currentCount + 1;
 }
-
 
 function formatAnalysis(analysis) {
     return analysis.replace(/\n/g, '<br>');
@@ -206,7 +293,6 @@ function formatPartsOfSpeech(text) {
     return `<div class="pos-text-container">${formattedHtml}</div>`;
 }
 
-// TTS 기능
 ttsBtn.addEventListener('click', () => {
     if (currentCount >= sentences.length) return;
     
@@ -245,7 +331,7 @@ nextBtn.addEventListener('click', () => {
 });
 
 finishBtn.addEventListener('click', () => {
-    alert('오늘의 날먹 트레이닝 완료! 고생하셨습니다. 🍖🔥');
+    alert('오늘의 트레이닝 완료! 고생하셨습니다. 🔥');
     location.reload();
 });
 

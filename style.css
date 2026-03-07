@@ -320,21 +320,17 @@ select:focus {
     }
 }
 
-.header-section {
+.nav-links {
     display: flex;
-    justify-content: flex-end;
+    gap: 15px;
     align-items: center;
-    margin-bottom: 1rem;
 }
 
-.settings-link {
+.nav-link {
     color: var(--text-muted);
     text-decoration: none;
     font-size: 0.95rem;
     font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
     padding: 8px 16px;
     border-radius: 12px;
     background: #fff;
@@ -342,11 +338,136 @@ select:focus {
     border: 1px solid var(--border-color);
 }
 
-.settings-link:hover {
+.nav-link:hover {
     color: var(--primary);
     background: var(--primary-light);
     border-color: #c7d2fe;
+}
+
+/* Review Section */
+#review-section {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.section-header h2 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 1.5rem;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.history-item {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.history-item:hover {
+    border-color: var(--primary);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.history-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.history-topic {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.history-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.history-date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.history-difficulty {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+.delete-history-btn {
+    background-color: #fee2e2;
+    color: #ef4444;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+}
+
+.delete-history-btn:hover {
+    background-color: #ef4444;
+    color: #fff;
+}
+
+.history-loading {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.history-empty {
+    padding: 60px;
+    text-align: center;
+    background-color: #f8fafc;
+    border-radius: 20px;
+    border: 2px dashed var(--border-color);
+    color: var(--text-muted);
+}
+
+#setup-section.hidden, 
+#review-section.hidden {
+    display: none !important;
 }
 
 .home-btn {
