@@ -237,6 +237,76 @@ app.get('/api/usage', (req, res) => {
     });
 });
 
+// Trends API - 다양한 카테고리(경제, 연예, 스포츠, 기술) 뉴스 골고루 수집
+app.get('/api/trends', async (req, res) => {
+    // 에러 발생 시 사용할 기본 트랜드 데이터 (새로운 객체 구조에 맞춤)
+    const fallbacks = [
+        { category: 'TEC', title: 'ChatGPT를 활용한 효율적인 영어 학습법' },
+        { category: 'BIZ', title: '2026년 세계 경제 전망과 주요 투자 트랜드' },
+        { category: 'SPT', title: '유럽 챔피언스리그 결승전 주요 관전 포인트' },
+        { category: 'ENT', title: '올해 가장 기대되는 넷플릭스 오리지널 시리즈' },
+        { category: 'TEC', title: '인공지능 기술이 바꾸는 우리의 미래 일상' },
+        { category: 'BIZ', title: '애플과 테슬라의 차세대 제품 출시 소식' },
+        { category: 'SPT', title: '손흥민 선수의 최근 경기 활약상 및 인터뷰' },
+        { category: 'ENT', title: '글로벌 차트를 점령한 K-POP 아티스트 뉴스' },
+        { category: 'TOP', title: '해외 여행객을 위한 실시간 날씨 및 여행지 추천' },
+        { category: 'TEC', title: '최신 스마트폰 카메라 성능 비교 및 리뷰' }
+    ];
+    
+    const categories = [
+        { name: 'TOP', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'BIZ', url: 'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'ENT', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'SPT', url: 'https://news.google.com/rss/headlines/section/topic/SPORTS?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'TEC', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' }
+    ];
+
+    try {
+        const results = await Promise.allSettled(
+            categories.map(cat => axios.get(cat.url, { 
+                timeout: 5000, // 대기 시간을 5초로 연장
+                headers: { 'User-Agent': 'Mozilla/5.0' } 
+            }))
+        );
+
+        let allKeywords = [];
+
+        results.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                const categoryName = categories[index].name;
+                const xml = result.value.data;
+                const titleMatches = xml.match(/<title>(.*?)<\/title>/g) || [];
+                
+                const categoryTitles = titleMatches
+                    .slice(1, 4) 
+                    .map(m => {
+                        let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
+                        title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                        return {
+                            category: categoryName,
+                            title: title.trim()
+                        };
+                    });
+                
+                allKeywords = [...allKeywords, ...categoryTitles];
+            }
+        });
+
+        // 랜덤하게 섞고 10개 추출
+        let trends = allKeywords.sort(() => Math.random() - 0.5).slice(0, 10);
+
+        // 데이터가 부족하면 fallback 데이터로 보충
+        if (trends.length < 5) {
+            trends = fallbacks;
+        }
+
+        res.json({ trends });
+    } catch (error) {
+        console.error('Trends API Error (Using Fallback):', error.message);
+        res.json({ trends: fallbacks });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

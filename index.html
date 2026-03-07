@@ -13,19 +13,41 @@
         <div class="header-section">
             <a href="/settings.html" class="settings-link">⚙️ 설정</a>
         </div>
-        <h1>AIEng 📚</h1>
-        <p>좋아하는 주제를 입력하고 난이도를 선택해 보세요!</p>
+        <h1>AIEng 🤖</h1>
+        <p>인공지능이 제안하는 당신만을 위한 맞춤형 영어 학습 솔루션</p>
 
         <div class="setup-section">
-            <input type="text" id="topic" placeholder="예: 축구, 여행, 요리, 인공지능">
-            <select id="difficulty">
-                <option value="level1">레벨 1 (Level 1 - 왕초보)</option>
-                <option value="level2">레벨 2 (Level 2 - 초보)</option>
-                <option value="level3" selected>레벨 3 (Level 3 - 중급)</option>
-                <option value="level4">레벨 4 (Level 4 - 고급)</option>
-                <option value="level5">레벨 5 (Level 5 - 원어민 수준)</option>
-            </select>
-            <button id="start-btn">학습 시작</button>
+            <div class="setup-container">
+                <!-- 왼쪽: 입력 및 설정 영역 -->
+                <div class="setup-left">
+                    <div class="input-group topic-group">
+                        <label for="topic">학습 주제 및 세부 내용</label>
+                        <textarea id="topic" placeholder="학습하고 싶은 주제나 관련 기사 전문을 입력하세요. 상세할수록 더 정확한 문장이 생성됩니다." rows="8"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="difficulty">학습 난이도 선택</label>
+                        <select id="difficulty">
+                            <option value="level1">Level 1 (입문)</option>
+                            <option value="level2">Level 2 (초급)</option>
+                            <option value="level3" selected>Level 3 (중급)</option>
+                            <option value="level4">Level 4 (고급)</option>
+                            <option value="level5">Level 5 (심화)</option>
+                        </select>
+                    </div>
+                    <button id="start-btn" class="start-btn">학습 시작 🚀</button>
+                </div>
+
+                <!-- 오른쪽: 세로형 트랜드 리스트 영역 -->
+                <div class="setup-right">
+                    <div class="trends-header">
+                        <span>🔥 실시간 트랜드 추천</span>
+                    </div>
+                    <div id="trends-container" class="trends-vertical-list">
+                        <!-- 트랜드 카드들이 세로로 생성됩니다 -->
+                        <div class="trends-loading">데이터를 불러오는 중...</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="learning-section" class="hidden">
