@@ -59,7 +59,7 @@ async function getGlobalSettings() {
             else resolve({
                 geminiApiKey: row?.geminiApiKey || process.env.GEMINI_API_KEY,
                 geminiModel: row?.geminiModel || 'gemini-2.5-flash',
-                chatModel: row?.chatModel || 'gemini-2.5-flash-native-audio-latest',
+                chatModel: row?.chatModel || 'gemini-2.5-flash',
                 systemPrompt: row?.systemPrompt || DEFAULT_PROMPT
             });
         });
@@ -76,7 +76,7 @@ app.get('/api/settings', (req, res) => {
             hasApiKey: !!row?.geminiApiKey,
             apiKeyPreview: row?.geminiApiKey ? row.geminiApiKey.substring(0, 10) + '...' : null,
             model: row?.geminiModel || 'gemini-2.5-flash',
-            chatModel: row?.chatModel || 'gemini-2.5-flash-native-audio-latest',
+            chatModel: row?.chatModel || 'gemini-2.5-flash',
             systemPrompt: row?.systemPrompt || DEFAULT_PROMPT
         });
     });
@@ -189,11 +189,6 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
-// Chat API (Traditional SSE - Keep for compatibility)
-app.post('/api/chat', handleChatRequest);
-app.delete('/api/chat/:sessionId', handleClearSession);
-app.get('/api/chat/:sessionId/history', handleGetHistory);
-
 // History API
 app.get('/api/history', (req, res) => {
     db.all("SELECT id, topic, difficulty, createdAt FROM learning_history ORDER BY createdAt DESC", (err, rows) => {
@@ -226,22 +221,19 @@ app.delete('/api/history/:id', (req, res) => {
 });
 
 app.get('/api/trends', async (req, res) => {
-    res.json({ trends: [] }); // RSS logic removed for brevity but should be here
+    res.json({ trends: [] });
 });
 
 // Start Express Server
 const server = app.listen(PORT, async () => {
     console.log(`Express Server running on port ${PORT}`);
-    
     if (!db.isReady) {
         await new Promise(resolve => db.resolveReady = resolve);
     }
-    
     const settings = await getGlobalSettings();
     app.locals.geminiApiKey = settings.geminiApiKey;
     app.locals.geminiModel = settings.geminiModel;
-    app.locals.chatModel = settings.chatModel || 'gemini-2.5-flash-native-audio-latest';
-    console.log('App initialized with chat model:', app.locals.chatModel);
+    app.locals.chatModel = 'gemini-2.5-flash-native-audio-latest';
 });
 
 // WebSocket Server for Gemini Multimodal Live
@@ -250,72 +242,76 @@ const wss = new WebSocket.Server({ server, path: '/ws/chat' });
 wss.on('connection', (ws, req) => {
     console.log(`WS: New Connection from ${req.socket.remoteAddress}`);
     let geminiWs = null;
+    let messageQueue = [];
 
-    ws.on('message', async (message) => {
+    const connectToGemini = () => {
+        const apiKey = app.locals.geminiApiKey;
+        if (!apiKey) {
+            ws.send(JSON.stringify({ type: 'text', text: 'Gemini API Key가 없습니다.' }));
+            return;
+        }
+
+        const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+        geminiWs = new WebSocket(geminiUrl);
+
+        geminiWs.on('open', () => {
+            console.log('WS: Gemini Connected');
+            // 1. Setup 전송
+            geminiWs.send(JSON.stringify({
+                setup: { model: `models/${app.locals.chatModel}` }
+            }));
+
+            // 2. 큐에 쌓인 메시지 전송
+            while (messageQueue.length > 0) {
+                const msg = messageQueue.shift();
+                geminiWs.send(JSON.stringify(msg));
+            }
+        });
+
+        geminiWs.on('message', (response) => {
+            const geminiData = JSON.parse(response);
+            if (geminiData.serverContent?.modelTurn) {
+                const parts = geminiData.serverContent.modelTurn.parts;
+                parts.forEach(part => {
+                    if (part.text) ws.send(JSON.stringify({ type: 'text', text: part.text }));
+                    if (part.inlineData) ws.send(JSON.stringify({ type: 'audio', audio: part.inlineData.data }));
+                });
+            }
+        });
+
+        geminiWs.on('error', (err) => ws.send(JSON.stringify({ type: 'text', text: `Gemini 연결 에러: ${err.message}` })));
+        geminiWs.on('close', () => { geminiWs = null; });
+    };
+
+    ws.on('message', (message) => {
         try {
             const data = JSON.parse(message);
-            const apiKey = app.locals.geminiApiKey;
+            let geminiMsg = null;
 
-            if (!apiKey) {
-                ws.send(JSON.stringify({ type: 'text', text: 'Gemini API Key가 없습니다. 설정에서 입력해 주세요.' }));
-                return;
+            if (data.type === 'text') {
+                geminiMsg = {
+                    clientContent: {
+                        turns: [{ role: 'user', parts: [{ text: data.text }] }],
+                        turnComplete: true
+                    }
+                };
+            } else if (data.type === 'video' || data.type === 'audio') {
+                geminiMsg = {
+                    realtimeInput: {
+                        mediaChunks: [{
+                            mimeType: data.type === 'video' ? 'image/jpeg' : 'audio/pcm',
+                            data: data.data
+                        }]
+                    }
+                };
             }
 
-            if (!geminiWs) {
-                const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
-                console.log('WS: Connecting to Gemini Bidi API...');
-                
-                geminiWs = new WebSocket(geminiUrl);
-
-                geminiWs.on('open', () => {
-                    console.log('WS: Gemini API Connected');
-                    geminiWs.send(JSON.stringify({
-                        setup: { model: `models/${app.locals.chatModel}` }
-                    }));
-                });
-
-                geminiWs.on('message', (response) => {
-                    const geminiData = JSON.parse(response);
-                    if (geminiData.serverContent?.modelTurn) {
-                        const parts = geminiData.serverContent.modelTurn.parts;
-                        parts.forEach(part => {
-                            if (part.text) ws.send(JSON.stringify({ type: 'text', text: part.text }));
-                            if (part.inlineData) {
-                                ws.send(JSON.stringify({ type: 'audio', audio: part.inlineData.data }));
-                                ws.send(JSON.stringify({ type: 'status', status: 'talking' }));
-                            }
-                        });
-                    }
-                    if (geminiData.serverContent?.turnComplete) {
-                        ws.send(JSON.stringify({ type: 'status', status: 'idle' }));
-                    }
-                });
-
-                geminiWs.on('error', (err) => {
-                    console.error('WS: Gemini Socket Error:', err.message);
-                    ws.send(JSON.stringify({ type: 'text', text: `Gemini API 에러: ${err.message}` }));
-                });
-
-                geminiWs.on('close', () => console.log('WS: Gemini Connection Closed'));
-            }
-
-            if (geminiWs.readyState === WebSocket.OPEN) {
-                if (data.type === 'text') {
-                    geminiWs.send(JSON.stringify({
-                        clientContent: {
-                            turns: [{ role: 'user', parts: [{ text: data.text }] }],
-                            turnComplete: true
-                        }
-                    }));
-                } else if (data.type === 'video' || data.type === 'audio') {
-                    geminiWs.send(JSON.stringify({
-                        realtimeInput: {
-                            mediaChunks: [{
-                                mimeType: data.type === 'video' ? 'image/jpeg' : 'audio/pcm',
-                                data: data.data
-                            }]
-                        }
-                    }));
+            if (geminiMsg) {
+                if (geminiWs && geminiWs.readyState === WebSocket.OPEN) {
+                    geminiWs.send(JSON.stringify(geminiMsg));
+                } else {
+                    if (!geminiWs) connectToGemini();
+                    messageQueue.push(geminiMsg);
                 }
             }
         } catch (e) {
@@ -325,6 +321,5 @@ wss.on('connection', (ws, req) => {
 
     ws.on('close', () => {
         if (geminiWs) geminiWs.close();
-        console.log('WS: Client Disconnected');
     });
 });
