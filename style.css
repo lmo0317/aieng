@@ -843,6 +843,8 @@ button:active {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: modalSlideIn 0.3s ease-out;
     pointer-events: auto; /* 컨테이너 내부 클릭은 허용 */
+    position: relative; /* z-index 적용을 위해 필요 */
+    z-index: 1005; /* 오버레이(1000)보다 확실히 높게 설정 */
 }
 
 @keyframes modalSlideIn {
