@@ -58,7 +58,7 @@ async function getGlobalSettings() {
             else resolve({
                 geminiApiKey: row?.geminiApiKey || process.env.GEMINI_API_KEY,
                 geminiModel: row?.geminiModel || 'gemini-2.5-flash',
-                chatModel: row?.chatModel || 'gemini-2.5-flash-native-audio',
+                chatModel: row?.chatModel || 'gemini-2.5-flash-native-audio-latest',
                 systemPrompt: row?.systemPrompt || DEFAULT_PROMPT
             });
         });
@@ -75,7 +75,7 @@ app.get('/api/settings', (req, res) => {
             hasApiKey: !!row?.geminiApiKey,
             apiKeyPreview: row?.geminiApiKey || null,
             model: row?.geminiModel || 'gemini-2.5-flash',
-            chatModel: row?.chatModel || 'gemini-2.5-flash-native-audio',
+            chatModel: row?.chatModel || 'gemini-2.5-flash-native-audio-latest',
             systemPrompt: row?.systemPrompt || DEFAULT_PROMPT
         });
     });
