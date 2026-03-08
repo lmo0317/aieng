@@ -21,10 +21,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'Trend Eng'의 전문 AI 튜터입니다.
-이 사용자는 방금 학습을 마쳤거나 학습 중이며, 실시간 대화를 통해 스피킹 실력을 높이고 싶어 합니다.
 친절하고 격려하는 어조로 대화해 주세요.`;
 
-// Helper function to get global settings
 async function getGlobalSettings() {
     return new Promise((resolve, reject) => {
         db.get("SELECT geminiApiKey, geminiModel, chatModel, systemPrompt FROM global_settings WHERE id = 1", (err, row) => {
@@ -39,11 +37,11 @@ async function getGlobalSettings() {
     });
 }
 
-// REST APIs (Simplified for this task)
+// REST APIs
 app.get('/api/settings', async (req, res) => {
     try {
-        const settings = await getGlobalSettings();
-        res.json({ provider: 'gemini', hasApiKey: !!settings.geminiApiKey, model: settings.geminiModel, chatModel: settings.chatModel });
+        const s = await getGlobalSettings();
+        res.json({ provider: 'gemini', hasApiKey: !!s.geminiApiKey, model: s.geminiModel, chatModel: s.chatModel });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -76,33 +74,33 @@ wss.on('connection', (ws) => {
     const startGeminiSession = async () => {
         const s = await getGlobalSettings();
         if (!s.geminiApiKey) {
-            ws.send(JSON.stringify({ type: 'text', text: 'API Key가 설정되지 않았습니다.' }));
+            ws.send(JSON.stringify({ type: 'text', text: 'Error: API Key가 없습니다.' }));
             return;
         }
 
+        // 최신 Bidi URL (v1beta)
         const url = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${s.geminiApiKey}`;
         geminiWs = new WebSocket(url);
 
         geminiWs.on('open', () => {
-            console.log('Gemini API Connection Opened');
-            // 1. Setup 전송 (필수)
-            geminiWs.send(JSON.stringify({
+            console.log('Gemini Bidi Connection Opened');
+            // 최신 규격 Setup (불필요한 인자 제거하여 1007 에러 방지)
+            const setupMsg = {
                 setup: { 
-                    model: `models/${s.chatModel}`,
-                    generation_config: { response_modalities: ["audio", "text"] }
+                    model: `models/${s.chatModel}`
                 }
-            }));
+            };
+            geminiWs.send(JSON.stringify(setupMsg));
         });
 
         geminiWs.on('message', (data) => {
             try {
                 const response = JSON.parse(data);
+                console.log('Gemini Data:', JSON.stringify(response).substring(0, 100));
                 
-                // Setup 완료 확인
                 if (response.setupComplete) {
-                    console.log('Gemini Setup Complete');
+                    console.log('Gemini Setup Verified');
                     isSetupDone = true;
-                    // 대기 중인 메시지 쏘기
                     while (messageQueue.length > 0) {
                         geminiWs.send(JSON.stringify(messageQueue.shift()));
                     }
@@ -112,32 +110,24 @@ wss.on('connection', (ws) => {
                 if (response.serverContent?.modelTurn) {
                     const parts = response.serverContent.modelTurn.parts;
                     parts.forEach(p => {
-                        if (p.text) {
-                            console.log('AI Text Response:', p.text);
-                            ws.send(JSON.stringify({ type: 'text', text: p.text }));
-                        }
-                        if (p.inlineData) {
-                            ws.send(JSON.stringify({ type: 'audio', audio: p.inlineData.data }));
-                            ws.send(JSON.stringify({ type: 'status', status: 'talking' }));
-                        }
+                        if (p.text) ws.send(JSON.stringify({ type: 'text', text: p.text }));
+                        if (p.inlineData) ws.send(JSON.stringify({ type: 'audio', audio: p.inlineData.data }));
                     });
                 }
                 
                 if (response.serverContent?.turnComplete) {
                     ws.send(JSON.stringify({ type: 'status', status: 'idle' }));
                 }
-            } catch (e) { console.error('Error parsing Gemini response:', e); }
+            } catch (e) { console.error('Gemini Parse Error:', e); }
         });
 
         geminiWs.on('close', (code, reason) => {
-            console.log(`Gemini Connection Closed. Code: ${code}, Reason: ${reason}`);
+            console.log(`Gemini Closed. Code: ${code}, Reason: ${reason}`);
             geminiWs = null;
             isSetupDone = false;
         });
 
-        geminiWs.on('error', (err) => {
-            console.error('Gemini WS Error:', err.message);
-        });
+        geminiWs.on('error', (err) => console.error('Gemini WS Error:', err.message));
     };
 
     ws.on('message', (message) => {
@@ -148,7 +138,9 @@ wss.on('connection', (ws) => {
             if (data.type === 'text') {
                 payload = { clientContent: { turns: [{ role: 'user', parts: [{ text: data.text }] }], turnComplete: true } };
             } else if (data.type === 'audio') {
-                payload = { realtimeInput: { mediaChunks: [{ mimeType: 'audio/pcm', data: data.data }] } };
+                payload = { realtimeInput: { mediaChunks: [{ mimeType: 'audio/pcm;rate=16000', data: data.data }] } };
+            } else if (data.type === 'video') {
+                payload = { realtimeInput: { mediaChunks: [{ mimeType: 'image/jpeg', data: data.data }] } };
             }
 
             if (payload) {
@@ -159,7 +151,7 @@ wss.on('connection', (ws) => {
                     messageQueue.push(payload);
                 }
             }
-        } catch (e) { console.error('Client message handling error:', e); }
+        } catch (e) { console.error('Local WS Error:', e); }
     });
 
     ws.on('close', () => { if (geminiWs) geminiWs.close(); });
