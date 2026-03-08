@@ -197,12 +197,8 @@ app.get('/api/trends', async (req, res) => {
                     let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
                     title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
                     const cleanTitle = title.trim();
-                    
-                    // 의미 없는 제목 필터링
                     const genericTerms = ['Google 뉴스', 'Google News', '속보', '오늘의 뉴스'];
-                    const isGeneric = genericTerms.some(term => cleanTitle.includes(term));
-                    
-                    if (cleanTitle.length > 10 && !isGeneric) {
+                    if (cleanTitle.length > 10 && !genericTerms.some(term => cleanTitle.includes(term))) {
                         allTrends.push({ category: categories[index].name, title: cleanTitle });
                     }
                 });
@@ -227,17 +223,39 @@ wss.on('connection', (ws, req) => {
     let geminiWs = null;
     let messageQueue = [];
     let isSetupDone = false;
+    let currentTopic = null;
 
     const startGeminiSession = async () => {
         const s = await getGlobalSettings();
         if (!s.geminiApiKey) { ws.send(JSON.stringify({ type: 'text', text: 'API Key가 없습니다.' })); return; }
+        
         geminiWs = new WebSocket(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${s.geminiApiKey}`);
+        
         geminiWs.on('open', () => {
-            geminiWs.send(JSON.stringify({ setup: { model: `models/gemini-2.5-flash-native-audio-latest`, generation_config: { response_modalities: ["AUDIO"] } } }));
+            console.log('Gemini Bidi Connection Opened');
+            const topicContext = currentTopic 
+                ? `\n\n현재 사용자가 공부하고 있는 주제는 '${currentTopic}'입니다. 이 주제를 바탕으로 자연스럽게 대화를 시작하고 학습을 도와주세요.`
+                : '';
+
+            const setupMsg = {
+                setup: { 
+                    model: `models/gemini-2.5-flash-native-audio-latest`,
+                    generation_config: { response_modalities: ["AUDIO"] },
+                    system_instruction: {
+                        parts: [{ text: (s.systemPrompt || DEFAULT_PROMPT) + topicContext }]
+                    }
+                }
+            };
+            geminiWs.send(JSON.stringify(setupMsg));
         });
+
         geminiWs.on('message', (data) => {
             const resp = JSON.parse(data);
-            if (resp.setupComplete) { isSetupDone = true; while (messageQueue.length > 0) geminiWs.send(JSON.stringify(messageQueue.shift())); return; }
+            if (resp.setupComplete) {
+                isSetupDone = true;
+                while (messageQueue.length > 0) geminiWs.send(JSON.stringify(messageQueue.shift()));
+                return;
+            }
             if (resp.serverContent?.modelTurn) {
                 resp.serverContent.modelTurn.parts.forEach(p => {
                     if (p.text) ws.send(JSON.stringify({ type: 'text', text: p.text }));
@@ -249,15 +267,25 @@ wss.on('connection', (ws, req) => {
     };
 
     ws.on('message', (message) => {
-        const data = JSON.parse(message);
-        let payload = null;
-        if (data.type === 'text') payload = { client_content: { turns: [{ role: "user", parts: [{ text: data.text }] }], turn_complete: true } };
-        else if (data.type === 'audio') payload = { realtime_input: { media_chunks: [{ mime_type: 'audio/pcm;rate=16000', data: data.data }] } };
-        
-        if (payload) {
-            if (geminiWs?.readyState === WebSocket.OPEN && isSetupDone) geminiWs.send(JSON.stringify(payload));
-            else { if (!geminiWs) startGeminiSession(); messageQueue.push(payload); }
-        }
+        try {
+            const data = JSON.parse(message);
+            
+            if (data.type === 'context') {
+                currentTopic = data.topic;
+                console.log('Topic context received:', currentTopic);
+                if (!geminiWs) startGeminiSession();
+                return;
+            }
+
+            let payload = null;
+            if (data.type === 'text') payload = { client_content: { turns: [{ role: "user", parts: [{ text: data.text }] }], turn_complete: true } };
+            else if (data.type === 'audio') payload = { realtime_input: { media_chunks: [{ mime_type: 'audio/pcm;rate=16000', data: data.data }] } };
+            
+            if (payload) {
+                if (geminiWs?.readyState === WebSocket.OPEN && isSetupDone) geminiWs.send(JSON.stringify(payload));
+                else { if (!geminiWs) startGeminiSession(); messageQueue.push(payload); }
+            }
+        } catch (e) { console.error('Local WS Error:', e); }
     });
     ws.on('close', () => { if (geminiWs) geminiWs.close(); });
 });

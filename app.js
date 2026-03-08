@@ -272,6 +272,9 @@ async function fetchSentences(topic, difficulty) {
             throw new Error('데이터 형식이 올바르지 않습니다.');
         }
 
+        // 현재 주제를 세션 스토리지에 저장 (채팅 연동용)
+        sessionStorage.setItem('currentTopic', topic);
+
         sentences = data.sentences;
         currentCount = 0;
         showSentence();

@@ -51,6 +51,16 @@ function connectWebSocket() {
     ChatState.socket.onopen = () => {
         ChatState.isConnected = true;
         updateStatus('AI 연결됨', 'active');
+
+        // 학습 페이지의 주제가 있다면 서버에 알림
+        const topic = sessionStorage.getItem('currentTopic');
+        if (topic) {
+            ChatState.socket.send(JSON.stringify({ 
+                type: 'context', 
+                topic: topic 
+            }));
+            console.log('Sent topic context:', topic);
+        }
     };
     
     ChatState.socket.onmessage = (event) => {
