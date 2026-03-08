@@ -15,7 +15,6 @@ const currentCountSpan = document.getElementById('current-count');
 
 const sentenceEn = document.getElementById('sentence-en');
 const sentenceKo = document.getElementById('sentence-ko');
-const analysisDiv = document.getElementById('analysis');
 const structureDiv = document.getElementById('structure');
 const explanationDiv = document.getElementById('explanation');
 const vocaDiv = document.getElementById('voca');
@@ -36,14 +35,12 @@ function resetLearningState() {
     // UI 텍스트 초기화
     sentenceEn.textContent = '문장을 불러오는 중...';
     sentenceKo.innerHTML = '';
-    analysisDiv.innerHTML = '';
     structureDiv.innerHTML = '';
     explanationDiv.innerHTML = '';
     vocaDiv.innerHTML = '';
     
     // UI 노출 상태 초기화
     sentenceKo.classList.add('hidden');
-    analysisDiv.classList.add('hidden');
     structureDiv.classList.add('hidden');
     explanationDiv.classList.add('hidden');
     vocaDiv.classList.add('hidden');
@@ -298,12 +295,6 @@ function showSentence() {
     
     ttsBtn.classList.remove('hidden');
 
-    if (current.parts_of_speech) {
-        analysisDiv.innerHTML = `<strong>📝 품사 구조 분석:</strong><br/>${formatPartsOfSpeech(current.parts_of_speech)}`;
-    } else {
-        analysisDiv.innerHTML = '';
-    }
-
     if (current.sentence_structure) {
         structureDiv.innerHTML = `<strong>🧩 문장 구성 요소:</strong><br/>${current.sentence_structure}`;
     } else {
@@ -323,7 +314,6 @@ function showSentence() {
     }
 
     sentenceKo.classList.add('hidden');
-    analysisDiv.classList.add('hidden');
     structureDiv.classList.add('hidden');
     explanationDiv.classList.add('hidden');
     vocaDiv.classList.add('hidden');
@@ -336,23 +326,6 @@ function showSentence() {
 
 function formatAnalysis(analysis) {
     return analysis.replace(/\n/g, '<br>');
-}
-
-function formatPartsOfSpeech(text) {
-    if (!text) return '';
-    const parts = text.split('/').map(p => p.trim()).filter(p => p);
-    
-    const formattedHtml = parts.map(part => {
-        const match = part.match(/(.+?)\((.+?)\)/);
-        if (match) {
-            const word = match[1].trim();
-            const role = match[2].trim();
-            return `<span class="pos-text-item"><span class="pos-word">${word}</span> <span class="pos-role">(${role})</span></span>`;
-        }
-        return `<span class="pos-text-item"><span class="pos-word">${part}</span></span>`;
-    }).join('<span class="pos-separator"> / </span>');
-    
-    return `<div class="pos-text-container">${formattedHtml}</div>`;
 }
 
 ttsBtn.addEventListener('click', () => {
@@ -372,7 +345,6 @@ ttsBtn.addEventListener('click', () => {
 
 revealBtn.addEventListener('click', () => {
     sentenceKo.classList.remove('hidden');
-    analysisDiv.classList.remove('hidden');
     structureDiv.classList.remove('hidden');
     explanationDiv.classList.remove('hidden');
     if (vocaDiv.innerHTML !== '') {
@@ -400,7 +372,6 @@ finishBtn.addEventListener('click', () => {
 function finishLearning() {
     sentenceEn.textContent = '모든 세션을 클리어했습니다! 🏆';
     sentenceKo.classList.add('hidden');
-    analysisDiv.classList.add('hidden');
     structureDiv.classList.add('hidden');
     explanationDiv.classList.add('hidden');
     vocaDiv.classList.add('hidden');
