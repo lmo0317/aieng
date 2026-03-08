@@ -66,16 +66,55 @@ function showSection(sectionId, pushState = true) {
     [setupSection, reviewSection, learningSection].forEach(section => {
         if (section) section.classList.add('hidden');
     });
-    
+
     const target = document.getElementById(sectionId);
     if (target) target.classList.remove('hidden');
-    
+
     window.speechSynthesis.cancel();
+
+    // 학습 섹션으로 전환 시 채팅 대화 초기화
+    if (sectionId === 'learning-section') {
+        resetChatConversation();
+    }
 
     // 브라우저 뒤로가기 버튼 지원을 위해 상태 저장
     if (pushState) {
         history.pushState({ sectionId }, '', '');
     }
+}
+
+// 채팅 대화 초기화 함수
+function resetChatConversation() {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+
+    // 기존 채팅 메시지 모두 제거
+    const messages = chatMessages.querySelectorAll('.chat-message');
+    messages.forEach(msg => msg.remove());
+
+    // 기존 환영 메시지도 제거
+    const welcome = chatMessages.querySelector('.chat-welcome-message');
+    if (welcome) welcome.remove();
+
+    // 환영 메시지 다시 추가 (이미 없는 경우에만)
+    if (!chatMessages.querySelector('.chat-welcome-message')) {
+        const welcomeDiv = document.createElement('div');
+        welcomeDiv.className = 'chat-welcome-message';
+        welcomeDiv.innerHTML = `
+            안녕하세요! Trend Eng AI 튜터입니다.<br>
+            실시간 음성 및 화상 대화로 영어 실력을 키워보세요!<br>
+            하단의 마이크나 상단의 비디오 버튼을 눌러 시작하세요.
+        `;
+        chatMessages.appendChild(welcomeDiv);
+    }
+
+    // 채팅 상태 초기화 (ChatState 변수가 있는 경우)
+    if (typeof ChatState !== 'undefined') {
+        ChatState.currentAiMessageTextDiv = null;
+        ChatState.aiTextBuffer = '';
+    }
+
+    console.log('[App] Chat conversation reset');
 }
 
 // 브라우저 뒤로가기/앞으로가기 버튼 감지
@@ -250,6 +289,20 @@ startBtn.addEventListener('click', async () => {
     await fetchSentences(topic, difficulty);
 });
 
+// 채팅 서버에 주제 전송 함수
+function sendTopicToChat(topic) {
+    // WebSocket이 연결되어 있고, ChatState가 있는 경우
+    if (typeof ChatState !== 'undefined' && ChatState.socket && ChatState.socket.readyState === WebSocket.OPEN) {
+        ChatState.socket.send(JSON.stringify({
+            type: 'context',
+            topic: topic
+        }));
+        console.log('[App] Topic sent to chat:', topic);
+    } else {
+        console.log('[App] Chat not connected, topic saved in sessionStorage');
+    }
+}
+
 async function fetchSentences(topic, difficulty) {
     sentenceEn.textContent = 'AI가 맞춤형 학습 콘텐츠를 생성하고 있습니다...';
 
@@ -278,6 +331,9 @@ async function fetchSentences(topic, difficulty) {
         sentences = data.sentences;
         currentCount = 0;
         showSentence();
+
+        // 채팅 서버에 주제 재전송
+        sendTopicToChat(topic);
     } catch (error) {
         console.error('Error fetching sentences:', error);
         sentenceEn.textContent = '콘텐츠를 불러오는 중 오류가 발생했습니다.';

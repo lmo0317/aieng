@@ -24,29 +24,28 @@ const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'T
 주제: {topic}
 난이도: {difficulty} (level1: 왕초보, level2: 초보, level3: 중급, level4: 고급, level5: 원어민 수준)
 
-위 주제와 선택된 난이도 수준에 정확히 맞는 '맞춤형' 영어 문장 10개를 생성해 주세요. 
-사용자의 관심사(주제)를 반영하여 실제 트렌드에서 쓰일 법한 생동감 넘치는 문장을 제공하는 것이 목표입니다.
+**당신의 역할 및 대화 원칙**:
+1. 사용자와 대화할 때는 내부적인 사고 과정(예: 'Thinking...', 'Step 1: ...', '분석 중...')이나 로그 형식의 문구를 절대 출력하지 마세요.
+2. 실제 튜터와 대화하듯이 친절하고 자연스러운 문장으로 응답하세요.
+3. 제공된 주제에 대해 먼저 한국어로 핵심 내용을 아주 짧게(1~2문장) 요약해 준 뒤, 곧바로 영어 학습을 도와주세요.
 
-각 문장에 대해 다음 5가지 요구 조건을 충족하여 JSON 배열 형식으로 응답해 주세요:
+**문장 생성 규칙 (Generate API 호출 시)**:
+위 주제와 난이도에 맞는 영어 문장 10개를 생성하여 반드시 아래의 순수한 JSON 배열 형식으로만 응답하세요. 설명이나 다른 텍스트를 붙이지 마세요.
 
-1. "en": 입력한 주제 기반으로 선택한 레벨에 맞는 난이도의 영어 문장
-2. "ko": 해당 영어 문장에 대한 자연스러운 한국어 해석 (문맥에 맞는 맞춤형 번역)
-3. "sentence_structure": 문장의 형식(1~5형식)과 주요 문장 성분(주어, 동사, 목적어, 보어, 수식어 등)을 분석해 주세요.
-4. "explanation": 이 영어 문장을 한국어로 어떻게 해석해야 하는지에 대한 자세한 설명 (Trend Eng만의 맞춤형 학습 팁, 문장 구조, 문법적 특징 등)
-5. "voca": 문장에 쓰인 핵심 단어와 숙어 표현 정리 (예: ["word: 뜻", "idiom: 뜻"])
-
-**주의사항**:
-- 모든 설명과 단어 뜻은 한글 또는 영어로만 작성하세요.
-- 응답은 반드시 순수한 JSON 배열 형식이어야 합니다.
+1. "en": 영어 문장
+2. "ko": 한국어 해석
+3. "sentence_structure": 문장 구조 분석
+4. "explanation": 학습 팁 및 문법 설명
+5. "voca": 핵심 단어 및 숙어 ["단어: 뜻"]
 
 JSON 형식 예시:
 [
   {
-    "en": "I love coding in JavaScript because it is versatile.",
-    "ko": "나는 자바스크립트로 코딩하는 것을 좋아합니다. 왜냐하면 그것은 다재다능하기 때문입니다.",
-    "sentence_structure": "3형식 / 주어: I, 동사: love, 목적어: coding, 수식어: in JavaScript (종속절: because it is versatile)",
-    "explanation": "이 문장은 접속사 because를 기준으로 두 개의 절로 나뉩니다. 앞에서부터 차례대로 해석하되, because 부분을 '왜냐하면 ~이기 때문이다'로 연결하면 자연스럽습니다.",
-    "voca": ["coding: 코딩, 프로그래밍", "versatile: 다재다능한, 다용도의"]
+    "en": "Example sentence",
+    "ko": "예시 문장",
+    "sentence_structure": "구조 분석",
+    "explanation": "설명",
+    "voca": ["word: 뜻"]
   }
 ]`;
 
@@ -130,13 +129,18 @@ app.post('/api/generate', async (req, res) => {
     const s = await getGlobalSettings();
     if (!s.geminiApiKey) return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
 
-    const finalPrompt = s.systemPrompt.replace(/{topic}/g, topic).replace(/{difficulty}/g, difficulty);
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${s.geminiModel}:generateContent?key=${s.geminiApiKey}`;
     
     try {
         const response = await axios.post(API_URL, {
-            contents: [{ parts: [{ text: finalPrompt }] }],
-            generationConfig: { temperature: 0.2, maxOutputTokens: 8192 }
+            system_instruction: {
+                parts: [{ text: s.systemPrompt }]
+            },
+            contents: [{ parts: [{ text: `주제: ${topic}\n난이도: ${difficulty}\n\n[CRITICAL: Output ONLY a valid JSON array of exactly 10 objects matching the required schema. Do NOT wrap the JSON in markdown code blocks. No other text.]` }] }],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 8192
+            }
         });
 
         let content = response.data.candidates[0].content.parts[0].text;
@@ -151,6 +155,7 @@ app.post('/api/generate', async (req, res) => {
         res.json({ sentences });
     } catch (error) {
         console.error('Generate Error:', error.message);
+        if (error.response) console.error(error.response.data);
         res.status(500).json({ error: 'Failed to generate sentences' });
     }
 });
@@ -208,84 +213,152 @@ app.get('/api/trends', async (req, res) => {
     } catch (error) { res.json({ trends: fallbacks }); }
 });
 
+// Chat API endpoint using REST
+app.post('/api/chat', async (req, res) => {
+    try {
+        const { message, topic } = req.body;
+        const s = await getGlobalSettings();
+
+        if (!s.geminiApiKey) {
+            return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
+        }
+
+        const topicContext = topic
+            ? `The user is currently studying this topic: '${topic}'. Talk about this topic naturally.`
+            : 'The user is here to practice English conversation.';
+
+        const systemPrompt = `You are 'Trend Eng', an AI English Tutor.
+Topic: '${topic || "English conversation"}'.
+
+CRITICAL INSTRUCTION:
+In your response, you MUST NOT write your thought process (e.g. NEVER write "**Greeting**", "I'm registering...", etc.).
+Your response MUST ONLY be the transcript of what you say, in this exact format:
+[Your English Speech]
+----
+[Korean Translation]
+
+Do not add any other text. Just the English, the dashes, and the Korean. Be brief and conversational.`;
+
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${s.geminiApiKey}`;
+
+        const response = await axios.post(API_URL, {
+            system_instruction: {
+                parts: [{ text: systemPrompt }]
+            },
+            contents: [{
+                parts: [{ text: message }]
+            }],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 1024
+            }
+        });
+
+        if (response.data.candidates && response.data.candidates[0]) {
+            const aiResponse = response.data.candidates[0].content.parts[0].text;
+            res.json({ response: aiResponse });
+        } else {
+            res.status(500).json({ error: 'No response from AI' });
+        }
+    } catch (error) {
+        console.error('Chat API Error:', error.message);
+        if (error.response) {
+            console.error('API Response:', error.response.data);
+        }
+        res.status(500).json({ error: 'Failed to get response' });
+    }
+});
+
 // Start Express Server
 const server = app.listen(PORT, async () => {
     console.log(`Express Server running on port ${PORT}`);
     if (!db.isReady) await new Promise(resolve => db.resolveReady = resolve);
     const settings = await getGlobalSettings();
     app.locals.geminiApiKey = settings.geminiApiKey;
-    app.locals.chatModel = 'gemini-2.5-flash-native-audio-latest';
-});
+    app.locals.chatModel = 'gemini-2.5-flash';
 
-// WebSocket Server
-const wss = new WebSocket.Server({ server, path: '/ws/chat' });
-wss.on('connection', (ws, req) => {
-    let geminiWs = null;
-    let messageQueue = [];
-    let isSetupDone = false;
-    let currentTopic = null;
+    // WebSocket for real-time chat (no audio)
+    const wss = new WebSocket.Server({ server, path: '/ws/chat' });
+    wss.on('connection', (ws, req) => {
+        console.log('[WS] Client connected');
+        let currentTopic = null;
 
-    const startGeminiSession = async () => {
-        const s = await getGlobalSettings();
-        if (!s.geminiApiKey) { ws.send(JSON.stringify({ type: 'text', text: 'API Key가 없습니다.' })); return; }
-        
-        geminiWs = new WebSocket(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${s.geminiApiKey}`);
-        
-        geminiWs.on('open', () => {
-            console.log('Gemini Bidi Connection Opened');
-            const topicContext = currentTopic 
-                ? `\n\n현재 사용자가 공부하고 있는 주제는 '${currentTopic}'입니다. 이 주제를 바탕으로 자연스럽게 대화를 시작하고 학습을 도와주세요.`
-                : '';
+        ws.on('message', async (message) => {
+            try {
+                const data = JSON.parse(message);
+                console.log('[WS] Received:', data.type);
 
-            const setupMsg = {
-                setup: { 
-                    model: `models/gemini-2.5-flash-native-audio-latest`,
-                    generation_config: { response_modalities: ["AUDIO"] },
-                    system_instruction: {
-                        parts: [{ text: (s.systemPrompt || DEFAULT_PROMPT) + topicContext }]
+                if (data.type === 'context') {
+                    currentTopic = data.topic;
+                    console.log('[WS] Topic set:', currentTopic);
+                    ws.send(JSON.stringify({ type: 'status', status: 'ready' }));
+                    return;
+                }
+
+                if (data.type === 'text') {
+                    const s = await getGlobalSettings();
+                    if (!s.geminiApiKey) {
+                        ws.send(JSON.stringify({ type: 'error', message: 'API Key가 없습니다.' }));
+                        return;
+                    }
+
+                    const topicContext = currentTopic
+                        ? `The user is currently studying this topic: '${currentTopic}'. Talk about this topic naturally.`
+                        : 'The user is here to practice English conversation.';
+
+                    const systemPrompt = `You are 'Trend Eng', an AI English Tutor.
+Topic: '${currentTopic || "English conversation"}'.
+
+CRITICAL INSTRUCTION:
+In your response, you MUST NOT write your thought process (e.g. NEVER write "**Greeting**", "I'm registering...", etc.).
+Your response MUST ONLY be the transcript of what you say, in this exact format:
+[Your English Speech]
+----
+[Korean Translation]
+
+Do not add any other text. Just the English, the dashes, and the Korean. Be brief and conversational.`;
+
+                    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${s.geminiApiKey}`;
+
+                    try {
+                        const response = await axios.post(API_URL, {
+                            system_instruction: {
+                                parts: [{ text: systemPrompt }]
+                            },
+                            contents: [{
+                                parts: [{ text: data.text }]
+                            }],
+                            generationConfig: {
+                                temperature: 0.7,
+                                maxOutputTokens: 1024
+                            }
+                        });
+
+                        if (response.data.candidates && response.data.candidates[0]) {
+                            const aiResponse = response.data.candidates[0].content.parts[0].text;
+                            console.log('[WS] AI Response:', aiResponse.substring(0, 50) + '...');
+                            ws.send(JSON.stringify({ type: 'text', text: aiResponse }));
+                            // 응답 완료 신호 전송
+                            ws.send(JSON.stringify({ type: 'turn_complete' }));
+                        } else {
+                            ws.send(JSON.stringify({ type: 'error', message: 'AI 응답 없음' }));
+                        }
+                    } catch (error) {
+                        console.error('[WS] Chat Error:', error.message);
+                        ws.send(JSON.stringify({ type: 'error', message: '채팅 실패: ' + error.message }));
                     }
                 }
-            };
-            geminiWs.send(JSON.stringify(setupMsg));
-        });
-
-        geminiWs.on('message', (data) => {
-            const resp = JSON.parse(data);
-            if (resp.setupComplete) {
-                isSetupDone = true;
-                while (messageQueue.length > 0) geminiWs.send(JSON.stringify(messageQueue.shift()));
-                return;
-            }
-            if (resp.serverContent?.modelTurn) {
-                resp.serverContent.modelTurn.parts.forEach(p => {
-                    if (p.text) ws.send(JSON.stringify({ type: 'text', text: p.text }));
-                    if (p.inlineData) ws.send(JSON.stringify({ type: 'audio', audio: p.inlineData.data }));
-                });
+            } catch (e) {
+                console.error('[WS] Message error:', e);
             }
         });
-        geminiWs.on('close', () => { geminiWs = null; isSetupDone = false; });
-    };
 
-    ws.on('message', (message) => {
-        try {
-            const data = JSON.parse(message);
-            
-            if (data.type === 'context') {
-                currentTopic = data.topic;
-                console.log('Topic context received:', currentTopic);
-                if (!geminiWs) startGeminiSession();
-                return;
-            }
+        ws.on('close', () => {
+            console.log('[WS] Client disconnected');
+        });
 
-            let payload = null;
-            if (data.type === 'text') payload = { client_content: { turns: [{ role: "user", parts: [{ text: data.text }] }], turn_complete: true } };
-            else if (data.type === 'audio') payload = { realtime_input: { media_chunks: [{ mime_type: 'audio/pcm;rate=16000', data: data.data }] } };
-            
-            if (payload) {
-                if (geminiWs?.readyState === WebSocket.OPEN && isSetupDone) geminiWs.send(JSON.stringify(payload));
-                else { if (!geminiWs) startGeminiSession(); messageQueue.push(payload); }
-            }
-        } catch (e) { console.error('Local WS Error:', e); }
+        ws.on('error', (error) => {
+            console.error('[WS] Error:', error);
+        });
     });
-    ws.on('close', () => { if (geminiWs) geminiWs.close(); });
 });
