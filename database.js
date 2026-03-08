@@ -90,6 +90,9 @@ const db = new sqlite3.Database(dbPath, (err) => {
                     } else {
                         console.log('Default settings row ready.');
                     }
+                    // Signal database is ready
+                    db.isReady = true;
+                    if (db.resolveReady) db.resolveReady();
                 });
             }
 
