@@ -380,6 +380,16 @@ app.get('/api/trends', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server is running on http://localhost:${PORT}`);
+    
+    // 서버 시작 시 DB에서 설정 로드하여 app.locals에 저장
+    try {
+        const settings = await getGlobalSettings();
+        app.locals.geminiApiKey = settings.geminiApiKey;
+        app.locals.geminiModel = settings.geminiModel;
+        console.log('Global settings loaded into memory');
+    } catch (err) {
+        console.error('Failed to load settings on startup:', err);
+    }
 });

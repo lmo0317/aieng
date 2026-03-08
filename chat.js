@@ -343,8 +343,8 @@ async function fetchAIResponse(userMessage) {
                     try {
                         const parsed = JSON.parse(data);
 
-                        if (parsed.content) {
-                            aiResponse += parsed.content;
+                        if (parsed.text) {
+                            aiResponse += parsed.text;
                             messageTextDiv.textContent = aiResponse;
                             scrollToBottom();
                         }
