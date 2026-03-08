@@ -14,11 +14,36 @@
             <div class="nav-links">
                 <a href="/" id="nav-home" class="nav-link">🏠 홈</a>
                 <a href="#" id="nav-review" class="nav-link">📚 복습하기</a>
+                <a href="#" id="nav-chat" class="nav-link">💬 원어민 대화</a>
                 <a href="/settings.html" class="settings-link">⚙️ 설정</a>
             </div>
         </div>
         <h1>AIEng 🤖</h1>
         <p>인공지능이 제안하는 당신만을 위한 맞춤형 영어 학습 솔루션</p>
+
+        <!-- 실시간 대화 섹션 -->
+        <div id="chat-section" class="hidden">
+            <div class="section-header">
+                <h2>💬 Gemini 원어민 실시간 대화</h2>
+                <button class="home-btn back-to-main-btn">🏠 메인으로</button>
+            </div>
+            <div class="chat-container card">
+                <p class="chat-instructions">마이크 아이콘을 누르고 영어로 자유롭게 대화해 보세요!</p>
+                <div class="chat-status-box">
+                    <span id="chat-status-indicator" class="status-indicator inactive"></span>
+                    <span id="chat-status-text">오프라인</span>
+                </div>
+                
+                <div id="chat-log" class="chat-log">
+                    <!-- 대화 내용이 여기에 표시됩니다 -->
+                </div>
+                
+                <div class="chat-controls controls">
+                    <button id="connect-btn" class="btn-primary">연결하기 📡</button>
+                    <button id="mic-btn" class="hidden" disabled>마이크 켜기 🎤</button>
+                </div>
+            </div>
+        </div>
 
         <!-- 복습 섹션 -->
         <div id="review-section" class="hidden">
@@ -74,7 +99,6 @@
                     <button id="tts-btn" class="tts-btn hidden" title="문장 읽기">🔊</button>
                 </div>
                 <div class="korean-sentence hidden" id="sentence-ko"></div>
-                <div class="analysis-section hidden" id="analysis"></div>
                 <div class="structure-section hidden" id="structure"></div>
                 <div class="explanation-section hidden" id="explanation"></div>
                 <div class="voca-section hidden" id="voca"></div>
