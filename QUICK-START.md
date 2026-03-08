@@ -1,4 +1,4 @@
-# Chat API Quick Start Guide
+# Trend Eng - 맞춤형 트렌드 Chat API Quick Start Guide
 
 ## 1단계: API Key 설정
 
