@@ -36,10 +36,12 @@ async function getGlobalSettings() {
     });
 }
 
-// APIs
+// REST APIs
 app.get('/api/settings', async (req, res) => {
-    const s = await getGlobalSettings();
-    res.json({ provider: 'gemini', hasApiKey: !!s.geminiApiKey, model: s.geminiModel, chatModel: s.chatModel });
+    try {
+        const s = await getGlobalSettings();
+        res.json({ provider: 'gemini', hasApiKey: !!s.geminiApiKey, model: s.geminiModel, chatModel: s.chatModel });
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/settings', async (req, res) => {
@@ -81,17 +83,15 @@ wss.on('connection', (ws) => {
         geminiWs.on('open', () => {
             console.log('Gemini Bidi Connection Opened');
             
-            // [CRITICAL] 최신 공식 규격 Setup (Snake Case & Minimal)
+            // [CRITICAL FIX] 1007 에러 해결을 위한 절대 최소화 Setup
+            // 불필요한 generation_config 등을 모두 제거하고 모델 명칭만 전달
             const setupMsg = {
                 setup: { 
-                    model: `models/gemini-2.5-flash-native-audio-latest`,
-                    generation_config: {
-                        response_modalities: ["audio", "text"]
-                    }
+                    model: `models/gemini-2.5-flash-native-audio-latest`
                 }
             };
             
-            console.log('Sending Setup:', JSON.stringify(setupMsg));
+            console.log('Sending Minimal Setup:', JSON.stringify(setupMsg));
             geminiWs.send(JSON.stringify(setupMsg));
         });
 
@@ -102,10 +102,9 @@ wss.on('connection', (ws) => {
                 if (response.setupComplete) {
                     console.log('Gemini Setup Success!');
                     isSetupDone = true;
-                    // 대기 중인 텍스트가 있다면 전송
+                    // 대기 중인 메시지 전송
                     while (messageQueue.length > 0) {
-                        const msg = messageQueue.shift();
-                        geminiWs.send(JSON.stringify(msg));
+                        geminiWs.send(JSON.stringify(messageQueue.shift()));
                     }
                     return;
                 }
@@ -121,12 +120,12 @@ wss.on('connection', (ws) => {
         });
 
         geminiWs.on('close', (code, reason) => {
-            console.log(`Gemini Closed. Code: ${code}, Reason: ${reason}`);
+            console.log(`Gemini Closed. Code: ${code}, Reason: ${reason || 'No reason'}`);
             geminiWs = null;
             isSetupDone = false;
         });
 
-        geminiWs.on('error', (err) => console.error('Gemini Error:', err.message));
+        geminiWs.on('error', (err) => console.error('Gemini WS Error:', err.message));
     };
 
     ws.on('message', (message) => {
@@ -135,6 +134,7 @@ wss.on('connection', (ws) => {
             let geminiPayload = null;
 
             if (data.type === 'text') {
+                // 텍스트 전송 규격 최적화
                 geminiPayload = {
                     client_content: {
                         turns: [{ role: "user", parts: [{ text: data.text }] }],
