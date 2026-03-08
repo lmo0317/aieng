@@ -1,8 +1,5 @@
 /**
  * AI Real-time Video/Voice Chat System JavaScript
- * 
- * Uses WebSockets to connect to the backend, 
- * which proxies to the Gemini Multimodal Live API (bidi).
  */
 
 const ChatState = {
@@ -10,11 +7,11 @@ const ChatState = {
     isConnected: false,
     isRecording: false,
     isVideoEnabled: false,
-    sessionId: null,
     socket: null,
     localStream: null,
-    mediaRecorder: null,
     audioContext: null,
+    audioWorklet: null,
+    source: null,
     processor: null
 };
 
@@ -32,220 +29,161 @@ const videoChatContainer = document.getElementById('video-chat-container');
 const localVideo = document.getElementById('local-video');
 const aiVoiceWaves = document.getElementById('ai-voice-waves');
 
-/**
- * 모달 열기
- */
 function openChatModal() {
     chatModal.classList.remove('hidden');
     ChatState.isOpen = true;
     connectWebSocket();
 }
 
-/**
- * 모달 닫기
- */
 function closeChatModal() {
     chatModal.classList.add('hidden');
     ChatState.isOpen = false;
-    stopMedia();
-    if (ChatState.socket) {
-        ChatState.socket.close();
-    }
+    stopAllMedia();
+    if (ChatState.socket) ChatState.socket.close();
 }
 
-/**
- * WebSocket 연결
- */
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/ws/chat`;
+    const wsUrl = `${protocol}//${window.location.host}/ws/chat`;
     
-    console.log('Connecting to WebSocket:', wsUrl);
+    ChatState.socket = new WebSocket(wsUrl);
     
-    try {
-        ChatState.socket = new WebSocket(wsUrl);
-        
-        ChatState.socket.onopen = () => {
-            console.log('WebSocket Connection Established');
-            ChatState.isConnected = true;
-            updateStatus('연결됨', 'active');
-        };
-        
-        ChatState.socket.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                handleIncomingMessage(data);
-            } catch (e) {
-                console.error('Message Parse Error:', e, event.data);
-            }
-        };
-        
-        ChatState.socket.onclose = (event) => {
-            console.log('WebSocket Closed:', event.code, event.reason);
-            ChatState.isConnected = false;
-            updateStatus('연결 끊김', 'inactive');
-        };
-        
-        ChatState.socket.onerror = (error) => {
-            console.error('WebSocket Socket Error:', error);
-            addMessage('ai', '서버 연결 중 오류가 발생했습니다. 개발자 도구(F12) 콘솔을 확인해 주세요.');
-        };
-    } catch (e) {
-        console.error('WebSocket Creation Error:', e);
-    }
-}
-
-/**
- * 메시지 처리
- */
-function handleIncomingMessage(data) {
-    if (data.type === 'text') {
-        addMessage('ai', data.text);
-    } else if (data.type === 'audio') {
-        // 실시간 오디오 재생 로직 (Web Audio API 활용)
-        playAudioChunk(data.audio);
-    } else if (data.type === 'status') {
-        if (data.status === 'talking') {
-            aiVoiceWaves.classList.add('active');
-        } else {
-            aiVoiceWaves.classList.remove('active');
-        }
-    }
-}
-
-/**
- * 비디오 토글
- */
-async function toggleVideo() {
-    if (!ChatState.isVideoEnabled) {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            ChatState.localStream = stream;
-            localVideo.srcObject = stream;
-            videoChatContainer.classList.remove('hidden');
-            ChatState.isVideoEnabled = true;
-            videoToggleBtn.textContent = '📵';
-            
-            // 실시간 영상 프레임 전송 시작 (Canvas 캡처 방식)
-            startVideoStreaming();
-        } catch (err) {
-            console.error('카메라 접근 실패:', err);
-            alert('카메라에 접근할 수 없습니다.');
-        }
-    } else {
-        stopMedia();
-        videoChatContainer.classList.add('hidden');
-        ChatState.isVideoEnabled = false;
-        videoToggleBtn.textContent = '📹';
-    }
-}
-
-/**
- * 영상 스트리밍 시작 (Gemini Live API용 프레임 추출)
- */
-function startVideoStreaming() {
-    if (!ChatState.localStream) return;
-    
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    const sendFrame = () => {
-        if (!ChatState.isVideoEnabled || !ChatState.socket || ChatState.socket.readyState !== WebSocket.OPEN) return;
-        
-        // 프레임 최적화 (Gemini는 1fps 정도면 충분함)
-        canvas.width = 320;
-        canvas.height = 240;
-        ctx.drawImage(localVideo, 0, 0, canvas.width, canvas.height);
-        
-        const base64Image = canvas.toDataURL('image/jpeg', 0.5);
-        ChatState.socket.send(JSON.stringify({
-            type: 'video',
-            data: base64Image.split(',')[1]
-        }));
-        
-        setTimeout(sendFrame, 1000); // 1초마다 전송
+    ChatState.socket.onopen = () => {
+        ChatState.isConnected = true;
+        updateStatus('AI 연결됨', 'active');
     };
     
-    sendFrame();
+    ChatState.socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'text') {
+            addMessage('ai', data.text);
+        } else if (data.type === 'audio') {
+            playAudioChunk(data.audio);
+        } else if (data.type === 'status') {
+            if (data.status === 'talking') aiVoiceWaves.classList.add('active');
+            else aiVoiceWaves.classList.remove('active');
+        }
+    };
+    
+    ChatState.socket.onclose = () => {
+        ChatState.isConnected = false;
+        updateStatus('연결 끊김', 'inactive');
+    };
 }
 
 /**
- * 미디어 중지
+ * 마이크 토글 및 음성 녹음 시작/중지
  */
-function stopMedia() {
-    if (ChatState.localStream) {
-        ChatState.localStream.getTracks().forEach(track => track.stop());
-        localVideo.srcObject = null;
+async function toggleMic() {
+    if (!ChatState.isRecording) {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            ChatState.localStream = stream;
+            
+            // Web Audio API 설정
+            ChatState.audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+            ChatState.source = ChatState.audioContext.createMediaStreamSource(stream);
+            ChatState.processor = ChatState.audioContext.createScriptProcessor(4096, 1, 1);
+            
+            ChatState.source.connect(ChatState.processor);
+            ChatState.processor.connect(ChatState.audioContext.destination);
+            
+            ChatState.processor.onaudioprocess = (e) => {
+                if (ChatState.socket?.readyState === WebSocket.OPEN) {
+                    const inputData = e.inputBuffer.getChannelData(0);
+                    // 16비트 PCM으로 변환하여 전송
+                    const pcmData = floatTo16BitPCM(inputData);
+                    const base64Audio = btoa(String.fromCharCode(...new Uint8Array(pcmData.buffer)));
+                    ChatState.socket.send(JSON.stringify({ type: 'audio', data: base64Audio }));
+                }
+            };
+            
+            ChatState.isRecording = true;
+            chatMicBtn.classList.add('recording');
+            updateStatus('듣고 있는 중...', 'active');
+        } catch (err) {
+            console.error('마이크 접근 실패:', err);
+            alert('마이크를 사용할 수 없습니다.');
+        }
+    } else {
+        stopMic();
     }
 }
 
-/**
- * 메시지 전송
- */
+function stopMic() {
+    if (ChatState.processor) {
+        ChatState.processor.disconnect();
+        ChatState.source.disconnect();
+    }
+    ChatState.isRecording = false;
+    chatMicBtn.classList.remove('recording');
+    updateStatus('AI 연결됨', 'active');
+}
+
+function stopAllMedia() {
+    stopMic();
+    if (ChatState.localStream) {
+        ChatState.localStream.getTracks().forEach(track => track.stop());
+    }
+    if (ChatState.audioContext) ChatState.audioContext.close();
+}
+
+function floatTo16BitPCM(input) {
+    const output = new Int16Array(input.length);
+    for (let i = 0; i < input.length; i++) {
+        const s = Math.max(-1, Math.min(1, input[i]));
+        output[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    }
+    return output;
+}
+
 function sendMessage() {
     const text = chatInput.value.trim();
     if (!text || !ChatState.isConnected) return;
     
     addMessage('user', text);
-    ChatState.socket.send(JSON.stringify({
-        type: 'text',
-        text: text
-    }));
-    
+    ChatState.socket.send(JSON.stringify({ type: 'text', text: text }));
     chatInput.value = '';
 }
 
-/**
- * 메시지 화면 추가
- */
 function addMessage(type, text) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message chat-message-${type}`;
-    
-    messageDiv.innerHTML = `
-        <div class="chat-message-content">
-            <div class="chat-message-text">${text}</div>
-        </div>
-    `;
-    
+    messageDiv.innerHTML = `<div class="chat-message-content"><div class="chat-message-text">${text}</div></div>`;
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
-    // 웰컴 메시지 제거 (첫 메시지 시)
     const welcome = document.querySelector('.chat-welcome-message');
     if (welcome) welcome.remove();
 }
 
-/**
- * 상태 업데이트
- */
 function updateStatus(text, type) {
     chatStatusIndicator.classList.remove('hidden');
     chatStatusText.textContent = text;
 }
 
-// 이벤트 리스너 등록
+// 오디오 재생 큐
+let audioQueue = [];
+let isPlaying = false;
+
+function playAudioChunk(base64Audio) {
+    const binaryString = atob(base64Audio);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+    
+    // 브라우저 기본 오디오 재생 (간이 버전)
+    const blob = new Blob([bytes.buffer], { type: 'audio/pcm' });
+    // 실제 구현 시에는 AudioContext의 decodeAudioData나 오디오 큐잉 필요
+    // 여기서는 텍스트 응답 확인을 우선함
+}
+
+// 초기화
 document.addEventListener('DOMContentLoaded', () => {
     const chatBtn = document.getElementById('ai-chat-btn');
-    if (chatBtn) {
-        chatBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openChatModal();
-        });
-    }
-    
+    if (chatBtn) chatBtn.addEventListener('click', (e) => { e.stopPropagation(); openChatModal(); });
     chatCloseBtn.addEventListener('click', closeChatModal);
+    chatMicBtn.addEventListener('click', toggleMic);
     chatSendBtn.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-    
-    videoToggleBtn.addEventListener('click', toggleVideo);
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 });
-
-// 오디오 재생 (AI의 음성 응답)
-function playAudioChunk(base64Audio) {
-    // 실시간 음성 재생 로직 구현 (추후 보완)
-    // 현재는 텍스트 스크립트 위주로 구현
-}
