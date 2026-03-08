@@ -101,21 +101,48 @@
         <div class="chat-modal-overlay"></div>
         <div class="chat-modal-container">
             <div class="chat-modal-header">
-                <h2 id="chat-modal-title">AI 음성 대화</h2>
-                <button id="chat-close-btn" class="chat-close-btn" aria-label="대화창 닫기">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+                <div class="chat-header-left">
+                    <h2 id="chat-modal-title">AI Real-time Tutor</h2>
+                    <div class="chat-status-indicator hidden" id="chat-status-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text" id="chat-status-text">연결 중...</span>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <button id="video-toggle-btn" class="chat-header-btn" title="비디오 켜기/끄기">📹</button>
+                    <button id="chat-close-btn" class="chat-close-btn" aria-label="대화창 닫기">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 화상 채팅 영역 -->
+            <div id="video-chat-container" class="video-chat-container hidden">
+                <div class="video-grid">
+                    <div class="video-wrapper remote-video">
+                        <div class="ai-avatar-visual">
+                            <div class="ai-voice-waves" id="ai-voice-waves">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                            <div class="ai-emoji">🤖</div>
+                        </div>
+                        <div class="video-label">AI Tutor</div>
+                    </div>
+                    <div class="video-wrapper local-video">
+                        <video id="local-video" autoplay playsinline muted></video>
+                        <div class="video-label">Me</div>
+                    </div>
+                </div>
             </div>
 
             <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
                 <div class="chat-welcome-message">
-                    안녕하세요! 저는 AI 음성 대화 어시스턴트입니다.
-                    <br><br>
-                    마이크 버튼을 눌러 음성으로 대화하거나,
-                    텍스트로 메시지를 입력하세요.
+                    안녕하세요! Trend Eng AI 튜터입니다.<br>
+                    실시간 음성 및 화상 대화로 영어 실력을 키워보세요!<br>
+                    하단의 마이크나 상단의 비디오 버튼을 눌러 시작하세요.
                 </div>
             </div>
 

@@ -13,6 +13,9 @@
 - **브랜드**: Trend Eng (트렌드 맞춤형 영어 학습)
 - **핵심 가치**: 사용자 관심사(Trend)에 기반한 **맞춤형(Customized)** 영어 문장 및 학습 가이드 제공.
 
-## 3. 기술적 제약 사항
+## 3. 기술적 제약 및 핵심 기능
+- **AI 화상 채팅 (Real-time Video Chat)**: 
+    - **모델**: 오직 **`gemini-2.5-flash-native-audio-latest`** 모델만 사용함 (Multimodal Live API 방식).
+    - **기능**: 사용자의 카메라 영상과 마이크 음성을 실시간으로 AI에게 전달하고, AI는 이를 보고 들으며 실시간 음성 및 텍스트 스크립트로 응답함.
+    - **기술**: WebSocket을 통한 양방향 스트리밍 구현.
 - **품사 분석(POS Analysis) 제외**: 문장의 핵심 성분인 품사 분석 기능은 더 이상 사용하지 않으며, '문장 구성 요소(Sentence Structure)'와 'AI 학습 가이드(Explanation)'에 집중함.
-- **AI 모델**: Google Gemini 2.5 Flash (또는 그 이상)를 기본으로 사용.
