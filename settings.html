@@ -43,14 +43,26 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="model-select">AI 모델 선택</label>
+                    <label for="model-select">영어 학습 모델 선택 (학습 페이지용)</label>
                     <div class="model-select-wrapper">
                         <select id="model-select" class="model-select">
                         </select>
                         <span id="current-model-badge" class="model-badge"></span>
                     </div>
-                    <small class="help-text" id="model-help">
-                        💡 고객님의 환경에서 지원되는 최신 모델입니다.
+                    <small class="help-text">
+                        주제에 따른 학습 문장을 생성할 때 사용되는 모델입니다. (권장: gemini-2.5-flash)
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="chat-model-select">AI 음성 대화 모델 선택 (채팅용)</label>
+                    <div class="model-select-wrapper">
+                        <select id="chat-model-select" class="model-select">
+                        </select>
+                        <span id="current-chat-model-badge" class="model-badge"></span>
+                    </div>
+                    <small class="help-text">
+                        실시간 음성 대화 및 채팅에 사용되는 모델입니다. (권장: gemini-2.5-flash-native-audio)
                     </small>
                 </div>
 

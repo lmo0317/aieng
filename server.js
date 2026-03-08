@@ -53,11 +53,12 @@ JSON 형식 예시:
 // Helper function to get global settings
 async function getGlobalSettings() {
     return new Promise((resolve, reject) => {
-        db.get("SELECT geminiApiKey, geminiModel, systemPrompt FROM global_settings WHERE id = 1", (err, row) => {
+        db.get("SELECT geminiApiKey, geminiModel, chatModel, systemPrompt FROM global_settings WHERE id = 1", (err, row) => {
             if (err) reject(err);
             else resolve({
                 geminiApiKey: row?.geminiApiKey || process.env.GEMINI_API_KEY,
                 geminiModel: row?.geminiModel || 'gemini-2.5-flash',
+                chatModel: row?.chatModel || 'gemini-2.5-flash-native-audio',
                 systemPrompt: row?.systemPrompt || DEFAULT_PROMPT
             });
         });
@@ -66,7 +67,7 @@ async function getGlobalSettings() {
 
 // Global Settings API endpoints
 app.get('/api/settings', (req, res) => {
-    db.get("SELECT geminiApiKey, geminiModel, systemPrompt FROM global_settings WHERE id = 1", (err, row) => {
+    db.get("SELECT geminiApiKey, geminiModel, chatModel, systemPrompt FROM global_settings WHERE id = 1", (err, row) => {
         if (err) return res.status(500).json({ error: err.message });
 
         res.json({
@@ -74,13 +75,14 @@ app.get('/api/settings', (req, res) => {
             hasApiKey: !!row?.geminiApiKey,
             apiKeyPreview: row?.geminiApiKey || null,
             model: row?.geminiModel || 'gemini-2.5-flash',
+            chatModel: row?.chatModel || 'gemini-2.5-flash-native-audio',
             systemPrompt: row?.systemPrompt || DEFAULT_PROMPT
         });
     });
 });
 
 app.post('/api/settings', (req, res) => {
-    const { geminiApiKey, geminiModel, systemPrompt } = req.body;
+    const { geminiApiKey, geminiModel, chatModel, systemPrompt } = req.body;
 
     const updates = [];
     const values = [];
@@ -94,12 +96,21 @@ app.post('/api/settings', (req, res) => {
     }
 
     if (geminiModel !== undefined) {
-        const validGeminiModels = ['gemini-2.5-flash', 'gemini-2.5-flash-native-audio', 'gemini-3.1-flash-lite-preview'];
+        const validGeminiModels = ['gemini-2.5-flash', 'gemini-3.1-flash-lite-preview'];
         if (!validGeminiModels.includes(geminiModel)) {
             return res.status(400).json({ error: `유효하지 않은 Gemini 모델입니다: ${geminiModel}` });
         }
         updates.push('geminiModel = ?');
         values.push(geminiModel);
+    }
+
+    if (chatModel !== undefined) {
+        const validChatModels = ['gemini-2.5-flash', 'gemini-2.5-flash-native-audio'];
+        if (!validChatModels.includes(chatModel)) {
+            return res.status(400).json({ error: `유효하지 않은 채팅 모델입니다: ${chatModel}` });
+        }
+        updates.push('chatModel = ?');
+        values.push(chatModel);
     }
 
     if (systemPrompt !== undefined) {
@@ -123,12 +134,19 @@ app.post('/api/settings', (req, res) => {
     values.push(1); // id = 1 for global settings
 
     const sql = `UPDATE global_settings SET ${updates.join(', ')} WHERE id = ?`;
-    db.run(sql, values, function(updateErr) {
+    db.run(sql, values, async function(updateErr) {
         if (updateErr) {
             console.error('DB UPDATE Error:', updateErr);
             return res.status(500).json({ error: updateErr.message });
         }
         console.log('Global settings updated successfully');
+        
+        // Update app.locals in memory
+        const settings = await getGlobalSettings();
+        app.locals.geminiApiKey = settings.geminiApiKey;
+        app.locals.geminiModel = settings.geminiModel;
+        app.locals.chatModel = settings.chatModel;
+        
         res.json({ success: true, message: '설정이 저장되었습니다.' });
     });
 });

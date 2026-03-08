@@ -2,6 +2,7 @@ const form = document.getElementById('settings-form');
 const promptForm = document.getElementById('prompt-form');
 const apiKeyInput = document.getElementById('api-key');
 const modelSelect = document.getElementById('model-select');
+const chatModelSelect = document.getElementById('chat-model-select');
 const systemPromptInput = document.getElementById('system-prompt');
 const deleteBtn = document.getElementById('delete-btn');
 const resetPromptBtn = document.getElementById('reset-prompt-btn');
@@ -12,25 +13,31 @@ const currentKeyInfo = document.getElementById('current-key-info');
 const keyPreview = document.getElementById('key-preview');
 const modelPreview = document.getElementById('model-preview');
 const currentModelBadge = document.getElementById('current-model-badge');
+const currentChatModelBadge = document.getElementById('current-chat-model-badge');
 const toast = document.getElementById('toast');
 
 const models = [
-    { value: 'gemini-3.1-flash-lite-preview', label: 'Gemini 3.1 Flash Lite (최신/속도최적)' },
+    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (학습 권장)' },
+    { value: 'gemini-3.1-flash-lite-preview', label: 'Gemini 3.1 Flash Lite (최신/속도최적)' }
+];
+
+const chatModels = [
+    { value: 'gemini-2.5-flash-native-audio', label: 'Gemini 2.5 Flash Native Audio (대화 권장/무료)' },
     { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' }
 ];
 
 const modelNames = {
     'gemini-3.1-flash-lite-preview': 'Gemini 3.1 Flash Lite',
-    'gemini-2.5-flash': 'Gemini 2.5 Flash'
-};
-
-const modelBadgeClasses = {
-    'gemini-3.1-flash-lite-preview': 'gemini-flash',
-    'gemini-2.5-flash': 'gemini-flash'
+    'gemini-2.5-flash': 'Gemini 2.5 Flash',
+    'gemini-2.5-flash-native-audio': 'Gemini 2.5 Flash Native Audio'
 };
 
 // Initialize model select options
 modelSelect.innerHTML = models.map(model =>
+    `<option value="${model.value}">${model.label}</option>`
+).join('');
+
+chatModelSelect.innerHTML = chatModels.map(model =>
     `<option value="${model.value}">${model.label}</option>`
 ).join('');
 
@@ -57,12 +64,12 @@ async function loadSettings() {
 
         if (data.model) {
             modelSelect.value = data.model;
-            modelPreview.textContent = modelNames[data.model] || data.model;
             updateModelBadge(data.model);
-        } else {
-            const defaultModel = 'gemini-2.5-flash';
-            modelPreview.textContent = modelNames[defaultModel];
-            updateModelBadge(defaultModel);
+        }
+
+        if (data.chatModel) {
+            chatModelSelect.value = data.chatModel;
+            updateChatModelBadge(data.chatModel);
         }
 
         if (data.systemPrompt) {
@@ -81,16 +88,16 @@ form.addEventListener('submit', async (e) => {
 
     const apiKey = apiKeyInput.value.trim();
     const model = modelSelect.value;
-
-    if (!apiKey) {
-        showToast('API Key를 입력해주세요', 'error');
-        return;
-    }
+    const chatModel = chatModelSelect.value;
 
     const requestBody = { 
-        geminiApiKey: apiKey,
-        geminiModel: model
+        geminiModel: model,
+        chatModel: chatModel
     };
+
+    if (apiKey) {
+        requestBody.geminiApiKey = apiKey;
+    }
 
     try {
         const response = await fetch('/api/settings', {
@@ -183,9 +190,7 @@ deleteBtn.addEventListener('click', async () => {
     }
 
     try {
-        const response = await fetch('/api/settings', {
-            method: 'DELETE'
-        });
+        const response = await fetch('/api/DELETE') || await fetch('/api/settings', { method: 'DELETE' });
 
         const data = await response.json();
 
@@ -204,6 +209,7 @@ deleteBtn.addEventListener('click', async () => {
 function showToast(message, type = 'success') {
     toast.textContent = message;
     toast.className = 'toast ' + type;
+    toast.classList.remove('hidden');
 
     setTimeout(() => {
         toast.classList.add('hidden');
@@ -212,12 +218,19 @@ function showToast(message, type = 'success') {
 
 function updateModelBadge(model) {
     currentModelBadge.textContent = `현재: ${modelNames[model] || model}`;
-    currentModelBadge.className = 'model-badge ' + (modelBadgeClasses[model] || '');
+}
+
+function updateChatModelBadge(model) {
+    currentChatModelBadge.textContent = `현재: ${modelNames[model] || model}`;
 }
 
 // 모델 선택 시 배지 업데이트
 modelSelect.addEventListener('change', () => {
     updateModelBadge(modelSelect.value);
+});
+
+chatModelSelect.addEventListener('change', () => {
+    updateChatModelBadge(chatModelSelect.value);
 });
 
 loadSettings();
