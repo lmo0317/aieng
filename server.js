@@ -20,8 +20,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'Trend Eng'의 전문 AI 튜터입니다.
-친절하고 격려하는 어조로 대화해 주세요.`;
+const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'Trend Eng'의 전문 AI 튜터입니다. 친절하게 대화해 주세요.`;
 
 async function getGlobalSettings() {
     return new Promise((resolve, reject) => {
@@ -37,12 +36,10 @@ async function getGlobalSettings() {
     });
 }
 
-// REST APIs
+// APIs
 app.get('/api/settings', async (req, res) => {
-    try {
-        const s = await getGlobalSettings();
-        res.json({ provider: 'gemini', hasApiKey: !!s.geminiApiKey, model: s.geminiModel, chatModel: s.chatModel });
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    const s = await getGlobalSettings();
+    res.json({ provider: 'gemini', hasApiKey: !!s.geminiApiKey, model: s.geminiModel, chatModel: s.chatModel });
 });
 
 app.post('/api/settings', async (req, res) => {
@@ -84,25 +81,17 @@ wss.on('connection', (ws) => {
         geminiWs.on('open', () => {
             console.log('Gemini Bidi Connection Opened');
             
-            // "Cannot extract voices from a non-audio request" 해결을 위한 정밀 Setup
+            // [CRITICAL] 최신 공식 규격 Setup (Snake Case & Minimal)
             const setupMsg = {
                 setup: { 
-                    model: `models/${s.chatModel}`,
+                    model: `models/gemini-2.5-flash-native-audio-latest`,
                     generation_config: {
-                        response_modalities: ["AUDIO", "TEXT"], // 대문자로 명시
-                        speech_config: {
-                            voice_config: {
-                                prebuilt_voice_config: {
-                                    voice_name: "Aoede" // AI 목소리 선택 (Aoede, Charon, Fenrir, Kore, Puck 등)
-                                }
-                            }
-                        }
-                    },
-                    system_instruction: {
-                        parts: [{ text: s.systemPrompt || DEFAULT_PROMPT }]
+                        response_modalities: ["audio", "text"]
                     }
                 }
             };
+            
+            console.log('Sending Setup:', JSON.stringify(setupMsg));
             geminiWs.send(JSON.stringify(setupMsg));
         });
 
@@ -111,10 +100,12 @@ wss.on('connection', (ws) => {
                 const response = JSON.parse(data);
                 
                 if (response.setupComplete) {
-                    console.log('Gemini Setup Verified with Audio');
+                    console.log('Gemini Setup Success!');
                     isSetupDone = true;
+                    // 대기 중인 텍스트가 있다면 전송
                     while (messageQueue.length > 0) {
-                        geminiWs.send(JSON.stringify(messageQueue.shift()));
+                        const msg = messageQueue.shift();
+                        geminiWs.send(JSON.stringify(msg));
                     }
                     return;
                 }
@@ -126,11 +117,7 @@ wss.on('connection', (ws) => {
                         if (p.inlineData) ws.send(JSON.stringify({ type: 'audio', audio: p.inlineData.data }));
                     });
                 }
-                
-                if (response.serverContent?.turnComplete) {
-                    ws.send(JSON.stringify({ type: 'status', status: 'idle' }));
-                }
-            } catch (e) { console.error('Gemini Parse Error:', e); }
+            } catch (e) { console.error('Gemini Msg Error:', e); }
         });
 
         geminiWs.on('close', (code, reason) => {
@@ -139,41 +126,38 @@ wss.on('connection', (ws) => {
             isSetupDone = false;
         });
 
-        geminiWs.on('error', (err) => console.error('Gemini WS Error:', err.message));
+        geminiWs.on('error', (err) => console.error('Gemini Error:', err.message));
     };
 
     ws.on('message', (message) => {
         try {
             const data = JSON.parse(message);
-            let payload = null;
+            let geminiPayload = null;
 
             if (data.type === 'text') {
-                payload = { 
-                    clientContent: { 
-                        turns: [{ role: 'user', parts: [{ text: data.text }] }], 
-                        turnComplete: true 
-                    } 
+                geminiPayload = {
+                    client_content: {
+                        turns: [{ role: "user", parts: [{ text: data.text }] }],
+                        turn_complete: true
+                    }
                 };
-            } else if (data.type === 'audio') {
-                payload = { 
-                    realtimeInput: { 
-                        mediaChunks: [{ mimeType: 'audio/pcm;rate=16000', data: data.data }] 
-                    } 
-                };
-            } else if (data.type === 'video') {
-                payload = { 
-                    realtimeInput: { 
-                        mediaChunks: [{ mimeType: 'image/jpeg', data: data.data }] 
-                    } 
+            } else if (data.type === 'audio' || data.type === 'video') {
+                geminiPayload = {
+                    realtime_input: {
+                        media_chunks: [{
+                            mime_type: data.type === 'audio' ? 'audio/pcm;rate=16000' : 'image/jpeg',
+                            data: data.data
+                        }]
+                    }
                 };
             }
 
-            if (payload) {
+            if (geminiPayload) {
                 if (geminiWs && geminiWs.readyState === WebSocket.OPEN && isSetupDone) {
-                    geminiWs.send(JSON.stringify(payload));
+                    geminiWs.send(JSON.stringify(geminiPayload));
                 } else {
                     if (!geminiWs) startGeminiSession();
-                    messageQueue.push(payload);
+                    messageQueue.push(geminiPayload);
                 }
             }
         } catch (e) { console.error('Local WS Error:', e); }
