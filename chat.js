@@ -58,31 +58,42 @@ function closeChatModal() {
  */
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/chat`;
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}/ws/chat`;
     
-    ChatState.socket = new WebSocket(wsUrl);
+    console.log('Connecting to WebSocket:', wsUrl);
     
-    ChatState.socket.onopen = () => {
-        console.log('Connected to AI Chat Server');
-        ChatState.isConnected = true;
-        updateStatus('연결됨', 'active');
-    };
-    
-    ChatState.socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        handleIncomingMessage(data);
-    };
-    
-    ChatState.socket.onclose = () => {
-        console.log('Disconnected from AI Chat Server');
-        ChatState.isConnected = false;
-        updateStatus('연결 끊김', 'inactive');
-    };
-    
-    ChatState.socket.onerror = (error) => {
-        console.error('WebSocket Error:', error);
-        addMessage('ai', '서버 연결 중 오류가 발생했습니다.');
-    };
+    try {
+        ChatState.socket = new WebSocket(wsUrl);
+        
+        ChatState.socket.onopen = () => {
+            console.log('WebSocket Connection Established');
+            ChatState.isConnected = true;
+            updateStatus('연결됨', 'active');
+        };
+        
+        ChatState.socket.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                handleIncomingMessage(data);
+            } catch (e) {
+                console.error('Message Parse Error:', e, event.data);
+            }
+        };
+        
+        ChatState.socket.onclose = (event) => {
+            console.log('WebSocket Closed:', event.code, event.reason);
+            ChatState.isConnected = false;
+            updateStatus('연결 끊김', 'inactive');
+        };
+        
+        ChatState.socket.onerror = (error) => {
+            console.error('WebSocket Socket Error:', error);
+            addMessage('ai', '서버 연결 중 오류가 발생했습니다. 개발자 도구(F12) 콘솔을 확인해 주세요.');
+        };
+    } catch (e) {
+        console.error('WebSocket Creation Error:', e);
+    }
 }
 
 /**
