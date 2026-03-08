@@ -1,1 +1,1 @@
- sleep 2 echo 서버 시작 완료 cat server.log
+ sleep 3 echo Server started curl -s http://localhost/

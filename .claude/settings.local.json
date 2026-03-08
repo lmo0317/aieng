@@ -9,7 +9,13 @@
       "Bash(taskkill:*)",
       "Bash(sqlite3:*)",
       "Bash(where node:*)",
-      "Bash(git rebase:*)"
+      "Bash(git rebase:*)",
+      "Bash(tasklist:*)",
+      "Bash(\"/c/Program Files/nodejs/node.exe\":*)",
+      "mcp__web-reader__webReader",
+      "mcp__web-search-prime__web_search_prime",
+      "Bash(\"/c/Program Files/nodejs/node.js\":*)",
+      "Bash(rm:*)"
     ]
   }
 }
