@@ -194,8 +194,17 @@ app.get('/api/trends', async (req, res) => {
                 const xml = result.value.data;
                 const matches = xml.match(/<title>(.*?)<\/title>/g) || [];
                 matches.slice(1, 6).forEach(m => {
-                    const title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
-                    allTrends.push({ category: categories[index].name, title: title.trim() });
+                    let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
+                    title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                    const cleanTitle = title.trim();
+                    
+                    // 의미 없는 제목 필터링
+                    const genericTerms = ['Google 뉴스', 'Google News', '속보', '오늘의 뉴스'];
+                    const isGeneric = genericTerms.some(term => cleanTitle.includes(term));
+                    
+                    if (cleanTitle.length > 10 && !isGeneric) {
+                        allTrends.push({ category: categories[index].name, title: cleanTitle });
+                    }
                 });
             }
         });
