@@ -78,16 +78,29 @@ wss.on('connection', (ws) => {
             return;
         }
 
-        // 최신 Bidi URL (v1beta)
         const url = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${s.geminiApiKey}`;
         geminiWs = new WebSocket(url);
 
         geminiWs.on('open', () => {
             console.log('Gemini Bidi Connection Opened');
-            // 최신 규격 Setup (불필요한 인자 제거하여 1007 에러 방지)
+            
+            // "Cannot extract voices from a non-audio request" 해결을 위한 정밀 Setup
             const setupMsg = {
                 setup: { 
-                    model: `models/${s.chatModel}`
+                    model: `models/${s.chatModel}`,
+                    generation_config: {
+                        response_modalities: ["AUDIO", "TEXT"], // 대문자로 명시
+                        speech_config: {
+                            voice_config: {
+                                prebuilt_voice_config: {
+                                    voice_name: "Aoede" // AI 목소리 선택 (Aoede, Charon, Fenrir, Kore, Puck 등)
+                                }
+                            }
+                        }
+                    },
+                    system_instruction: {
+                        parts: [{ text: s.systemPrompt || DEFAULT_PROMPT }]
+                    }
                 }
             };
             geminiWs.send(JSON.stringify(setupMsg));
@@ -96,10 +109,9 @@ wss.on('connection', (ws) => {
         geminiWs.on('message', (data) => {
             try {
                 const response = JSON.parse(data);
-                console.log('Gemini Data:', JSON.stringify(response).substring(0, 100));
                 
                 if (response.setupComplete) {
-                    console.log('Gemini Setup Verified');
+                    console.log('Gemini Setup Verified with Audio');
                     isSetupDone = true;
                     while (messageQueue.length > 0) {
                         geminiWs.send(JSON.stringify(messageQueue.shift()));
@@ -136,11 +148,24 @@ wss.on('connection', (ws) => {
             let payload = null;
 
             if (data.type === 'text') {
-                payload = { clientContent: { turns: [{ role: 'user', parts: [{ text: data.text }] }], turnComplete: true } };
+                payload = { 
+                    clientContent: { 
+                        turns: [{ role: 'user', parts: [{ text: data.text }] }], 
+                        turnComplete: true 
+                    } 
+                };
             } else if (data.type === 'audio') {
-                payload = { realtimeInput: { mediaChunks: [{ mimeType: 'audio/pcm;rate=16000', data: data.data }] } };
+                payload = { 
+                    realtimeInput: { 
+                        mediaChunks: [{ mimeType: 'audio/pcm;rate=16000', data: data.data }] 
+                    } 
+                };
             } else if (data.type === 'video') {
-                payload = { realtimeInput: { mediaChunks: [{ mimeType: 'image/jpeg', data: data.data }] } };
+                payload = { 
+                    realtimeInput: { 
+                        mediaChunks: [{ mimeType: 'image/jpeg', data: data.data }] 
+                    } 
+                };
             }
 
             if (payload) {
