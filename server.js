@@ -105,7 +105,7 @@ app.post('/api/settings', (req, res) => {
     }
 
     if (chatModel !== undefined) {
-        const validChatModels = ['gemini-2.5-flash', 'gemini-2.5-flash'];
+        const validChatModels = ['gemini-2.5-flash', 'gemini-2.5-flash-native-audio-latest'];
         if (!validChatModels.includes(chatModel)) {
             return res.status(400).json({ error: `유효하지 않은 채팅 모델입니다: ${chatModel}` });
         }

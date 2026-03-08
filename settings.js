@@ -22,13 +22,15 @@ const models = [
 ];
 
 const chatModels = [
-    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (대화 권장/무료/빠름)' },
+    { value: 'gemini-2.5-flash-native-audio-latest', label: 'Gemini 2.5 Flash Native Audio (대화 전용/무료)' },
+    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
     { value: 'gemini-3.1-flash-lite-preview', label: 'Gemini 3.1 Flash Lite (최신/속도최적)' }
 ];
 
 const modelNames = {
     'gemini-3.1-flash-lite-preview': 'Gemini 3.1 Flash Lite',
-    'gemini-2.5-flash': 'Gemini 2.5 Flash'
+    'gemini-2.5-flash': 'Gemini 2.5 Flash',
+    'gemini-2.5-flash-native-audio-latest': 'Gemini 2.5 Flash Native Audio'
 };
 
 // Initialize model select options
