@@ -39,51 +39,18 @@ async function getGlobalSettings() {
     });
 }
 
-// REST APIs
+// REST APIs (Simplified for this task)
 app.get('/api/settings', async (req, res) => {
     try {
         const settings = await getGlobalSettings();
-        res.json({
-            provider: 'gemini',
-            hasApiKey: !!settings.geminiApiKey,
-            apiKeyPreview: settings.geminiApiKey ? settings.geminiApiKey.substring(0, 10) + '...' : null,
-            model: settings.geminiModel,
-            chatModel: settings.chatModel,
-            systemPrompt: settings.systemPrompt
-        });
+        res.json({ provider: 'gemini', hasApiKey: !!settings.geminiApiKey, model: settings.geminiModel, chatModel: settings.chatModel });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/settings', async (req, res) => {
-    const { geminiApiKey, geminiModel, chatModel, systemPrompt } = req.body;
-    const updates = []; const values = [];
-    if (geminiApiKey) { updates.push('geminiApiKey = ?'); values.push(geminiApiKey); }
-    if (geminiModel) { updates.push('geminiModel = ?'); values.push(geminiModel); }
-    if (chatModel) { updates.push('chatModel = ?'); values.push(chatModel); }
-    if (systemPrompt) { updates.push('systemPrompt = ?'); values.push(systemPrompt === 'RESET' ? null : systemPrompt); }
-    
-    if (updates.length === 0) return res.status(400).json({ error: 'No data' });
-    values.push(1);
-    db.run(`UPDATE global_settings SET ${updates.join(', ')} WHERE id = ?`, values, async (err) => {
-        if (err) return res.status(500).json({ error: err.message });
-        const s = await getGlobalSettings();
-        app.locals.geminiApiKey = s.geminiApiKey;
-        app.locals.chatModel = s.chatModel;
-        res.json({ success: true });
-    });
-});
-
-app.post('/api/generate', async (req, res) => {
-    const { topic, difficulty } = req.body;
-    const s = await getGlobalSettings();
-    if (!s.geminiApiKey) return res.status(400).json({ error: 'API Key required' });
-    
-    try {
-        const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/${s.geminiModel}:generateContent?key=${s.geminiApiKey}`, {
-            contents: [{ parts: [{ text: `Topic: ${topic}, Difficulty: ${difficulty}. Output 10 sentences in JSON format.` }] }]
-        });
-        res.json({ sentences: [] }); // Simplified for speed
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const { geminiApiKey, geminiModel, chatModel } = req.body;
+    db.run(`UPDATE global_settings SET geminiApiKey = ?, geminiModel = ?, chatModel = ? WHERE id = 1`, 
+        [geminiApiKey, geminiModel, chatModel], () => res.json({ success: true }));
 });
 
 app.get('/api/history', (req, res) => {
@@ -96,9 +63,6 @@ app.get('/api/trends', (req, res) => res.json({ trends: [] }));
 const server = app.listen(PORT, async () => {
     console.log(`Server running on port ${PORT}`);
     if (!db.isReady) await new Promise(r => db.resolveReady = r);
-    const s = await getGlobalSettings();
-    app.locals.geminiApiKey = s.geminiApiKey;
-    app.locals.chatModel = 'gemini-2.5-flash-native-audio-latest';
 });
 
 const wss = new WebSocket.Server({ server, path: '/ws/chat' });
@@ -107,47 +71,73 @@ wss.on('connection', (ws) => {
     console.log('Client connected to WebSocket');
     let geminiWs = null;
     let messageQueue = [];
+    let isSetupDone = false;
 
-    const startGeminiSession = () => {
-        const apiKey = app.locals.geminiApiKey;
-        if (!apiKey) {
-            ws.send(JSON.stringify({ type: 'text', text: 'Error: API Key가 설정되지 않았습니다.' }));
+    const startGeminiSession = async () => {
+        const s = await getGlobalSettings();
+        if (!s.geminiApiKey) {
+            ws.send(JSON.stringify({ type: 'text', text: 'API Key가 설정되지 않았습니다.' }));
             return;
         }
 
-        const url = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+        const url = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${s.geminiApiKey}`;
         geminiWs = new WebSocket(url);
 
         geminiWs.on('open', () => {
-            console.log('Gemini API Connected');
-            // Setup
+            console.log('Gemini API Connection Opened');
+            // 1. Setup 전송 (필수)
             geminiWs.send(JSON.stringify({
-                setup: { model: `models/${app.locals.chatModel}` }
+                setup: { 
+                    model: `models/${s.chatModel}`,
+                    generation_config: { response_modalities: ["audio", "text"] }
+                }
             }));
-            
-            // 전송 대기 중인 메시지 처리
-            while (messageQueue.length > 0) {
-                geminiWs.send(JSON.stringify(messageQueue.shift()));
-            }
         });
 
         geminiWs.on('message', (data) => {
             try {
                 const response = JSON.parse(data);
-                console.log('Gemini Response Received');
                 
+                // Setup 완료 확인
+                if (response.setupComplete) {
+                    console.log('Gemini Setup Complete');
+                    isSetupDone = true;
+                    // 대기 중인 메시지 쏘기
+                    while (messageQueue.length > 0) {
+                        geminiWs.send(JSON.stringify(messageQueue.shift()));
+                    }
+                    return;
+                }
+
                 if (response.serverContent?.modelTurn) {
                     const parts = response.serverContent.modelTurn.parts;
                     parts.forEach(p => {
-                        if (part.text) ws.send(JSON.stringify({ type: 'text', text: p.text }));
-                        if (part.inlineData) ws.send(JSON.stringify({ type: 'audio', audio: p.inlineData.data }));
+                        if (p.text) {
+                            console.log('AI Text Response:', p.text);
+                            ws.send(JSON.stringify({ type: 'text', text: p.text }));
+                        }
+                        if (p.inlineData) {
+                            ws.send(JSON.stringify({ type: 'audio', audio: p.inlineData.data }));
+                            ws.send(JSON.stringify({ type: 'status', status: 'talking' }));
+                        }
                     });
                 }
-            } catch (e) { console.error('Gemini Msg Error:', e); }
+                
+                if (response.serverContent?.turnComplete) {
+                    ws.send(JSON.stringify({ type: 'status', status: 'idle' }));
+                }
+            } catch (e) { console.error('Error parsing Gemini response:', e); }
         });
 
-        geminiWs.on('error', (e) => console.error('Gemini WS Error:', e));
-        geminiWs.on('close', () => { geminiWs = null; console.log('Gemini WS Closed'); });
+        geminiWs.on('close', (code, reason) => {
+            console.log(`Gemini Connection Closed. Code: ${code}, Reason: ${reason}`);
+            geminiWs = null;
+            isSetupDone = false;
+        });
+
+        geminiWs.on('error', (err) => {
+            console.error('Gemini WS Error:', err.message);
+        });
     };
 
     ws.on('message', (message) => {
@@ -162,13 +152,14 @@ wss.on('connection', (ws) => {
             }
 
             if (payload) {
-                if (geminiWs?.readyState === WebSocket.OPEN) geminiWs.send(JSON.stringify(payload));
-                else {
+                if (geminiWs && geminiWs.readyState === WebSocket.OPEN && isSetupDone) {
+                    geminiWs.send(JSON.stringify(payload));
+                } else {
                     if (!geminiWs) startGeminiSession();
                     messageQueue.push(payload);
                 }
             }
-        } catch (e) { console.error('Client WS Error:', e); }
+        } catch (e) { console.error('Client message handling error:', e); }
     });
 
     ws.on('close', () => { if (geminiWs) geminiWs.close(); });
