@@ -72,6 +72,11 @@ async function loadSettings() {
             updateChatModelBadge(data.chatModel);
         }
 
+        // 현재 선택된 모델 정보 텍스트 업데이트
+        const learningModelName = modelNames[data.model] || data.model || '미설정';
+        const chatModelName = modelNames[data.chatModel] || data.chatModel || '미설정';
+        modelPreview.textContent = `학습: ${learningModelName} / 대화: ${chatModelName}`;
+
         if (data.systemPrompt) {
             systemPromptInput.value = data.systemPrompt;
         }
