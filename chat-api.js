@@ -175,15 +175,8 @@ async function handleChatRequest(req, res) {
 
         // Gemini 클라이언트 초기화
         const genAI = initializeGeminiClient(apiKey);
-        let modelName = req.app.locals.chatModel || 'gemini-2.5-flash';
+        const modelName = req.app.locals.chatModel || 'gemini-2.5-flash-native-audio-latest';
         
-        // 기술적 제약 해결: native-audio 모델은 텍스트 채팅(generateContent)을 지원하지 않으므로
-        // 동일한 엔진의 텍스트 최적화 버전인 gemini-2.5-flash로 자동 전환하여 404 에러 방지
-        if (modelName.includes('native-audio')) {
-            console.log(`[System] Switching ${modelName} to gemini-2.5-flash for text compatibility.`);
-            modelName = 'gemini-2.5-flash';
-        }
-
         const model = genAI.getGenerativeModel({
             model: modelName,
             generationConfig: {
