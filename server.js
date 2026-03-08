@@ -36,7 +36,7 @@ async function getGlobalSettings() {
     });
 }
 
-// REST APIs
+// APIs
 app.get('/api/settings', async (req, res) => {
     try {
         const s = await getGlobalSettings();
@@ -54,7 +54,59 @@ app.get('/api/history', (req, res) => {
     db.all("SELECT * FROM learning_history ORDER BY createdAt DESC", (err, rows) => res.json({ history: rows || [] }));
 });
 
-app.get('/api/trends', (req, res) => res.json({ trends: [] }));
+// Trends API 복구 - 실시간 뉴스 수집 및 정제
+app.get('/api/trends', async (req, res) => {
+    const fallbacks = [
+        { category: 'TEC', title: '인공지능(AI) 기술이 바꾸는 우리의 미래 일상과 직업의 변화' },
+        { category: 'BIZ', title: '2026년 세계 경제 전망: 금리 인하와 글로벌 시장의 새로운 투자 기회' },
+        { category: 'SPT', title: '유럽 챔피언스리그 결승전: 전 세계 축구 팬들이 주목하는 관전 포인트' },
+        { category: 'ENT', title: 'K-콘텐츠의 글로벌 흥행 소식과 새롭게 공개되는 넷플릭스 기대작' },
+        { category: 'TEC', title: '스마트폰 이후의 혁신: 차세대 웨어러블 기기와 증강현실(AR) 기술 동향' },
+        { category: 'BIZ', title: '애플과 테슬라의 신제품 발표가 시장에 미치는 영향과 소비자 반응' },
+        { category: 'SPT', title: '손흥민 선수의 최근 경기 활약상과 팀 내 리더십에 대한 현지 언론 평가' },
+        { category: 'ENT', title: '빌보드 차트를 점령한 K-POP 아티스트들의 성과와 향후 활동 계획' },
+        { category: 'TOP', title: '친환경 여행과 지속 가능한 관광: 전 세계 여행자들이 선택한 새로운 방식' },
+        { category: 'TEC', title: '사이버 보안의 중요성: 개인 정보를 안전하게 지키는 생활 속 디지털 습관' }
+    ];
+
+    const categories = [
+        { name: 'TOP', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'BIZ', url: 'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'ENT', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'SPT', url: 'https://news.google.com/rss/headlines/section/topic/SPORTS?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'TEC', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' }
+    ];
+
+    try {
+        const results = await Promise.allSettled(
+            categories.map(cat => axios.get(cat.url, { timeout: 5000, headers: { 'User-Agent': 'Mozilla/5.0' } }))
+        );
+
+        let allTrends = [];
+        results.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                const categoryName = categories[index].name;
+                const xml = result.value.data;
+                const titleMatches = xml.match(/<title>(.*?)<\/title>/g) || [];
+                const categoryTitles = titleMatches.slice(1, 10).map(m => {
+                    let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
+                    title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                    return { category: categoryName, title: title.trim() };
+                }).filter(item => item.title.length > 10 && !item.title.includes('Google News'));
+                allTrends = [...allTrends, ...categoryTitles];
+            }
+        });
+
+        const uniqueTitles = new Map();
+        allTrends.forEach(item => { if (!uniqueTitles.has(item.title)) uniqueTitles.set(item.title, item); });
+        let finalTrends = Array.from(uniqueTitles.values()).sort(() => Math.random() - 0.5);
+        if (finalTrends.length < 10) {
+            const extra = fallbacks.filter(f => !uniqueTitles.has(f.title));
+            finalTrends = [...finalTrends, ...extra];
+        }
+        res.json({ trends: finalTrends.slice(0, 10) });
+    } catch (error) { res.json({ trends: fallbacks }); }
+});
 
 // WebSocket Server
 const server = app.listen(PORT, async () => {
@@ -82,34 +134,23 @@ wss.on('connection', (ws) => {
 
         geminiWs.on('open', () => {
             console.log('Gemini Bidi Connection Opened');
-            
-            // [CRITICAL] "Cannot extract voices" 해결을 위한 AUDIO 모드 명시 Setup
             const setupMsg = {
                 setup: { 
                     model: `models/gemini-2.5-flash-native-audio-latest`,
-                    generation_config: {
-                        response_modalities: ["AUDIO"]
-                    }
+                    generation_config: { response_modalities: ["AUDIO"] }
                 }
             };
-            
-            console.log('Sending Audio-First Setup:', JSON.stringify(setupMsg));
             geminiWs.send(JSON.stringify(setupMsg));
         });
 
         geminiWs.on('message', (data) => {
             try {
                 const response = JSON.parse(data);
-                
                 if (response.setupComplete) {
-                    console.log('Gemini Setup Success!');
                     isSetupDone = true;
-                    while (messageQueue.length > 0) {
-                        geminiWs.send(JSON.stringify(messageQueue.shift()));
-                    }
+                    while (messageQueue.length > 0) geminiWs.send(JSON.stringify(messageQueue.shift()));
                     return;
                 }
-
                 if (response.serverContent?.modelTurn) {
                     const parts = response.serverContent.modelTurn.parts;
                     parts.forEach(p => {
@@ -121,7 +162,6 @@ wss.on('connection', (ws) => {
         });
 
         geminiWs.on('close', (code, reason) => {
-            console.log(`Gemini Closed. Code: ${code}, Reason: ${reason}`);
             geminiWs = null;
             isSetupDone = false;
         });
@@ -133,29 +173,14 @@ wss.on('connection', (ws) => {
         try {
             const data = JSON.parse(message);
             let geminiPayload = null;
-
             if (data.type === 'text') {
-                geminiPayload = {
-                    client_content: {
-                        turns: [{ role: "user", parts: [{ text: data.text }] }],
-                        turn_complete: true
-                    }
-                };
+                geminiPayload = { client_content: { turns: [{ role: "user", parts: [{ text: data.text }] }], turn_complete: true } };
             } else if (data.type === 'audio' || data.type === 'video') {
-                geminiPayload = {
-                    realtime_input: {
-                        media_chunks: [{
-                            mime_type: data.type === 'audio' ? 'audio/pcm;rate=16000' : 'image/jpeg',
-                            data: data.data
-                        }]
-                    }
-                };
+                geminiPayload = { realtime_input: { media_chunks: [{ mime_type: data.type === 'audio' ? 'audio/pcm;rate=16000' : 'image/jpeg', data: data.data }] } };
             }
-
             if (geminiPayload) {
-                if (geminiWs && geminiWs.readyState === WebSocket.OPEN && isSetupDone) {
-                    geminiWs.send(JSON.stringify(geminiPayload));
-                } else {
+                if (geminiWs && geminiWs.readyState === WebSocket.OPEN && isSetupDone) geminiWs.send(JSON.stringify(geminiPayload));
+                else {
                     if (!geminiWs) startGeminiSession();
                     messageQueue.push(geminiPayload);
                 }
