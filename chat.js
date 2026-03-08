@@ -560,7 +560,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 채팅 버튼 클릭 이벤트
     const chatBtn = document.getElementById('ai-chat-btn');
     if (chatBtn) {
-        chatBtn.addEventListener('click', openChatModal);
+        chatBtn.addEventListener('click', (event) => {
+            event.stopPropagation(); // 이벤트 전파 방지 (모달이 바로 닫히는 현상 해결)
+            openChatModal();
+        });
     }
 
     // 닫기 버튼 클릭 이벤트
