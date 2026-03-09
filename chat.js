@@ -97,8 +97,7 @@ function connectWebSocket() {
 
                 if (cleanText.length === 0) return;
 
-                // 형식 정리: 항상 "영어 --- 한글" 순서로
-                cleanText = formatResponse(cleanText);
+                // 한글 응답만 표시 (형식 정리 제거)
 
                 if (!ChatState.currentAiMessageTextDiv) {
                     const messageDiv = document.createElement('div');

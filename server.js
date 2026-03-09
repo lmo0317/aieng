@@ -504,21 +504,58 @@ app.post('/api/chat', async (req, res) => {
             return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
         }
 
-        const topicContext = topic
-            ? `The user is currently studying this topic: '${topic}'. Talk about this topic naturally.`
-            : 'The user is here to practice English conversation.';
+        // 주제에 해당하는 학습 데이터 조회
+        let learningContext = '';
+        if (topic) {
+            const dbGet = () => new Promise((resolve, reject) => {
+                db.get("SELECT * FROM trends WHERE title = ? LIMIT 1", [topic], (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
 
-        const systemPrompt = `You are 'Trend Eng', an AI English Tutor.
-Topic: '${topic || "English conversation"}'.
+            try {
+                const trend = await dbGet();
+                if (trend && trend.sentences) {
+                    const sentences = JSON.parse(trend.sentences);
+                    if (sentences && sentences.length > 0) {
+                        // 학습 데이터를 컨텍스트에 추가
+                        learningContext = `\n\n## 현재 학습 중인 주제: ${trend.title}\n\n`;
+                        learningContext += `카테고리: ${trend.category}\n`;
+                        learningContext += `요약: ${trend.summary || ''}\n\n`;
+                        learningContext += `## 학습 문장 (사용자가 이 문장들을 학습했습니다):\n\n`;
 
-CRITICAL INSTRUCTION:
-In your response, you MUST NOT write your thought process (e.g. NEVER write "**Greeting**", "I'm registering...", etc.).
-Your response MUST ONLY be the transcript of what you say, in this exact format:
-[Your English Speech]
-----
-[Korean Translation]
+                        sentences.slice(0, 5).forEach((sent, idx) => {
+                            learningContext += `${idx + 1}. ${sent.en}\n   ${sent.ko}\n`;
+                            if (sent.voca) {
+                                learningContext += `   단어: ${sent.voca.join(', ')}\n`;
+                            }
+                            learningContext += '\n';
+                        });
 
-Do not add any other text. Just the English, the dashes, and the Korean. Be brief and conversational.`;
+                        learningContext += `\n위 학습 문장들에 대해 질문하면 자세히 설명해주세요.`;
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching learning data:', err);
+            }
+        }
+
+        const systemPrompt = `당신은 'Trend Eng'의 한국어 AI 튜터입니다. 사용자와 한국어로 대화하며 영어 학습을 도와주세요.${learningContext || ''}
+
+## 대화 원칙:
+1. **한국어로만 대화하세요** (영어로 답변하지 마세요)
+2. 사용자의 질문에 친절하고 자연스럽게 답변하세요
+3. 학습 문장이 있다면 그 내용을 바탕으로 설명해주세요
+4. 사고 과정(Thinking..., 분석 중 등)을 절대 출력하지 마세요
+5. 2~3문장으로 간결하고 명확하게 답변하세요
+
+${topic ? `현재 학습 주제: ${topic}` : ''}
+
+## 답변 형식:
+- 한국어로만 답변
+- 필요시 학습 문장의 뜻이나 단어 설명
+- 친근하고 격려하는 말투`;
 
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${s.geminiApiKey}`;
 
