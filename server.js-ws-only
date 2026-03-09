@@ -8,9 +8,42 @@ wss.on('connection', (ws, req) => {
 
     const startGeminiSession = async () => {
         const s = await getGlobalSettings();
-        if (!s.geminiApiKey) { 
-            ws.send(JSON.stringify({ type: 'text', text: 'API Key가 없습니다. 설정에서 입력해 주세요.' })); 
-            return; 
+        if (!s.geminiApiKey) {
+            ws.send(JSON.stringify({ type: 'text', text: 'API Key가 없습니다. 설정에서 입력해 주세요.' }));
+            return;
+        }
+
+        // 주제에 해당하는 학습 데이터 조회
+        let learningContext = '';
+        if (currentTopic) {
+            try {
+                const dbGet = () => new Promise((resolve, reject) => {
+                    db.get("SELECT * FROM trends WHERE title = ? LIMIT 1", [currentTopic], (err, row) => {
+                        if (err) reject(err);
+                        else resolve(row);
+                    });
+                });
+
+                const trend = await dbGet();
+                if (trend && trend.sentences) {
+                    const sentences = JSON.parse(trend.sentences);
+                    if (sentences && sentences.length > 0) {
+                        // 학습 데이터를 컨텍스트에 추가
+                        learningContext = `\n\n## 현재 학습 중인 주제: ${trend.title}\n\n`;
+                        learningContext += `카테고리: ${trend.category}\n`;
+                        learningContext += `요약: ${trend.summary || ''}\n\n`;
+                        learningContext += `## 학습 문장:\n\n`;
+
+                        sentences.slice(0, 5).forEach((sent, idx) => {
+                            learningContext += `${idx + 1}. ${sent.en}\n   ${sent.ko}\n\n`;
+                        });
+
+                        learningContext += `\n위 학습 문장들에 대해 질문하면 자세히 설명해주세요.`;
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching learning data:', err);
+            }
         }
 
         const url = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${s.geminiApiKey}`;
@@ -18,20 +51,26 @@ wss.on('connection', (ws, req) => {
 
         geminiWs.on('open', () => {
             console.log('Gemini Bidi Connection Opened');
-            
-            // 학습 주제가 있다면 시스템 지침에 추가
-            const topicContext = currentTopic 
-                ? `\n\n현재 사용자가 공부하고 있는 주제는 '${currentTopic}'입니다. 이 주제를 바탕으로 자연스럽게 대화를 시작하고 학습을 도와주세요.`
-                : '';
+
+            const koreanSystemPrompt = `당신은 'Trend Eng'의 한국어 AI 튜터입니다. 사용자와 한국어로 대화하며 영어 학습을 도와주세요.${learningContext || ''}
+
+## 대화 원칙:
+1. **한국어로만 대화하세요** (음성으로도 한국어만 말하세요)
+2. 사용자의 질문에 친절하고 자연스럽게 답변하세요
+3. 학습 문장이 있다면 그 내용을 바탕으로 설명해주세요
+4. 사고 과정(Thinking..., 분석 중 등)을 절대 말하지 마세요
+5. 2~3문장으로 간결하고 명확하게 답변하세요
+
+${currentTopic ? `현재 학습 주제: ${currentTopic}` : ''}`;
 
             const setupMsg = {
-                setup: { 
+                setup: {
                     model: `models/gemini-2.5-flash-native-audio-latest`,
-                    generation_config: { 
-                        response_modalities: ["AUDIO"] 
+                    generation_config: {
+                        response_modalities: ["AUDIO"]
                     },
                     system_instruction: {
-                        parts: [{ text: (s.systemPrompt || DEFAULT_PROMPT) + topicContext }]
+                        parts: [{ text: koreanSystemPrompt }]
                     }
                 }
             };
