@@ -327,8 +327,24 @@ app.post('/api/trends/fetch', async (req, res) => {
             return res.status(500).json({ error: '트렌드를 가져오지 못했습니다.' });
         }
 
+        // 중복 제거
+        const uniqueTrends = [];
+        const seenTitles = new Set();
+        for (const trend of allTrends) {
+            if (!seenTitles.has(trend.title)) {
+                seenTitles.add(trend.title);
+                uniqueTrends.push(trend);
+            }
+        }
+
+        // 섞기 (shuffle)
+        for (let i = uniqueTrends.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [uniqueTrends[i], uniqueTrends[j]] = [uniqueTrends[j], uniqueTrends[i]];
+        }
+
         // 상위 10개만 선택
-        const topTrends = allTrends.slice(0, 10);
+        const topTrends = uniqueTrends.slice(0, 10);
 
         broadcastTrendsProgress('analyzing', `AI 분석 중... (0/${topTrends.length})`, 0, topTrends.length);
 
