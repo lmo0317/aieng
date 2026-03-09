@@ -3,10 +3,12 @@ let sentences = [];
 
 const trendsSection = document.getElementById('trends-section');
 const topicSection = document.getElementById('topic-section');
+const paragraphSection = document.getElementById('paragraph-section');
 const learningSection = document.getElementById('learning-section');
 const realtimeTrendsContainer = document.getElementById('realtime-trends-container');
 
 const startBtn = document.getElementById('start-btn');
+const paragraphStartBtn = document.getElementById('paragraph-start-btn');
 const revealBtn = document.getElementById('reveal-btn');
 const nextBtn = document.getElementById('next-btn');
 const finishBtn = document.getElementById('finish-btn');
@@ -20,9 +22,11 @@ const vocaDiv = document.getElementById('voca');
 const ttsBtn = document.getElementById('tts-btn');
 
 const topicInput = document.getElementById('topic');
+const paragraphInput = document.getElementById('paragraph');
 
 const navTrends = document.getElementById('nav-trends');
 const navTopic = document.getElementById('nav-topic');
+const navParagraph = document.getElementById('nav-paragraph');
 
 // 학습 상태 초기화 함수
 function resetLearningState() {
@@ -253,6 +257,11 @@ navTopic.addEventListener('click', (e) => {
     showSection('topic-section');
 });
 
+navParagraph.addEventListener('click', (e) => {
+    e.preventDefault();
+    showSection('paragraph-section');
+});
+
 startBtn.addEventListener('click', async () => {
     const topic = topicInput.value;
     const difficulty = document.getElementById('difficulty').value;
@@ -267,6 +276,65 @@ startBtn.addEventListener('click', async () => {
 
     await fetchSentences(topic, difficulty);
 });
+
+// 문단 입력 학습 시작
+paragraphStartBtn.addEventListener('click', async () => {
+    const paragraph = paragraphInput.value.trim();
+    const difficulty = document.getElementById('paragraph-difficulty').value;
+
+    if (!paragraph) {
+        alert('학습할 문단을 입력해 주세요.');
+        return;
+    }
+
+    showSection('learning-section');
+    ttsBtn.classList.add('hidden');
+
+    await analyzeParagraph(paragraph, difficulty);
+});
+
+// 문단 분석 및 학습 함수
+async function analyzeParagraph(paragraph, difficulty) {
+    sentenceEn.textContent = 'AI가 문장별로 분석하고 있습니다...';
+
+    try {
+        const response = await fetch('/api/analyze-paragraph', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paragraph, difficulty })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('API Error:', data);
+            sentenceEn.textContent = `분석 실패: ${data.error || '알 수 없는 오류'}`;
+            return;
+        }
+
+        if (!data.sentences || !Array.isArray(data.sentences)) {
+            throw new Error('데이터 형식이 올바르지 않습니다.');
+        }
+
+        // 세션 스토리지에 문단 저장
+        sessionStorage.setItem('currentParagraph', paragraph);
+        sessionStorage.setItem('currentTopic', '문장 분석 학습');
+
+        sentences = data.sentences;
+        currentCount = 0;
+
+        // 진행률 텍스트 업데이트
+        currentCountSpan.textContent = `${currentCount + 1} / ${sentences.length}`;
+
+        showSentence();
+
+        // 채팅 서버에 문단 전송
+        sendTopicToChat('문장 분석 학습: ' + paragraph.substring(0, 50) + '...');
+    } catch (error) {
+        console.error('Error analyzing paragraph:', error);
+        sentenceEn.textContent = '문단 분석 중 오류가 발생했습니다.';
+    }
+}
 
 // 채팅 서버에 주제 전송 함수
 function sendTopicToChat(topic) {
@@ -359,7 +427,8 @@ function showSentence() {
     nextBtn.classList.add('hidden');
     finishBtn.classList.add('hidden');
 
-    currentCountSpan.textContent = currentCount + 1;
+    // 진행률 업데이트
+    currentCountSpan.textContent = `${currentCount + 1} / ${sentences.length}`;
 }
 
 function formatAnalysis(analysis) {

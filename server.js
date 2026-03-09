@@ -164,6 +164,98 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
+// Paragraph Analysis API
+app.post('/api/analyze-paragraph', async (req, res) => {
+    const { paragraph, difficulty } = req.body;
+    const s = await getGlobalSettings();
+    if (!s.geminiApiKey) return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
+
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${s.geminiModel}:generateContent?key=${s.geminiApiKey}`;
+
+    try {
+        // 먼저 문장 분리를 위한 프롬프트
+        const splitPrompt = `다음 영어 문단을 문장 단위로 분리해주세요. 각 문장에 대해:
+1. 문장 번호
+2. 원문 영어 문장
+3. 한국어 번역
+
+문단:
+${paragraph}
+
+결과를 JSON 배열 형식으로 반환하세요:
+[
+  {
+    "en": "영어 문장",
+    "ko": "한국어 번역"
+  }
+]`;
+
+        const splitResponse = await axios.post(API_URL, {
+            contents: [{ parts: [{ text: splitPrompt }] }],
+            generationConfig: {
+                temperature: 0.3,
+                maxOutputTokens: 4096
+            }
+        });
+
+        let splitContent = splitResponse.data.candidates[0].content.parts[0].text;
+        splitContent = splitContent.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
+        const firstBracket = splitContent.indexOf('[');
+        if (firstBracket !== -1) splitContent = splitContent.substring(firstBracket);
+        const sentences = JSON.parse(splitContent);
+
+        // 각 문장에 대해 상세 분석 생성
+        const analyzedSentences = [];
+        for (let i = 0; i < sentences.length; i++) {
+            const sentence = sentences[i];
+            const analysisPrompt = `다음 영어 문장을 ${difficulty} 수준에 맞춰 분석해주세요:
+
+문장: ${sentence.en}
+번역: ${sentence.ko}
+
+다음 형식의 JSON으로 응답하세요:
+{
+  "en": "${sentence.en}",
+  "ko": "${sentence.ko}",
+  "sentence_structure": "문장 구조 분석 (주어, 동사, 목적어, 수식어 등)",
+  "explanation": "이 문장의 핵심 문법 포인트와 학습 팁",
+  "voca": ["단어1: 뜻", "단어2: 뜻"]
+}`;
+
+            const analysisResponse = await axios.post(API_URL, {
+                system_instruction: {
+                    parts: [{ text: s.systemPrompt }]
+                },
+                contents: [{ parts: [{ text: analysisPrompt }] }],
+                generationConfig: {
+                    temperature: 0.5,
+                    maxOutputTokens: 2048
+                }
+            });
+
+            let analysisContent = analysisResponse.data.candidates[0].content.parts[0].text;
+            analysisContent = analysisContent.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
+            const analysisFirstBrace = analysisContent.indexOf('{');
+            if (analysisFirstBrace !== -1) analysisContent = analysisContent.substring(analysisFirstBrace);
+            const lastBrace = analysisContent.lastIndexOf('}');
+            if (lastBrace !== -1) analysisContent = analysisContent.substring(0, lastBrace + 1);
+
+            const analyzed = JSON.parse(analysisContent);
+            analyzedSentences.push(analyzed);
+        }
+
+        // DB에 저장
+        db.run("INSERT INTO learning_history (topic, difficulty, sentences) VALUES (?, ?, ?)",
+            [`문장 분석: ${paragraph.substring(0, 50)}...`, difficulty, JSON.stringify(analyzedSentences)]);
+
+        res.json({ sentences: analyzedSentences });
+    } catch (error) {
+        console.error('Paragraph Analysis Error:', error.message);
+        if (error.response) console.error(error.response.data);
+        res.status(500).json({ error: 'Failed to analyze paragraph' });
+    }
+});
+
 // History API
 app.get('/api/history', (req, res) => {
     db.all("SELECT id, topic, difficulty, createdAt FROM learning_history ORDER BY createdAt DESC", (err, rows) => {

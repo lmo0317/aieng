@@ -14,6 +14,7 @@
             <div class="nav-links">
                 <a href="#" id="nav-trends" class="nav-link active">🔥 실시간 트렌드</a>
                 <a href="#" id="nav-topic" class="nav-link">✏️ 주제 입력</a>
+                <a href="#" id="nav-paragraph" class="nav-link">📝 문단 입력</a>
                 <a href="/settings.html" class="settings-link">⚙️ 설정</a>
             </div>
         </div>
@@ -60,6 +61,33 @@
                         </select>
                     </div>
                     <button id="start-btn" class="start-btn">학습 시작 🚀</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 문단 입력 섹션 -->
+        <div id="paragraph-section" class="hidden">
+            <div class="paragraph-page-header">
+                <h2>📝 문단 입력 학습</h2>
+                <p class="paragraph-subtitle">영어 문단을 입력하면 문장별로 분석하여 학습합니다</p>
+            </div>
+            <div class="setup-container">
+                <div class="setup-left">
+                    <div class="input-group paragraph-group">
+                        <label for="paragraph">영어 문단 입력</label>
+                        <textarea id="paragraph" placeholder="학습하고 싶은 영어 문단이나 기사 전문을 입력하세요.&#10;&#10;예시:&#10;Artificial intelligence is transforming the way we live and work. From healthcare to education, AI systems are making processes more efficient and accessible. However, as these technologies become more powerful, we must consider their ethical implications and ensure they benefit everyone in society." rows="12"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="paragraph-difficulty">학습 난이도 선택</label>
+                        <select id="paragraph-difficulty">
+                            <option value="level1">Level 1 (입문)</option>
+                            <option value="level2">Level 2 (초급)</option>
+                            <option value="level3" selected>Level 3 (중급)</option>
+                            <option value="level4">Level 4 (고급)</option>
+                            <option value="level5">Level 5 (심화)</option>
+                        </select>
+                    </div>
+                    <button id="paragraph-start-btn" class="start-btn">문장 분석 시작 📊</button>
                 </div>
             </div>
         </div>

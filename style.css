@@ -1158,3 +1158,26 @@ button:active {
     background: var(--primary-light);
     color: var(--primary);
 }
+
+/* 문단 입력 페이지 스타일 */
+.paragraph-page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.paragraph-page-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.paragraph-subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.paragraph-group textarea {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8;
+}
