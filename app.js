@@ -59,17 +59,33 @@ function resetLearningState() {
 
 // 섹션 전환 유틸리티 (히스토리 지원)
 function showSection(sectionId, pushState = true) {
+    // 모든 섹션 목록
+    const allSections = [trendsSection, topicSection, paragraphSection, learningSection];
+    const allNavLinks = [navTrends, navTopic, navParagraph];
+
     // 학습 화면에서 나갈 때 상태 초기화
-    if (sectionId === 'trends-section' || sectionId === 'topic-section') {
+    if (sectionId === 'trends-section' || sectionId === 'topic-section' || sectionId === 'paragraph-section') {
         resetLearningState();
     }
 
-    [trendsSection, topicSection, learningSection].forEach(section => {
+    // 모든 섹션 숨기기
+    allSections.forEach(section => {
         if (section) section.classList.add('hidden');
     });
 
+    // 모든 내비게이션 링크 활성화 해제
+    allNavLinks.forEach(link => {
+        if (link) link.classList.remove('active');
+    });
+
+    // 대상 섹션 보이기
     const target = document.getElementById(sectionId);
     if (target) target.classList.remove('hidden');
+
+    // 해당 내비게이션 링크 활성화
+    if (sectionId === 'trends-section') navTrends.classList.add('active');
+    if (sectionId === 'topic-section') navTopic.classList.add('active');
+    if (sectionId === 'paragraph-section') navParagraph.classList.add('active');
 
     window.speechSynthesis.cancel();
 
@@ -324,7 +340,7 @@ async function analyzeParagraph(paragraph, difficulty) {
         currentCount = 0;
 
         // 진행률 텍스트 업데이트
-        currentCountSpan.textContent = `${currentCount + 1} / ${sentences.length}`;
+        currentCountSpan.textContent = currentCount + 1;
 
         showSentence();
 

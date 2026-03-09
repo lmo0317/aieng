@@ -56,16 +56,107 @@ JSON 형식 예시:
 // Helper function to get global settings
 async function getGlobalSettings() {
     return new Promise((resolve, reject) => {
-        db.get("SELECT geminiApiKey, geminiModel, chatModel, systemPrompt FROM global_settings WHERE id = 1", (err, row) => {
+        db.get("SELECT geminiApiKey, glmApiKey, groqApiKey, geminiModel, chatModel, systemPrompt FROM global_settings WHERE id = 1", (err, row) => {
             if (err) reject(err);
             else resolve({
                 geminiApiKey: row?.geminiApiKey || process.env.GEMINI_API_KEY,
+                glmApiKey: row?.glmApiKey || process.env.GLM_API_KEY,
+                groqApiKey: row?.groqApiKey || process.env.GROQ_API_KEY,
                 geminiModel: row?.geminiModel || 'gemini-2.5-flash',
                 chatModel: row?.chatModel || 'gemini-2.5-flash-native-audio-latest',
                 systemPrompt: row?.systemPrompt || DEFAULT_PROMPT
             });
         });
     });
+}
+
+// Helper function to detect model provider
+function getModelProvider(model) {
+    if (model.startsWith('glm-')) return 'glm';
+    if (model.startsWith('llama-') || 
+        model.startsWith('mixtral-') || 
+        model.startsWith('gemma') ||
+        model.startsWith('openai/') ||
+        model.startsWith('moonshotai/') ||
+        model.startsWith('qwen/')
+    ) return 'groq';
+    return 'gemini';
+}
+
+// Helper function to call Gemini API
+async function callGeminiAPI(apiKey, model, systemPrompt, userPrompt, config = {}) {
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    const requestBody = {
+        contents: [{ parts: [{ text: userPrompt }] }],
+        generationConfig: {
+            temperature: config.temperature || 0.7,
+            maxOutputTokens: config.maxOutputTokens || 8192
+        }
+    };
+
+    if (systemPrompt) {
+        requestBody.system_instruction = {
+            parts: [{ text: systemPrompt }]
+        };
+    }
+
+    const response = await axios.post(API_URL, requestBody);
+    return response.data.candidates[0].content.parts[0].text;
+}
+
+// Helper function to call GLM API
+async function callGLMAPI(apiKey, model, systemPrompt, userPrompt, config = {}) {
+    const API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+
+    const messages = [];
+    if (systemPrompt) {
+        messages.push({ role: 'system', content: systemPrompt });
+    }
+    messages.push({ role: 'user', content: userPrompt });
+
+    const requestBody = {
+        model: model,
+        messages: messages,
+        temperature: config.temperature || 0.7,
+        max_tokens: config.maxOutputTokens || 8192
+    };
+
+    const response = await axios.post(API_URL, requestBody, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    return response.data.choices[0].message.content;
+}
+
+// Helper function to call Groq API
+async function callGroqAPI(apiKey, model, systemPrompt, userPrompt, config = {}) {
+    const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+    const messages = [];
+    if (systemPrompt) {
+        messages.push({ role: 'system', content: systemPrompt });
+    }
+    messages.push({ role: 'user', content: userPrompt });
+
+    const requestBody = {
+        model: model,
+        messages: messages,
+        temperature: config.temperature || 0.7,
+        max_tokens: config.maxOutputTokens || 8192
+    };
+
+    const response = await axios.post(API_URL, requestBody, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    return response.data.choices[0].message.content;
 }
 
 // Global Settings API endpoints
@@ -76,6 +167,10 @@ app.get('/api/settings', async (req, res) => {
             provider: 'gemini',
             hasApiKey: !!row.geminiApiKey,
             apiKeyPreview: row.geminiApiKey ? row.geminiApiKey.substring(0, 10) + '...' : null,
+            hasGLMApiKey: !!row.glmApiKey,
+            glmApiKeyPreview: row.glmApiKey ? row.glmApiKey.substring(0, 10) + '...' : null,
+            hasGroqApiKey: !!row.groqApiKey,
+            groqApiKeyPreview: row.groqApiKey ? row.groqApiKey.substring(0, 10) + '...' : null,
             model: row.geminiModel,
             chatModel: row.chatModel,
             systemPrompt: row.systemPrompt
@@ -86,13 +181,21 @@ app.get('/api/settings', async (req, res) => {
 });
 
 app.post('/api/settings', async (req, res) => {
-    const { geminiApiKey, geminiModel, chatModel, systemPrompt } = req.body;
+    const { geminiApiKey, glmApiKey, groqApiKey, geminiModel, chatModel, systemPrompt } = req.body;
     const updates = [];
     const values = [];
 
     if (geminiApiKey !== undefined) {
         updates.push('geminiApiKey = ?');
         values.push(geminiApiKey ? geminiApiKey.trim() : null);
+    }
+    if (glmApiKey !== undefined) {
+        updates.push('glmApiKey = ?');
+        values.push(glmApiKey ? glmApiKey.trim() : null);
+    }
+    if (groqApiKey !== undefined) {
+        updates.push('groqApiKey = ?');
+        values.push(groqApiKey ? groqApiKey.trim() : null);
     }
     if (geminiModel !== undefined) {
         updates.push('geminiModel = ?');
@@ -114,6 +217,8 @@ app.post('/api/settings', async (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         const s = await getGlobalSettings();
         app.locals.geminiApiKey = s.geminiApiKey;
+        app.locals.glmApiKey = s.glmApiKey;
+        app.locals.groqApiKey = s.groqApiKey;
         app.locals.geminiModel = s.geminiModel;
         app.locals.chatModel = s.chatModel;
         res.json({ success: true, message: '설정이 저장되었습니다.' });
@@ -123,7 +228,21 @@ app.post('/api/settings', async (req, res) => {
 app.delete('/api/settings', (req, res) => {
     db.run(`UPDATE global_settings SET geminiApiKey = NULL WHERE id = 1`, (err) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ success: true, message: 'API Key가 삭제되었습니다.' });
+        res.json({ success: true, message: 'Gemini API Key가 삭제되었습니다.' });
+    });
+});
+
+app.delete('/api/settings/glm', (req, res) => {
+    db.run(`UPDATE global_settings SET glmApiKey = NULL WHERE id = 1`, (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, message: 'GLM API Key가 삭제되었습니다.' });
+    });
+});
+
+app.delete('/api/settings/groq', (req, res) => {
+    db.run(`UPDATE global_settings SET groqApiKey = NULL WHERE id = 1`, (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, message: 'Groq API Key가 삭제되었습니다.' });
     });
 });
 
@@ -131,29 +250,55 @@ app.delete('/api/settings', (req, res) => {
 app.post('/api/generate', async (req, res) => {
     const { topic, difficulty } = req.body;
     const s = await getGlobalSettings();
-    if (!s.geminiApiKey) return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${s.geminiModel}:generateContent?key=${s.geminiApiKey}`;
-    
+    const provider = getModelProvider(s.geminiModel);
+    let apiKey;
+    if (provider === 'glm') {
+        apiKey = s.glmApiKey;
+    } else if (provider === 'groq') {
+        apiKey = s.groqApiKey;
+    } else {
+        apiKey = s.geminiApiKey;
+    }
+
+    if (!apiKey) {
+        return res.status(400).json({
+            error: provider === 'glm'
+                ? 'GLM API Key가 설정되지 않았습니다.'
+                : provider === 'groq'
+                ? 'Groq API Key가 설정되지 않았습니다.'
+                : 'Gemini API Key가 설정되지 않았습니다.'
+        });
+    }
+
     try {
-        const response = await axios.post(API_URL, {
-            system_instruction: {
-                parts: [{ text: s.systemPrompt }]
-            },
-            contents: [{ parts: [{ text: `주제: ${topic}\n난이도: ${difficulty}\n\n[CRITICAL: Output ONLY a valid JSON array of exactly 10 objects matching the required schema. Do NOT wrap the JSON in markdown code blocks. No other text.]` }] }],
-            generationConfig: {
+        const userPrompt = `주제: ${topic}\n난이도: ${difficulty}\n\n[CRITICAL: Output ONLY a valid JSON array of exactly 10 objects matching the required schema. Do NOT wrap the JSON in markdown code blocks. No other text.]`;
+
+        let content;
+        if (provider === 'glm') {
+            content = await callGLMAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt, {
                 temperature: 0.7,
                 maxOutputTokens: 8192
-            }
-        });
+            });
+        } else if (provider === 'groq') {
+            content = await callGroqAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt, {
+                temperature: 0.7,
+                maxOutputTokens: 8192
+            });
+        } else {
+            content = await callGeminiAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt, {
+                temperature: 0.7,
+                maxOutputTokens: 8192
+            });
+        }
 
-        let content = response.data.candidates[0].content.parts[0].text;
+        // Clean and parse JSON response
         content = content.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
         const firstBracket = content.indexOf('[');
         if (firstBracket !== -1) content = content.substring(firstBracket);
 
         const sentences = JSON.parse(content);
-        db.run("INSERT INTO learning_history (topic, difficulty, sentences) VALUES (?, ?, ?)", 
+        db.run("INSERT INTO learning_history (topic, difficulty, sentences) VALUES (?, ?, ?)",
             [topic, difficulty, JSON.stringify(sentences)]);
 
         res.json({ sentences });
@@ -168,91 +313,81 @@ app.post('/api/generate', async (req, res) => {
 app.post('/api/analyze-paragraph', async (req, res) => {
     const { paragraph, difficulty } = req.body;
     const s = await getGlobalSettings();
-    if (!s.geminiApiKey) return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${s.geminiModel}:generateContent?key=${s.geminiApiKey}`;
+    const provider = getModelProvider(s.geminiModel);
+    let apiKey;
+    if (provider === 'glm') {
+        apiKey = s.glmApiKey;
+    } else if (provider === 'groq') {
+        apiKey = s.groqApiKey;
+    } else {
+        apiKey = s.geminiApiKey;
+    }
+
+    if (!apiKey) {
+        return res.status(400).json({
+            error: provider === 'glm'
+                ? 'GLM API Key가 설정되지 않았습니다.'
+                : provider === 'groq'
+                ? 'Groq API Key가 설정되지 않았습니다.'
+                : 'Gemini API Key가 설정되지 않았습니다.'
+        });
+    }
 
     try {
-        // 먼저 문장 분리를 위한 프롬프트
-        const splitPrompt = `다음 영어 문단을 문장 단위로 분리해주세요. 각 문장에 대해:
-1. 문장 번호
-2. 원문 영어 문장
-3. 한국어 번역
+        // 일괄 분석을 위한 통합 프롬프트
+        const batchPrompt = `다음 영어 문단을 문장 단위로 정밀 분석해주세요. 
+난이도 설정: ${difficulty}
 
-문단:
+각 문장에 대해 다음 정보를 포함하여 반드시 순수한 JSON 배열 형식으로만 응답하세요 (설명이나 마크다운 코드 블록 제외):
+1. "en": 원문 영어 문장
+2. "ko": 한국어 해석
+3. "sentence_structure": 문장 구조 분석 (주어, 동사, 목적어, 수식어 등)
+4. "explanation": 해당 문장의 핵심 문법 포인트 및 학습 팁
+5. "voca": 핵심 단어 및 숙어 목록 ["단어: 뜻", ...]
+
+문단 내용:
 ${paragraph}
 
-결과를 JSON 배열 형식으로 반환하세요:
-[
-  {
-    "en": "영어 문장",
-    "ko": "한국어 번역"
-  }
-]`;
+[CRITICAL: Output ONLY a valid JSON array of objects. Do NOT wrap the JSON in markdown code blocks. No other text.]`;
 
-        const splitResponse = await axios.post(API_URL, {
-            contents: [{ parts: [{ text: splitPrompt }] }],
-            generationConfig: {
-                temperature: 0.3,
-                maxOutputTokens: 4096
-            }
-        });
-
-        let splitContent = splitResponse.data.candidates[0].content.parts[0].text;
-        splitContent = splitContent.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
-        const firstBracket = splitContent.indexOf('[');
-        if (firstBracket !== -1) splitContent = splitContent.substring(firstBracket);
-        const sentences = JSON.parse(splitContent);
-
-        // 각 문장에 대해 상세 분석 생성
-        const analyzedSentences = [];
-        for (let i = 0; i < sentences.length; i++) {
-            const sentence = sentences[i];
-            const analysisPrompt = `다음 영어 문장을 ${difficulty} 수준에 맞춰 분석해주세요:
-
-문장: ${sentence.en}
-번역: ${sentence.ko}
-
-다음 형식의 JSON으로 응답하세요:
-{
-  "en": "${sentence.en}",
-  "ko": "${sentence.ko}",
-  "sentence_structure": "문장 구조 분석 (주어, 동사, 목적어, 수식어 등)",
-  "explanation": "이 문장의 핵심 문법 포인트와 학습 팁",
-  "voca": ["단어1: 뜻", "단어2: 뜻"]
-}`;
-
-            const analysisResponse = await axios.post(API_URL, {
-                system_instruction: {
-                    parts: [{ text: s.systemPrompt }]
-                },
-                contents: [{ parts: [{ text: analysisPrompt }] }],
-                generationConfig: {
-                    temperature: 0.5,
-                    maxOutputTokens: 2048
-                }
+        let content;
+        if (provider === 'glm') {
+            content = await callGLMAPI(apiKey, s.geminiModel, s.systemPrompt, batchPrompt, {
+                temperature: 0.5,
+                maxOutputTokens: 8192
             });
-
-            let analysisContent = analysisResponse.data.candidates[0].content.parts[0].text;
-            analysisContent = analysisContent.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
-            const analysisFirstBrace = analysisContent.indexOf('{');
-            if (analysisFirstBrace !== -1) analysisContent = analysisContent.substring(analysisFirstBrace);
-            const lastBrace = analysisContent.lastIndexOf('}');
-            if (lastBrace !== -1) analysisContent = analysisContent.substring(0, lastBrace + 1);
-
-            const analyzed = JSON.parse(analysisContent);
-            analyzedSentences.push(analyzed);
+        } else if (provider === 'groq') {
+            content = await callGroqAPI(apiKey, s.geminiModel, s.systemPrompt, batchPrompt, {
+                temperature: 0.5,
+                maxOutputTokens: 8192
+            });
+        } else {
+            content = await callGeminiAPI(apiKey, s.geminiModel, s.systemPrompt, batchPrompt, {
+                temperature: 0.5,
+                maxOutputTokens: 8192
+            });
         }
+
+        // JSON 응답 정제 및 파싱
+        content = content.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
+        const firstBracket = content.indexOf('[');
+        const lastBracket = content.lastIndexOf(']');
+        if (firstBracket !== -1 && lastBracket !== -1) {
+            content = content.substring(firstBracket, lastBracket + 1);
+        }
+
+        const analyzedSentences = JSON.parse(content);
 
         // DB에 저장
         db.run("INSERT INTO learning_history (topic, difficulty, sentences) VALUES (?, ?, ?)",
-            [`문장 분석: ${paragraph.substring(0, 50)}...`, difficulty, JSON.stringify(analyzedSentences)]);
+            [`문단 분석: ${paragraph.substring(0, 50)}...`, difficulty, JSON.stringify(analyzedSentences)]);
 
         res.json({ sentences: analyzedSentences });
     } catch (error) {
-        console.error('Paragraph Analysis Error:', error.message);
-        if (error.response) console.error(error.response.data);
-        res.status(500).json({ error: 'Failed to analyze paragraph' });
+        console.error('Batch Paragraph Analysis Error:', error.message);
+        if (error.response) console.error('API Error Details:', error.response.data);
+        res.status(500).json({ error: '문단 분석 중 오류가 발생했습니다. (Batch processing failed)' });
     }
 });
 
