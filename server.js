@@ -260,9 +260,16 @@ app.post('/api/trends/fetch', async (req, res) => {
     if (!s.geminiApiKey) return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
 
     const categories = [
-        { name: 'TOP', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
-        { name: 'BIZ', url: 'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ko&gl=KR&ceid=KR:ko' },
-        { name: 'TEC', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' }
+        { name: 'TOP', label: '전체', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'TOP', label: '전체', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'TEC', label: '테크', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'TEC', label: '테크', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'SPO', label: '스포츠', url: 'https://news.google.com/rss/headlines/section/topic/SPORTS?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'SPO', label: '스포츠', url: 'https://news.google.com/rss/headlines/section/topic/SPORTS?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'ENT', label: '연애', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'ENT', label: '연애', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'POL', label: '정치', url: 'https://news.google.com/rss/headlines/section/topic/POLITICS?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'POL', label: '정치', url: 'https://news.google.com/rss/headlines/section/topic/POLITICS?hl=ko&gl=KR&ceid=KR:ko' }
     ];
 
     try {
@@ -307,7 +314,7 @@ app.post('/api/trends/fetch', async (req, res) => {
                     const cleanTitle = title.trim();
                     const genericTerms = ['Google 뉴스', 'Google News', '속보', '오늘의 뉴스'];
                     if (cleanTitle.length > 10 && !genericTerms.some(term => cleanTitle.includes(term))) {
-                        allTrends.push({ category: categories[index].name, title: cleanTitle });
+                        allTrends.push({ category: categories[index].label, title: cleanTitle });
                         // 실시간으로 찾은 트렌드 수 전송
                         broadcastTrendsProgress('fetching', `뉴스 트렌드 수집 중... (${allTrends.length}개)`, allTrends.length, 0);
                     }
