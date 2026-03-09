@@ -452,7 +452,8 @@ function broadcastTrendsProgress(status, message, current, total) {
 
 // Saved Trends API
 app.get('/api/trends/saved', (req, res) => {
-    db.all("SELECT * FROM trends ORDER BY createdAt DESC", (err, rows) => {
+    // sentences가 NULL이 아니고 빈 배열('[]')이 아닌 데이터만 조회
+    db.all("SELECT * FROM trends WHERE sentences IS NOT NULL AND sentences != '[]' ORDER BY createdAt DESC", (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ trends: rows || [] });
     });
@@ -484,18 +485,32 @@ app.get('/api/trends/by-title', (req, res) => {
 // Fetch and Analyze Trends API
 app.post('/api/trends/fetch', async (req, res) => {
     const s = await getGlobalSettings();
-    if (!s.geminiApiKey) return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
+    
+    const provider = getModelProvider(s.geminiModel);
+    let apiKey;
+    if (provider === 'glm') {
+        apiKey = s.glmApiKey;
+    } else if (provider === 'groq') {
+        apiKey = s.groqApiKey;
+    } else {
+        apiKey = s.geminiApiKey;
+    }
+
+    if (!apiKey) {
+        return res.status(400).json({
+            error: provider === 'glm'
+                ? 'GLM API Key가 설정되지 않았습니다.'
+                : provider === 'groq'
+                ? 'Groq API Key가 설정되지 않았습니다.'
+                : 'Gemini API Key가 설정되지 않았습니다.'
+        });
+    }
 
     const categories = [
         { name: 'TOP', label: '전체', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
-        { name: 'TOP', label: '전체', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
-        { name: 'TEC', label: '테크', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' },
         { name: 'TEC', label: '테크', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' },
         { name: 'SPO', label: '스포츠', url: 'https://news.google.com/rss/headlines/section/topic/SPORTS?hl=ko&gl=KR&ceid=KR:ko' },
-        { name: 'SPO', label: '스포츠', url: 'https://news.google.com/rss/headlines/section/topic/SPORTS?hl=ko&gl=KR&ceid=KR:ko' },
         { name: 'ENT', label: '연애', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ko&gl=KR&ceid=KR:ko' },
-        { name: 'ENT', label: '연애', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ko&gl=KR&ceid=KR:ko' },
-        { name: 'POL', label: '정치', url: 'https://news.google.com/rss/headlines/section/topic/POLITICS?hl=ko&gl=KR&ceid=KR:ko' },
         { name: 'POL', label: '정치', url: 'https://news.google.com/rss/headlines/section/topic/POLITICS?hl=ko&gl=KR&ceid=KR:ko' }
     ];
 
@@ -506,27 +521,18 @@ app.post('/api/trends/fetch', async (req, res) => {
         const httpsAgent = new https.Agent({
             rejectUnauthorized: true,
             keepAlive: true,
-            keepAliveMsecs: 1000,
-            maxSockets: 50,
-            maxFreeSockets: 10,
-            timeout: 30000,
-            scheduling: 'fifo'
+            timeout: 30000
         });
 
         const headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-            'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         };
 
         const results = await Promise.allSettled(
             categories.map(cat => axios.get(cat.url, {
                 timeout: 15000,
                 headers: headers,
-                httpsAgent: httpsAgent,
-                maxRedirects: 5
+                httpsAgent: httpsAgent
             }))
         );
         let allTrends = [];
@@ -539,11 +545,8 @@ app.post('/api/trends/fetch', async (req, res) => {
                     let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
                     title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
                     const cleanTitle = title.trim();
-                    const genericTerms = ['Google 뉴스', 'Google News', '속보', '오늘의 뉴스'];
-                    if (cleanTitle.length > 10 && !genericTerms.some(term => cleanTitle.includes(term))) {
+                    if (cleanTitle.length > 10) {
                         allTrends.push({ category: categories[index].label, title: cleanTitle });
-                        // 실시간으로 찾은 트렌드 수 전송
-                        broadcastTrendsProgress('fetching', `뉴스 트렌드 수집 중... (${allTrends.length}개)`, allTrends.length, 0);
                     }
                 });
             }
@@ -554,40 +557,18 @@ app.post('/api/trends/fetch', async (req, res) => {
             return res.status(500).json({ error: '트렌드를 가져오지 못했습니다.' });
         }
 
-        // 중복 제거
-        const uniqueTrends = [];
-        const seenTitles = new Set();
-        for (const trend of allTrends) {
-            if (!seenTitles.has(trend.title)) {
-                seenTitles.add(trend.title);
-                uniqueTrends.push(trend);
-            }
-        }
+        // 중복 제거 및 셔플 후 상위 10개 선택
+        const uniqueTrends = Array.from(new Set(allTrends.map(t => t.title)))
+            .map(title => allTrends.find(t => t.title === title))
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 10);
 
-        // 섞기 (shuffle)
-        for (let i = uniqueTrends.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [uniqueTrends[i], uniqueTrends[j]] = [uniqueTrends[j], uniqueTrends[i]];
-        }
-
-        // 상위 10개만 선택
-        const topTrends = uniqueTrends.slice(0, 10);
-
-        broadcastTrendsProgress('analyzing', `AI 분석 중... (0/${topTrends.length})`, 0, topTrends.length);
+        broadcastTrendsProgress('analyzing', `AI 분석 중... (0/${uniqueTrends.length})`, 0, uniqueTrends.length);
 
         // 2. AI로 트렌드 분석 (일괄 처리)
-        const trendsForAI = topTrends.map(t => `${t.category}: ${t.title}`).join('\n');
+        const trendsForAI = uniqueTrends.map(t => `${t.category}: ${t.title}`).join('\n');
 
-        const analysisPrompt = `당신은 뉴스 트렌드 분석 전문가입니다. 다음 10개의 뉴스 트렌드를 분석하여 각각에 대한 요약과 핵심 키워드를 추출하세요.
-
-트렌드 목록:
-${trendsForAI}
-
-각 트렌드에 대해 다음 형식으로 분석해주세요:
-1. 요약: 해당 뉴스의 핵심 내용을 1-2문장으로 요약
-2. 키워드: 관련 키워드 3-5개 (쉼표로 구분)
-
-반드시 아래 JSON 배열 형식으로만 응답하세요. 다른 텍스트는 포함하지 마세요:
+        const analysisPrompt = `당신은 뉴스 트렌드 분석 전문가입니다. 다음 10개의 뉴스 트렌드를 분석하여 각각에 대한 요약과 핵심 키워드를 추출하세요. 반드시 아래 JSON 배열 형식으로만 응답하세요:
 [
   {
     "title": "뉴스 제목",
@@ -596,128 +577,69 @@ ${trendsForAI}
   }
 ]`;
 
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${s.geminiModel}:generateContent?key=${s.geminiApiKey}`;
+        let aiContent;
+        if (provider === 'glm') {
+            aiContent = await callGLMAPI(apiKey, s.geminiModel, analysisPrompt, trendsForAI, { temperature: 0.7 });
+        } else if (provider === 'groq') {
+            aiContent = await callGroqAPI(apiKey, s.geminiModel, analysisPrompt, trendsForAI, { temperature: 0.7 });
+        } else {
+            aiContent = await callGeminiAPI(apiKey, s.geminiModel, analysisPrompt, trendsForAI, { temperature: 0.7 });
+        }
 
-        const aiResponse = await axios.post(API_URL, {
-            system_instruction: { parts: [{ text: analysisPrompt }] },
-            contents: [{ parts: [{ text: trendsForAI }] }],
-            generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
-        });
-
-        let aiContent = aiResponse.data.candidates[0].content.parts[0].text;
         aiContent = aiContent.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
         const firstBracket = aiContent.indexOf('[');
         if (firstBracket !== -1) aiContent = aiContent.substring(firstBracket);
-
         const analyzedTrends = JSON.parse(aiContent);
 
-        broadcastTrendsProgress('generating', '학습 콘텐츠 생성 중... (0/10)', 0, topTrends.length);
+        broadcastTrendsProgress('generating', `학습 콘텐츠 생성 중... (0/${uniqueTrends.length})`, 0, uniqueTrends.length);
 
         // 3. 각 트렌드에 대해 영어 학습 문장 생성
-        const generatePromises = topTrends.map(async (trend, index) => {
+        const trendsWithSentences = await Promise.all(uniqueTrends.map(async (trend, index) => {
             try {
-                const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${s.geminiModel}:generateContent?key=${s.geminiApiKey}`;
+                const userPrompt = `주제: ${trend.title}\n난이도: level3\n\n[CRITICAL: Output ONLY a valid JSON array of exactly 10 objects. No markdown code blocks.]`;
+                
+                let content;
+                if (provider === 'glm') {
+                    content = await callGLMAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt);
+                } else if (provider === 'groq') {
+                    content = await callGroqAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt);
+                } else {
+                    content = await callGeminiAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt);
+                }
 
-                const response = await axios.post(API_URL, {
-                    system_instruction: {
-                        parts: [{ text: s.systemPrompt }]
-                    },
-                    contents: [{
-                        parts: [{
-                            text: `주제: ${trend.title}\n난이도: level3\n\n[CRITICAL: Output ONLY a valid JSON array of exactly 10 objects matching the required schema. Do NOT wrap the JSON in markdown code blocks. No other text.]`
-                        }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 8192
-                    }
-                });
-
-                let content = response.data.candidates[0].content.parts[0].text;
                 content = content.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
-                const firstBracket = content.indexOf('[');
-                if (firstBracket !== -1) content = content.substring(firstBracket);
-
+                const firstBrk = content.indexOf('[');
+                if (firstBrk !== -1) content = content.substring(firstBrk);
                 const sentences = JSON.parse(content);
 
-                // 진행 상황 업데이트
-                broadcastTrendsProgress('generating', `학습 콘텐츠 생성 중... (${index + 1}/${topTrends.length})`, index + 1, topTrends.length);
+                broadcastTrendsProgress('generating', `학습 콘텐츠 생성 중... (${index + 1}/${uniqueTrends.length})`, index + 1, uniqueTrends.length);
 
-                return {
-                    ...trend,
-                    analyzed: analyzedTrends[index] || {},
-                    sentences: sentences
-                };
-            } catch (error) {
-                console.error(`Error generating sentences for trend ${index}:`, error.message);
-                // 문장 생성 실패 시 빈 배열 반환
-                return {
-                    ...trend,
-                    analyzed: analyzedTrends[index] || {},
-                    sentences: []
-                };
+                return { ...trend, analyzed: analyzedTrends[index] || {}, sentences };
+            } catch (e) {
+                console.error(`Error for trend ${index}:`, e.message);
+                return { ...trend, analyzed: analyzedTrends[index] || {}, sentences: [] };
             }
-        });
+        }));
 
-        const trendsWithSentences = await Promise.all(generatePromises);
-
-        broadcastTrendsProgress('saving', '데이터베이스에 저장 중...', 0, topTrends.length);
-
-        // 4. 기존 트렌드 삭제 후 새로운 트렌드 저장
-        db.run("DELETE FROM trends", (err) => {
-            if (err) console.error('Error deleting old trends:', err.message);
-        });
-
-        let savedCount = 0;
-        const insertPromises = trendsWithSentences.map((trend) => {
-            return new Promise((resolve, reject) => {
-                const analyzed = trend.analyzed || {};
-                const summary = analyzed.summary || '';
-                const keywords = analyzed.keywords ? JSON.stringify(analyzed.keywords) : '[]';
-                const sentencesJson = trend.sentences && trend.sentences.length > 0 ? JSON.stringify(trend.sentences) : null;
-
-                console.log(`💾 [DB] Saving trend: "${trend.title}" with ${trend.sentences?.length || 0} sentences`);
-
-                db.run(
-                    "INSERT INTO trends (title, category, summary, keywords, sentences, difficulty) VALUES (?, ?, ?, ?, ?, ?)",
-                    [trend.title, trend.category, summary, keywords, sentencesJson, 'level3'],
-                    (err) => {
-                        if (err) {
-                            console.error(`❌ [DB] Error saving trend "${trend.title}":`, err.message);
-                            reject(err);
-                        } else {
-                            savedCount++;
-                            console.log(`✅ [DB] Saved trend "${trend.title}" (${savedCount}/${topTrends.length})`);
-                            broadcastTrendsProgress('saving', `데이터베이스에 저장 중... (${savedCount}/${topTrends.length})`, savedCount, topTrends.length);
-                            resolve();
-                        }
-                    }
-                );
+        // 4. 데이터베이스 저장
+        db.serialize(() => {
+            db.run("DELETE FROM trends");
+            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, difficulty) VALUES (?, ?, ?, ?, ?, ?)");
+            trendsWithSentences.forEach(t => {
+                const keywords = t.analyzed?.keywords ? JSON.stringify(t.analyzed.keywords) : '[]';
+                const sentences = t.sentences?.length > 0 ? JSON.stringify(t.sentences) : null;
+                stmt.run(t.title, t.category, t.analyzed?.summary || '', keywords, sentences, 'level3');
             });
+            stmt.finalize();
         });
 
-        await Promise.all(insertPromises);
-
-        broadcastTrendsProgress('complete', '완료!', topTrends.length, topTrends.length);
-
-        // 4. 저장된 트렌드 반환
-        db.all("SELECT * FROM trends ORDER BY createdAt DESC", (err, rows) => {
-            if (err) return res.status(500).json({ error: err.message });
-            res.json({ trends: rows || [] });
-        });
+        broadcastTrendsProgress('complete', '완료!', uniqueTrends.length, uniqueTrends.length);
+        res.json({ trends: trendsWithSentences });
 
     } catch (error) {
         console.error('Trends fetch error:', error.message);
-        if (error.response) {
-            console.error('Response status:', error.response.status);
-            console.error('Response data:', error.response.data);
-        } else if (error.request) {
-            console.error('No response received:', error.request);
-        } else {
-            console.error('Error config:', error.config);
-        }
         broadcastTrendsProgress('error', `오류: ${error.message}`, 0, 0);
-        res.status(500).json({ error: `트렌드를 가져오는 데 실패했습니다: ${error.message}` });
+        res.status(500).json({ error: `실패: ${error.message}` });
     }
 });
 

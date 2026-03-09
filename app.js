@@ -198,14 +198,18 @@ function renderRealtimeTrends(trends) {
             <span class="trend-card-title">${item.title}</span>
             <div class="trend-card-info">
                 ${keywordsHtml ? `<div class="trend-card-keywords">${keywordsHtml}</div>` : ''}
-                <button class="trend-start-btn" data-title="${item.title}">학습 시작</button>
+                <button class="trend-start-btn">학습 시작</button>
             </div>
         `;
 
         // 학습 시작 버튼 이벤트
         const startBtn = card.querySelector('.trend-start-btn');
+        // 따옴표 등의 문자가 포함된 제목을 안전하게 전달하기 위해 dataset에 직접 저장
+        startBtn.dataset.title = item.title;
+
         startBtn.addEventListener('click', async () => {
             const topic = startBtn.dataset.title;
+            if (!topic) return;
             console.log('Starting learning for trend:', topic);
             await startLearningFromTrend(topic);
         });
@@ -216,46 +220,41 @@ function renderRealtimeTrends(trends) {
 
 // 트렌드에서 학습 시작
 async function startLearningFromTrend(topic) {
-    const difficulty = 'level3'; // 기본 난이도
+    if (!topic) return;
 
     showSection('learning-section');
     sessionStorage.setItem('currentTopic', topic);
 
-    sentenceEn.textContent = '저장된 학습 데이터를 확인하는 중...';
+    sentenceEn.textContent = '저장된 학습 데이터를 불러오는 중...';
 
-    // 먼저 저장된 학습 데이터가 있는지 확인
+    // 저장된 학습 데이터만 확인 (신규 생성 fallback 제거)
     try {
         console.log('Fetching cached trend for:', topic);
         const response = await fetch(`/api/trends/by-title?title=${encodeURIComponent(topic)}`);
-        console.log('Response status:', response.status);
         const data = await response.json();
-        console.log('Response data:', data);
 
         if (response.ok && data.trend && data.trend.sentences) {
             // 저장된 데이터가 있으면 바로 사용
             const savedSentences = JSON.parse(data.trend.sentences);
 
             if (savedSentences && savedSentences.length > 0) {
-                console.log('✅ Using cached sentences for trend:', topic, savedSentences.length, 'sentences');
-                // 저장된 데이터 사용
+                console.log('✅ Using cached sentences for trend:', topic);
                 sentences = savedSentences;
                 currentCount = 0;
                 showSentence();
                 sendTopicToChat(topic);
                 return;
-            } else {
-                console.log('❌ Cached sentences are empty');
             }
-        } else {
-            console.log('❌ No cached trend found or no sentences');
         }
+        
+        // 데이터가 없는 경우 경고창 후 메인으로 이동
+        alert('해당 트렌드의 학습 데이터가 존재하지 않습니다. 설정 페이지에서 트렌드를 다시 생성해주세요.');
+        showSection('trends-section');
     } catch (error) {
         console.error('❌ Error fetching cached trend:', error);
+        alert('학습 데이터를 불러오는 중 오류가 발생했습니다.');
+        showSection('trends-section');
     }
-
-    // 저장된 데이터가 없으면 새로 생성
-    console.log('🔄 Generating new sentences for:', topic);
-    fetchSentences(topic, difficulty);
 }
 
 // 초기화
