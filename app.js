@@ -1,13 +1,12 @@
 let currentCount = 0;
 let sentences = [];
 
-const setupSection = document.getElementById('setup-section');
-const reviewSection = document.getElementById('review-section');
+const trendsSection = document.getElementById('trends-section');
+const topicSection = document.getElementById('topic-section');
 const learningSection = document.getElementById('learning-section');
-const historyList = document.getElementById('history-list');
+const realtimeTrendsContainer = document.getElementById('realtime-trends-container');
 
 const startBtn = document.getElementById('start-btn');
-const homeBtn = document.getElementById('home-btn');
 const revealBtn = document.getElementById('reveal-btn');
 const nextBtn = document.getElementById('next-btn');
 const finishBtn = document.getElementById('finish-btn');
@@ -20,12 +19,10 @@ const explanationDiv = document.getElementById('explanation');
 const vocaDiv = document.getElementById('voca');
 const ttsBtn = document.getElementById('tts-btn');
 
-const trendsContainer = document.getElementById('trends-container');
 const topicInput = document.getElementById('topic');
 
-const navReview = document.getElementById('nav-review');
-const navHome = document.getElementById('nav-home');
-const backToMain = document.getElementById('back-to-main');
+const navTrends = document.getElementById('nav-trends');
+const navTopic = document.getElementById('nav-topic');
 
 // 학습 상태 초기화 함수
 function resetLearningState() {
@@ -59,11 +56,11 @@ function resetLearningState() {
 // 섹션 전환 유틸리티 (히스토리 지원)
 function showSection(sectionId, pushState = true) {
     // 학습 화면에서 나갈 때 상태 초기화
-    if (sectionId === 'setup-section' || sectionId === 'review-section') {
+    if (sectionId === 'trends-section' || sectionId === 'topic-section') {
         resetLearningState();
     }
 
-    [setupSection, reviewSection, learningSection].forEach(section => {
+    [trendsSection, topicSection, learningSection].forEach(section => {
         if (section) section.classList.add('hidden');
     });
 
@@ -122,157 +119,139 @@ window.addEventListener('popstate', (event) => {
     if (event.state && event.state.sectionId) {
         showSection(event.state.sectionId, false);
     } else {
-        // 초기 상태 (메인화면)
-        showSection('setup-section', false);
+        // 초기 상태 (메인화면 - 실시간 트렌드)
+        showSection('trends-section', false);
     }
 });
 
 // 초기 실행 시 현재 상태 저장
-history.replaceState({ sectionId: 'setup-section' }, '', '');
+history.replaceState({ sectionId: 'trends-section' }, '', '');
 
-// 트랜드 불러오기
-async function fetchTrends() {
+// 실시간 트렌드 불러오기
+async function fetchRealtimeTrends() {
     try {
-        const response = await fetch('/api/trends');
+        const response = await fetch('/api/trends/saved');
         const data = await response.json();
-        
-        if (data.trends && Array.isArray(data.trends)) {
-            renderTrends(data.trends);
+
+        if (data.trends && Array.isArray(data.trends) && data.trends.length > 0) {
+            renderRealtimeTrends(data.trends);
         } else {
-            trendsContainer.innerHTML = '<div class="trends-loading">학습 트랜드를 불러올 수 없습니다.</div>';
+            showEmptyTrendsState();
         }
     } catch (error) {
-        console.error('Error fetching trends:', error);
-        trendsContainer.innerHTML = '<div class="trends-loading">데이터 연결 상태를 확인해 주세요.</div>';
+        console.error('Error fetching realtime trends:', error);
+        showEmptyTrendsState();
     }
 }
 
-function renderTrends(trends) {
-    trendsContainer.innerHTML = '';
-    
+function showEmptyTrendsState() {
+    realtimeTrendsContainer.innerHTML = `
+        <div class="trends-empty-state">
+            <div class="empty-icon">🔍</div>
+            <h3>아직 트렌드가 없습니다</h3>
+            <p>설정 페이지에서 '실시간 트렌드 찾기'를 눌러 최신 트렌드를 가져오세요!</p>
+            <button id="go-settings-btn" class="go-settings-btn">설정으로 이동</button>
+        </div>
+    `;
+
+    // 설정으로 이동 버튼 이벤트
+    const goSettingsBtn = document.getElementById('go-settings-btn');
+    if (goSettingsBtn) {
+        goSettingsBtn.addEventListener('click', () => {
+            window.location.href = '/settings.html';
+        });
+    }
+}
+
+function renderRealtimeTrends(trends) {
+    realtimeTrendsContainer.innerHTML = '';
+
     trends.forEach((item) => {
         const card = document.createElement('div');
-        card.className = 'trend-card';
-        
-        const categoryClass = `badge-${item.category.toLowerCase()}`;
-        
+        card.className = 'realtime-trend-card';
+
+        const keywords = item.keywords ? JSON.parse(item.keywords) : [];
+        const keywordsHtml = keywords.map(kw => `<span class="trend-keyword">${kw}</span>`).join('');
+
         card.innerHTML = `
-            <div class="card-top">
-                <span class="card-category ${categoryClass}">${item.category}</span>
+            <span class="trend-category">${item.category || '일반'}</span>
+            <span class="trend-card-title">${item.title}</span>
+            <div class="trend-card-info">
+                ${keywordsHtml ? `<div class="trend-card-keywords">${keywordsHtml}</div>` : ''}
+                <button class="trend-start-btn" data-title="${item.title}">학습 시작</button>
             </div>
-            <div class="card-title">${item.title}</div>
         `;
-        
-        card.title = item.title;
-        
-        card.addEventListener('click', () => {
-            topicInput.value = item.title;
-            document.querySelectorAll('.trend-card').forEach(c => c.classList.remove('active'));
-            card.classList.add('active');
-            topicInput.focus();
+
+        // 학습 시작 버튼 이벤트
+        const startBtn = card.querySelector('.trend-start-btn');
+        startBtn.addEventListener('click', async () => {
+            const topic = startBtn.dataset.title;
+            console.log('Starting learning for trend:', topic);
+            await startLearningFromTrend(topic);
         });
-        trendsContainer.appendChild(card);
+
+        realtimeTrendsContainer.appendChild(card);
     });
 }
 
-// 히스토리 불러오기
-async function fetchHistory() {
-    historyList.innerHTML = '<div class="history-loading">학습 기록을 불러오는 중...</div>';
-    try {
-        const response = await fetch('/api/history');
-        const data = await response.json();
-        
-        if (data.history && data.history.length > 0) {
-            renderHistory(data.history);
-        } else {
-            historyList.innerHTML = '<div class="history-empty">아직 학습 기록이 없습니다. 새로운 학습을 시작해 보세요!</div>';
-        }
-    } catch (error) {
-        console.error('Error fetching history:', error);
-        historyList.innerHTML = '<div class="history-empty">기록을 불러오지 못했습니다.</div>';
-    }
-}
+// 트렌드에서 학습 시작
+async function startLearningFromTrend(topic) {
+    const difficulty = 'level3'; // 기본 난이도
 
-function renderHistory(history) {
-    historyList.innerHTML = '';
-    history.forEach(item => {
-        const date = new Date(item.createdAt).toLocaleDateString('ko-KR', {
-            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        });
-        
-        const card = document.createElement('div');
-        card.className = 'history-item';
-        card.innerHTML = `
-            <div class="history-info">
-                <div class="history-topic">${item.topic}</div>
-                <div class="history-meta">
-                    <span class="history-difficulty">${item.difficulty.toUpperCase()}</span>
-                    <span class="history-date">📅 ${date}</span>
-                </div>
-            </div>
-            <button class="delete-history-btn" title="삭제">🗑️</button>
-        `;
-        
-        card.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-history-btn')) return;
-            loadHistoryDetail(item.id);
-        });
-        
-        card.querySelector('.delete-history-btn').addEventListener('click', async (e) => {
-            e.stopPropagation();
-            if (confirm('이 학습 기록을 삭제하시겠습니까?')) {
-                await deleteHistory(item.id);
+    showSection('learning-section');
+    sessionStorage.setItem('currentTopic', topic);
+
+    sentenceEn.textContent = '저장된 학습 데이터를 확인하는 중...';
+
+    // 먼저 저장된 학습 데이터가 있는지 확인
+    try {
+        console.log('Fetching cached trend for:', topic);
+        const response = await fetch(`/api/trends/by-title?title=${encodeURIComponent(topic)}`);
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (response.ok && data.trend && data.trend.sentences) {
+            // 저장된 데이터가 있으면 바로 사용
+            const savedSentences = JSON.parse(data.trend.sentences);
+
+            if (savedSentences && savedSentences.length > 0) {
+                console.log('✅ Using cached sentences for trend:', topic, savedSentences.length, 'sentences');
+                // 저장된 데이터 사용
+                sentences = savedSentences;
+                currentCount = 0;
+                showSentence();
+                sendTopicToChat(topic);
+                return;
+            } else {
+                console.log('❌ Cached sentences are empty');
             }
-        });
-        
-        historyList.appendChild(card);
-    });
-}
-
-async function loadHistoryDetail(id) {
-    try {
-        const response = await fetch(`/api/history/${id}`);
-        if (!response.ok) throw new Error('데이터를 가져오지 못했습니다.');
-        
-        const data = await response.json();
-        sentences = data.sentences;
-        currentCount = 0;
-        
-        showSection('learning-section');
-        showSentence();
-    } catch (error) {
-        alert('복습 데이터를 불러오는 데 실패했습니다.');
-    }
-}
-
-async function deleteHistory(id) {
-    try {
-        const response = await fetch(`/api/history/${id}`, { method: 'DELETE' });
-        if (response.ok) {
-            fetchHistory();
+        } else {
+            console.log('❌ No cached trend found or no sentences');
         }
     } catch (error) {
-        alert('삭제 중 오류가 발생했습니다.');
+        console.error('❌ Error fetching cached trend:', error);
     }
+
+    // 저장된 데이터가 없으면 새로 생성
+    console.log('🔄 Generating new sentences for:', topic);
+    fetchSentences(topic, difficulty);
 }
 
 // 초기화
-fetchTrends();
+fetchRealtimeTrends();
 
 // 내비게이션 이벤트
-navHome.addEventListener('click', (e) => {
+navTrends.addEventListener('click', (e) => {
     e.preventDefault();
-    showSection('setup-section');
+    showSection('trends-section');
+    fetchRealtimeTrends();
 });
 
-navReview.addEventListener('click', (e) => {
+navTopic.addEventListener('click', (e) => {
     e.preventDefault();
-    showSection('review-section');
-    fetchHistory();
+    showSection('topic-section');
 });
-
-if (backToMain) backToMain.addEventListener('click', () => showSection('setup-section'));
-if (homeBtn) homeBtn.addEventListener('click', () => showSection('setup-section'));
 
 startBtn.addEventListener('click', async () => {
     const topic = topicInput.value;

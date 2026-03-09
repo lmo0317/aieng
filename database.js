@@ -122,6 +122,52 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 sentences TEXT,
                 createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
             )`);
+
+            // Create Real-time Trends table
+            db.run(`CREATE TABLE IF NOT EXISTS trends (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                category TEXT,
+                summary TEXT,
+                keywords TEXT,
+                sentences TEXT,
+                difficulty TEXT DEFAULT 'level3',
+                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`, (err) => {
+                if (err) {
+                    console.error('Error creating trends table:', err.message);
+                } else {
+                    // Migration: Add sentences column if not exists
+                    db.all("PRAGMA table_info(trends)", (err, columns) => {
+                        if (err) {
+                            console.error('Error checking trends table columns:', err.message);
+                            return;
+                        }
+
+                        const columnNames = columns.map(col => col.name);
+
+                        if (!columnNames.includes('sentences')) {
+                            db.run("ALTER TABLE trends ADD COLUMN sentences TEXT", (err) => {
+                                if (err) {
+                                    console.error('Error adding sentences column:', err.message);
+                                } else {
+                                    console.log('Added sentences column to trends table');
+                                }
+                            });
+                        }
+
+                        if (!columnNames.includes('difficulty')) {
+                            db.run("ALTER TABLE trends ADD COLUMN difficulty TEXT DEFAULT 'level3'", (err) => {
+                                if (err) {
+                                    console.error('Error adding difficulty column:', err.message);
+                                } else {
+                                    console.log('Added difficulty column to trends table');
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     }
 });

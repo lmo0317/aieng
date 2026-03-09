@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const WebSocket = require('ws');
+const https = require('https');
 const db = require('./database');
 const {
     handleChatRequest,
@@ -15,6 +16,9 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 80;
+
+// SSE 클라이언트 저장
+const trendsClients = new Map();
 
 app.use(cors());
 app.use(express.json());
@@ -184,16 +188,115 @@ app.delete('/api/history/:id', (req, res) => {
     });
 });
 
-// Trends API
-app.get('/api/trends', async (req, res) => {
-    const fallbacks = [{ category: 'TEC', title: '인공지능(AI) 기술이 바꾸는 우리의 미래 일상' }, { category: 'BIZ', title: '2026년 세계 경제 전망' }];
+// SSE endpoint for trends progress
+app.get('/api/trends/events', (req, res) => {
+    const headers = {
+        'Content-Type': 'text/event-stream',
+        'Connection': 'keep-alive',
+        'Cache-Control': 'no-cache'
+    };
+    res.writeHead(200, headers);
+
+    const clientId = Date.now() + Math.random();
+    trendsClients.set(clientId, res);
+
+    // 진행 상황 전송 헬퍼 함수
+    const sendProgress = (status, message, current, total) => {
+        if (trendsClients.has(clientId)) {
+            res.write(`data: ${JSON.stringify({ status, message, current, total })}\n\n`);
+        }
+    };
+
+    req.on('close', () => {
+        trendsClients.delete(clientId);
+    });
+});
+
+// Helper function to send progress to all connected clients
+function broadcastTrendsProgress(status, message, current, total) {
+    trendsClients.forEach((res) => {
+        try {
+            res.write(`data: ${JSON.stringify({ status, message, current, total })}\n\n`);
+        } catch (err) {
+            console.error('Error sending SSE:', err);
+        }
+    });
+}
+
+// Saved Trends API
+app.get('/api/trends/saved', (req, res) => {
+    db.all("SELECT * FROM trends ORDER BY createdAt DESC", (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ trends: rows || [] });
+    });
+});
+
+// Get trend by title API
+app.get('/api/trends/by-title', (req, res) => {
+    const { title } = req.query;
+    console.log('🔍 [API] Fetching trend by title:', title);
+
+    if (!title) {
+        return res.status(400).json({ error: 'Title is required' });
+    }
+
+    db.get("SELECT * FROM trends WHERE title = ? ORDER BY createdAt DESC LIMIT 1", [title], (err, row) => {
+        if (err) {
+            console.error('❌ [API] Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            console.log('❌ [API] Trend not found for title:', title);
+            return res.status(404).json({ error: 'Trend not found' });
+        }
+        console.log('✅ [API] Found trend:', row.title, 'with sentences:', row.sentences ? 'Yes' : 'No');
+        res.json({ trend: row });
+    });
+});
+
+// Fetch and Analyze Trends API
+app.post('/api/trends/fetch', async (req, res) => {
+    const s = await getGlobalSettings();
+    if (!s.geminiApiKey) return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
+
     const categories = [
         { name: 'TOP', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
-        { name: 'BIZ', url: 'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ko&gl=KR&ceid=KR:ko' }
+        { name: 'BIZ', url: 'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'TEC', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' }
     ];
+
     try {
-        const results = await Promise.allSettled(categories.map(cat => axios.get(cat.url, { timeout: 5000, headers: { 'User-Agent': 'Mozilla/5.0' } })));
+        // 1. RSS에서 트렌드 수집
+        broadcastTrendsProgress('fetching', '뉴스 트렌드 수집 중...', 0, 0);
+
+        const httpsAgent = new https.Agent({
+            rejectUnauthorized: true,
+            keepAlive: true,
+            keepAliveMsecs: 1000,
+            maxSockets: 50,
+            maxFreeSockets: 10,
+            timeout: 30000,
+            scheduling: 'fifo'
+        });
+
+        const headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+            'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive'
+        };
+
+        const results = await Promise.allSettled(
+            categories.map(cat => axios.get(cat.url, {
+                timeout: 15000,
+                headers: headers,
+                httpsAgent: httpsAgent,
+                maxRedirects: 5
+            }))
+        );
         let allTrends = [];
+
         results.forEach((result, index) => {
             if (result.status === 'fulfilled') {
                 const xml = result.value.data;
@@ -205,12 +308,167 @@ app.get('/api/trends', async (req, res) => {
                     const genericTerms = ['Google 뉴스', 'Google News', '속보', '오늘의 뉴스'];
                     if (cleanTitle.length > 10 && !genericTerms.some(term => cleanTitle.includes(term))) {
                         allTrends.push({ category: categories[index].name, title: cleanTitle });
+                        // 실시간으로 찾은 트렌드 수 전송
+                        broadcastTrendsProgress('fetching', `뉴스 트렌드 수집 중... (${allTrends.length}개)`, allTrends.length, 0);
                     }
                 });
             }
         });
-        res.json({ trends: allTrends.length > 0 ? allTrends : fallbacks });
-    } catch (error) { res.json({ trends: fallbacks }); }
+
+        if (allTrends.length === 0) {
+            broadcastTrendsProgress('error', '트렌드를 가져오지 못했습니다.', 0, 0);
+            return res.status(500).json({ error: '트렌드를 가져오지 못했습니다.' });
+        }
+
+        // 상위 10개만 선택
+        const topTrends = allTrends.slice(0, 10);
+
+        broadcastTrendsProgress('analyzing', `AI 분석 중... (0/${topTrends.length})`, 0, topTrends.length);
+
+        // 2. AI로 트렌드 분석 (일괄 처리)
+        const trendsForAI = topTrends.map(t => `${t.category}: ${t.title}`).join('\n');
+
+        const analysisPrompt = `당신은 뉴스 트렌드 분석 전문가입니다. 다음 10개의 뉴스 트렌드를 분석하여 각각에 대한 요약과 핵심 키워드를 추출하세요.
+
+트렌드 목록:
+${trendsForAI}
+
+각 트렌드에 대해 다음 형식으로 분석해주세요:
+1. 요약: 해당 뉴스의 핵심 내용을 1-2문장으로 요약
+2. 키워드: 관련 키워드 3-5개 (쉼표로 구분)
+
+반드시 아래 JSON 배열 형식으로만 응답하세요. 다른 텍스트는 포함하지 마세요:
+[
+  {
+    "title": "뉴스 제목",
+    "summary": "요약 내용",
+    "keywords": ["키워드1", "키워드2", "키워드3"]
+  }
+]`;
+
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${s.geminiModel}:generateContent?key=${s.geminiApiKey}`;
+
+        const aiResponse = await axios.post(API_URL, {
+            system_instruction: { parts: [{ text: analysisPrompt }] },
+            contents: [{ parts: [{ text: trendsForAI }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
+        });
+
+        let aiContent = aiResponse.data.candidates[0].content.parts[0].text;
+        aiContent = aiContent.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
+        const firstBracket = aiContent.indexOf('[');
+        if (firstBracket !== -1) aiContent = aiContent.substring(firstBracket);
+
+        const analyzedTrends = JSON.parse(aiContent);
+
+        broadcastTrendsProgress('generating', '학습 콘텐츠 생성 중... (0/10)', 0, topTrends.length);
+
+        // 3. 각 트렌드에 대해 영어 학습 문장 생성
+        const generatePromises = topTrends.map(async (trend, index) => {
+            try {
+                const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${s.geminiModel}:generateContent?key=${s.geminiApiKey}`;
+
+                const response = await axios.post(API_URL, {
+                    system_instruction: {
+                        parts: [{ text: s.systemPrompt }]
+                    },
+                    contents: [{
+                        parts: [{
+                            text: `주제: ${trend.title}\n난이도: level3\n\n[CRITICAL: Output ONLY a valid JSON array of exactly 10 objects matching the required schema. Do NOT wrap the JSON in markdown code blocks. No other text.]`
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        maxOutputTokens: 8192
+                    }
+                });
+
+                let content = response.data.candidates[0].content.parts[0].text;
+                content = content.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
+                const firstBracket = content.indexOf('[');
+                if (firstBracket !== -1) content = content.substring(firstBracket);
+
+                const sentences = JSON.parse(content);
+
+                // 진행 상황 업데이트
+                broadcastTrendsProgress('generating', `학습 콘텐츠 생성 중... (${index + 1}/${topTrends.length})`, index + 1, topTrends.length);
+
+                return {
+                    ...trend,
+                    analyzed: analyzedTrends[index] || {},
+                    sentences: sentences
+                };
+            } catch (error) {
+                console.error(`Error generating sentences for trend ${index}:`, error.message);
+                // 문장 생성 실패 시 빈 배열 반환
+                return {
+                    ...trend,
+                    analyzed: analyzedTrends[index] || {},
+                    sentences: []
+                };
+            }
+        });
+
+        const trendsWithSentences = await Promise.all(generatePromises);
+
+        broadcastTrendsProgress('saving', '데이터베이스에 저장 중...', 0, topTrends.length);
+
+        // 4. 기존 트렌드 삭제 후 새로운 트렌드 저장
+        db.run("DELETE FROM trends", (err) => {
+            if (err) console.error('Error deleting old trends:', err.message);
+        });
+
+        let savedCount = 0;
+        const insertPromises = trendsWithSentences.map((trend) => {
+            return new Promise((resolve, reject) => {
+                const analyzed = trend.analyzed || {};
+                const summary = analyzed.summary || '';
+                const keywords = analyzed.keywords ? JSON.stringify(analyzed.keywords) : '[]';
+                const sentencesJson = trend.sentences && trend.sentences.length > 0 ? JSON.stringify(trend.sentences) : null;
+
+                console.log(`💾 [DB] Saving trend: "${trend.title}" with ${trend.sentences?.length || 0} sentences`);
+
+                db.run(
+                    "INSERT INTO trends (title, category, summary, keywords, sentences, difficulty) VALUES (?, ?, ?, ?, ?, ?)",
+                    [trend.title, trend.category, summary, keywords, sentencesJson, 'level3'],
+                    (err) => {
+                        if (err) {
+                            console.error(`❌ [DB] Error saving trend "${trend.title}":`, err.message);
+                            reject(err);
+                        } else {
+                            savedCount++;
+                            console.log(`✅ [DB] Saved trend "${trend.title}" (${savedCount}/${topTrends.length})`);
+                            broadcastTrendsProgress('saving', `데이터베이스에 저장 중... (${savedCount}/${topTrends.length})`, savedCount, topTrends.length);
+                            resolve();
+                        }
+                    }
+                );
+            });
+        });
+
+        await Promise.all(insertPromises);
+
+        broadcastTrendsProgress('complete', '완료!', topTrends.length, topTrends.length);
+
+        // 4. 저장된 트렌드 반환
+        db.all("SELECT * FROM trends ORDER BY createdAt DESC", (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ trends: rows || [] });
+        });
+
+    } catch (error) {
+        console.error('Trends fetch error:', error.message);
+        if (error.response) {
+            console.error('Response status:', error.response.status);
+            console.error('Response data:', error.response.data);
+        } else if (error.request) {
+            console.error('No response received:', error.request);
+        } else {
+            console.error('Error config:', error.config);
+        }
+        broadcastTrendsProgress('error', `오류: ${error.message}`, 0, 0);
+        res.status(500).json({ error: `트렌드를 가져오는 데 실패했습니다: ${error.message}` });
+    }
 });
 
 // Chat API endpoint using REST

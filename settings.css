@@ -307,3 +307,74 @@
 
 .toast.success { background-color: var(--success); }
 .toast.error { background-color: var(--danger); }
+
+/* 실시간 트렌드 설정 스타일 */
+.trends-status {
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.trends-status-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.trends-status-icon {
+    font-size: 1.5rem;
+}
+
+.trends-status-text {
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 1.1rem;
+}
+
+.trends-count {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.trends-progress {
+    margin-top: 1.5rem;
+}
+
+.progress-bar-container {
+    background-color: #e2e8f0;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    background-color: var(--primary);
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.btn-secondary {
+    background-color: #fff;
+    color: var(--text-main);
+    border: 2px solid var(--border-color);
+    flex: 1;
+}
+
+.btn-secondary:hover {
+    background-color: #f8fafc;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}

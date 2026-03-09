@@ -12,27 +12,36 @@
     <div class="container">
         <div class="header-section">
             <div class="nav-links">
-                <a href="/" id="nav-home" class="nav-link">🏠 홈</a>
-                <a href="#" id="nav-review" class="nav-link">📚 복습하기</a>
+                <a href="#" id="nav-trends" class="nav-link active">🔥 실시간 트렌드</a>
+                <a href="#" id="nav-topic" class="nav-link">✏️ 주제 입력</a>
                 <a href="/settings.html" class="settings-link">⚙️ 설정</a>
             </div>
         </div>
         <h1>Trend Eng 🤖</h1>
         <p>인공지능이 제안하는 트렌드 맞춤형 영어 학습 솔루션</p>
 
-        <!-- 복습 섹션 -->
-        <div id="review-section" class="hidden">
-            <div class="section-header">
-                <h2>나의 학습 히스토리</h2>
-                <button id="back-to-main" class="home-btn">🏠 메인으로</button>
+        <!-- 실시간 트렌드 섹션 (메인) -->
+        <div id="trends-section">
+            <div class="trends-page-header">
+                <h2>🔥 실시간 트렌드</h2>
+                <p class="trends-subtitle">최신 이슈로 영어를 학습해보세요</p>
             </div>
-            <div id="history-list" class="history-list">
-                <!-- 히스토리 아이템이 여기에 생성됩니다 -->
-                <div class="history-loading">불러오는 중...</div>
+            <div id="realtime-trends-container" class="realtime-trends-container">
+                <div class="trends-empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <h3>아직 트렌드가 없습니다</h3>
+                    <p>설정 페이지에서 '실시간 트렌드 찾기'를 눌러 최신 트렌드를 가져오세요!</p>
+                    <button id="go-settings-btn" class="go-settings-btn">설정으로 이동</button>
+                </div>
             </div>
         </div>
 
-        <div id="setup-section">
+        <!-- 주제 입력 섹션 -->
+        <div id="topic-section" class="hidden">
+            <div class="topic-page-header">
+                <h2>✏️ 주제 입력 학습</h2>
+                <p class="topic-subtitle">원하는 주제로 맞춤형 영어 학습을 시작하세요</p>
+            </div>
             <div class="setup-container">
                 <!-- 왼쪽: 입력 및 설정 영역 -->
                 <div class="setup-left">
@@ -52,20 +61,10 @@
                     </div>
                     <button id="start-btn" class="start-btn">학습 시작 🚀</button>
                 </div>
-
-                <!-- 오른쪽: 세로형 트랜드 리스트 영역 -->
-                <div class="setup-right">
-                    <div class="trends-header">
-                        <span>🔥 실시간 트랜드 추천</span>
-                    </div>
-                    <div id="trends-container" class="trends-vertical-list">
-                        <!-- 트랜드 카드들이 세로로 생성됩니다 -->
-                        <div class="trends-loading">데이터를 불러오는 중...</div>
-                    </div>
-                </div>
             </div>
         </div>
 
+        <!-- 학습 섹션 -->
         <div id="learning-section" class="hidden">
             <div class="progress">오늘의 학습: <span id="current-count">0</span> / 10</div>
             <div id="content-card" class="card">

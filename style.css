@@ -983,3 +983,178 @@ button:active {
         opacity: 1;
     }
 }
+
+/* 실시간 트렌드 페이지 스타일 */
+.trends-page-header, .topic-page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.trends-page-header h2, .topic-page-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.trends-subtitle, .topic-subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.realtime-trends-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 2rem;
+}
+
+.trends-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #f8fafc;
+    border-radius: 20px;
+    border: 2px dashed var(--border-color);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.trends-empty-state h3 {
+    font-size: 1.5rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.trends-empty-state p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.go-settings-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.go-settings-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.realtime-trend-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.realtime-trend-card:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.trend-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.trend-category {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.trend-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.trend-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.4;
+    flex: 1;
+    min-width: 200px;
+}
+
+.trend-card-summary {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.trend-card-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.trend-keyword {
+    background: #f1f5f9;
+    color: var(--text-muted);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.trend-card-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.trend-start-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.trend-start-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* 내비게이션 액티브 상태 */
+.nav-link.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}

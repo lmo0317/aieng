@@ -6,6 +6,8 @@ const chatModelSelect = document.getElementById('chat-model-select');
 const systemPromptInput = document.getElementById('system-prompt');
 const deleteBtn = document.getElementById('delete-btn');
 const resetPromptBtn = document.getElementById('reset-prompt-btn');
+const fetchTrendsBtn = document.getElementById('fetch-trends-btn');
+const viewTrendsBtn = document.getElementById('view-trends-btn');
 const apiStatus = document.getElementById('api-status');
 const statusIndicator = apiStatus.querySelector('.status-indicator');
 const statusText = apiStatus.querySelector('.status-text');
@@ -15,6 +17,11 @@ const modelPreview = document.getElementById('model-preview');
 const currentModelBadge = document.getElementById('current-model-badge');
 const currentChatModelBadge = document.getElementById('current-chat-model-badge');
 const toast = document.getElementById('toast');
+const trendsStatusText = document.getElementById('trends-status-text');
+const trendsCount = document.getElementById('trends-count');
+const trendsProgress = document.getElementById('trends-progress');
+const trendsProgressBar = document.getElementById('trends-progress-bar');
+const trendsProgressText = document.getElementById('trends-progress-text');
 
 const models = [
     { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (학습 권장)' },
@@ -239,4 +246,118 @@ chatModelSelect.addEventListener('change', () => {
     updateChatModelBadge(chatModelSelect.value);
 });
 
+// 실시간 트렌드 관련 기능
+async function loadTrendsStatus() {
+    try {
+        const response = await fetch('/api/trends/saved');
+        const data = await response.json();
+
+        if (data.trends && data.trends.length > 0) {
+            trendsStatusText.textContent = `최신 트렌드 ${data.trends.length}개 저장됨`;
+            trendsCount.textContent = `저장된 트렌드: ${data.trends.length}개`;
+        } else {
+            trendsStatusText.textContent = '아직 트렌드가 없습니다';
+            trendsCount.textContent = '저장된 트렌드: 0개';
+        }
+    } catch (error) {
+        console.error('Failed to load trends status:', error);
+        trendsStatusText.textContent = '트렌드 상태 확인 실패';
+        trendsCount.textContent = '저장된 트렌드: 0개';
+    }
+}
+
+fetchTrendsBtn.addEventListener('click', async () => {
+    // API Key 확인
+    const settingsResponse = await fetch('/api/settings');
+    const settingsData = await settingsResponse.json();
+
+    if (!settingsData.hasApiKey) {
+        showToast('먼저 API Key를 설정해주세요', 'error');
+        return;
+    }
+
+    // 진행 상태 표시
+    fetchTrendsBtn.disabled = true;
+    fetchTrendsBtn.textContent = '⏳ 트렌드 수집 중...';
+    trendsProgress.classList.remove('hidden');
+    trendsProgressBar.style.width = '10%';
+    trendsProgressText.textContent = '뉴스 트렌드 수집 준비 중...';
+
+    // SSE 연결
+    const eventSource = new EventSource('/api/trends/events');
+
+    eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log('Trends progress:', data);
+
+        const { status, message, current, total } = data;
+
+        trendsProgressText.textContent = message;
+
+        if (status === 'fetching') {
+            // 수집 중: 10-40%
+            const progress = total > 0 ? 10 + (current / total) * 30 : 20;
+            trendsProgressBar.style.width = `${Math.min(progress, 40)}%`;
+        } else if (status === 'analyzing') {
+            // 분석 중: 40-70%
+            const progress = 40 + (current / total) * 30;
+            trendsProgressBar.style.width = `${progress}%`;
+        } else if (status === 'saving') {
+            // 저장 중: 70-95%
+            const progress = 70 + (current / total) * 25;
+            trendsProgressBar.style.width = `${progress}%`;
+        } else if (status === 'complete') {
+            // 완료: 100%
+            trendsProgressBar.style.width = '100%';
+            trendsProgressText.textContent = `완료! ${current}개의 트렌드를 찾았습니다.`;
+        } else if (status === 'error') {
+            trendsProgressBar.style.width = '100%';
+            trendsProgressBar.style.backgroundColor = '#ef4444';
+        }
+    };
+
+    eventSource.onerror = (error) => {
+        console.error('SSE error:', error);
+        eventSource.close();
+    };
+
+    try {
+        const response = await fetch('/api/trends/fetch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast(`${data.trends.length}개의 트렌드를 성공적으로 가져왔습니다!`, 'success');
+
+            // 상태 업데이트
+            trendsStatusText.textContent = `최신 트렌드 ${data.trends.length}개 저장됨`;
+            trendsCount.textContent = `저장된 트렌드: ${data.trends.length}개`;
+        } else {
+            showToast(data.error || '트렌드를 가져오는 데 실패했습니다', 'error');
+        }
+    } catch (error) {
+        console.error('Failed to fetch trends:', error);
+        showToast('트렌드를 가져오는 데 실패했습니다', 'error');
+    } finally {
+        // SSE 연결 종료
+        eventSource.close();
+
+        fetchTrendsBtn.disabled = false;
+        fetchTrendsBtn.textContent = '🔍 실시간 트렌드 찾기';
+
+        setTimeout(() => {
+            trendsProgress.classList.add('hidden');
+            trendsProgressBar.style.backgroundColor = ''; // 색상 초기화
+        }, 3000);
+    }
+});
+
+viewTrendsBtn.addEventListener('click', () => {
+    window.location.href = '/';
+});
+
 loadSettings();
+loadTrendsStatus();
