@@ -2,13 +2,13 @@ let currentCount = 0;
 let sentences = [];
 
 const trendsSection = document.getElementById('trends-section');
+const songsSection = document.getElementById('songs-section');
 const topicSection = document.getElementById('topic-section');
-const paragraphSection = document.getElementById('paragraph-section');
 const learningSection = document.getElementById('learning-section');
 const realtimeTrendsContainer = document.getElementById('realtime-trends-container');
+const songsContainer = document.getElementById('songs-container');
 
 const startBtn = document.getElementById('start-btn');
-const paragraphStartBtn = document.getElementById('paragraph-start-btn');
 const revealBtn = document.getElementById('reveal-btn');
 const nextBtn = document.getElementById('next-btn');
 const finishBtn = document.getElementById('finish-btn');
@@ -22,11 +22,10 @@ const vocaDiv = document.getElementById('voca');
 const ttsBtn = document.getElementById('tts-btn');
 
 const topicInput = document.getElementById('topic');
-const paragraphInput = document.getElementById('paragraph');
 
 const navTrends = document.getElementById('nav-trends');
+const navSongs = document.getElementById('nav-songs');
 const navTopic = document.getElementById('nav-topic');
-const navParagraph = document.getElementById('nav-paragraph');
 
 // 학습 상태 초기화 함수
 function resetLearningState() {
@@ -60,11 +59,11 @@ function resetLearningState() {
 // 섹션 전환 유틸리티 (히스토리 지원)
 function showSection(sectionId, pushState = true) {
     // 모든 섹션 목록
-    const allSections = [trendsSection, topicSection, paragraphSection, learningSection];
-    const allNavLinks = [navTrends, navTopic, navParagraph];
+    const allSections = [trendsSection, songsSection, topicSection, learningSection];
+    const allNavLinks = [navTrends, navSongs, navTopic];
 
     // 학습 화면에서 나갈 때 상태 초기화
-    if (sectionId === 'trends-section' || sectionId === 'topic-section' || sectionId === 'paragraph-section') {
+    if (sectionId === 'trends-section' || sectionId === 'songs-section' || sectionId === 'topic-section') {
         resetLearningState();
     }
 
@@ -84,8 +83,8 @@ function showSection(sectionId, pushState = true) {
 
     // 해당 내비게이션 링크 활성화
     if (sectionId === 'trends-section') navTrends.classList.add('active');
+    if (sectionId === 'songs-section') navSongs.classList.add('active');
     if (sectionId === 'topic-section') navTopic.classList.add('active');
-    if (sectionId === 'paragraph-section') navParagraph.classList.add('active');
 
     window.speechSynthesis.cancel();
 
@@ -183,39 +182,112 @@ function showEmptyTrendsState() {
     }
 }
 
+let trendsPagination = {
+    allDates: [],
+    groups: {},
+    currentPage: 0,
+    itemsPerPage: 3 // 한 번에 보여줄 날짜 수
+};
+
 function renderRealtimeTrends(trends) {
     realtimeTrendsContainer.innerHTML = '';
 
-    trends.forEach((item) => {
-        const card = document.createElement('div');
-        card.className = 'realtime-trend-card';
+    // 날짜별로 그룹화 초기화
+    trendsPagination.groups = {};
+    trends.forEach(item => {
+        const date = item.date || '기타';
+        if (!trendsPagination.groups[date]) trendsPagination.groups[date] = [];
+        trendsPagination.groups[date].push(item);
+    });
 
-        const keywords = item.keywords ? JSON.parse(item.keywords) : [];
-        const keywordsHtml = keywords.map(kw => `<span class="trend-keyword">${kw}</span>`).join('');
+    // 날짜 역순(최신순)으로 전체 목록 저장
+    trendsPagination.allDates = Object.keys(trendsPagination.groups).sort((a, b) => b.localeCompare(a));
+    trendsPagination.currentPage = 0;
 
-        card.innerHTML = `
-            <span class="trend-category">${item.category || '일반'}</span>
-            <span class="trend-card-title">${item.title}</span>
-            <div class="trend-card-info">
-                ${keywordsHtml ? `<div class="trend-card-keywords">${keywordsHtml}</div>` : ''}
-                <button class="trend-start-btn">학습 시작</button>
-            </div>
-        `;
+    // 첫 페이지 렌더링
+    renderNextTrendsPage();
+}
 
-        // 학습 시작 버튼 이벤트
-        const startBtn = card.querySelector('.trend-start-btn');
-        // 따옴표 등의 문자가 포함된 제목을 안전하게 전달하기 위해 dataset에 직접 저장
-        startBtn.dataset.title = item.title;
+function renderNextTrendsPage() {
+    const start = trendsPagination.currentPage * trendsPagination.itemsPerPage;
+    const end = start + trendsPagination.itemsPerPage;
+    const datesToShow = trendsPagination.allDates.slice(start, end);
 
-        startBtn.addEventListener('click', async () => {
-            const topic = startBtn.dataset.title;
-            if (!topic) return;
-            console.log('Starting learning for trend:', topic);
-            await startLearningFromTrend(topic);
+    if (datesToShow.length === 0 && trendsPagination.currentPage === 0) {
+        realtimeTrendsContainer.innerHTML = '<div class="trends-empty-state">트렌드가 없습니다.</div>';
+        return;
+    }
+
+    // 기존의 "더보기" 버튼 제거
+    const oldMoreBtn = document.getElementById('load-more-trends-btn');
+    if (oldMoreBtn) oldMoreBtn.remove();
+
+    datesToShow.forEach(date => {
+        // 날짜 헤더 추가
+        const dateHeader = document.createElement('div');
+        dateHeader.className = 'trends-date-header';
+        
+        const today = new Date().toISOString().split('T')[0];
+        const displayDate = date === today ? `오늘 (${date})` : date;
+        dateHeader.innerHTML = `<h3>📅 ${displayDate}</h3>`;
+        realtimeTrendsContainer.appendChild(dateHeader);
+
+        const dateGrid = document.createElement('div');
+        dateGrid.className = 'trends-date-grid';
+
+        // 그룹 내에서 카테고리별로 정렬
+        const sortedItems = trendsPagination.groups[date].sort((a, b) => (a.category || '').localeCompare(b.category || ''));
+
+        sortedItems.forEach((item) => {
+            const card = document.createElement('div');
+            card.className = 'realtime-trend-card';
+
+            const keywords = item.keywords ? JSON.parse(item.keywords) : [];
+            const keywordsHtml = keywords.map(kw => `<span class="trend-keyword">${kw}</span>`).join('');
+            
+            const catClass = `cat-${(item.category || '일반').replace(/\s+/g, '')}`;
+
+            card.innerHTML = `
+                <span class="trend-category ${catClass}">${item.category || '일반'}</span>
+                <span class="trend-card-title">${item.title}</span>
+                <div class="trend-card-info">
+                    ${keywordsHtml ? `<div class="trend-card-keywords">${keywordsHtml}</div>` : ''}
+                    <button class="trend-start-btn">학습 시작</button>
+                </div>
+            `;
+
+            const startBtn = card.querySelector('.trend-start-btn');
+            startBtn.dataset.title = item.title;
+
+            startBtn.addEventListener('click', async () => {
+                const topic = startBtn.dataset.title;
+                if (!topic) return;
+                await startLearningFromTrend(topic);
+            });
+
+            dateGrid.appendChild(card);
         });
 
-        realtimeTrendsContainer.appendChild(card);
+        realtimeTrendsContainer.appendChild(dateGrid);
     });
+
+    // 다음 페이지가 있으면 "더보기" 버튼 추가
+    if (end < trendsPagination.allDates.length) {
+        const moreBtnContainer = document.createElement('div');
+        moreBtnContainer.className = 'load-more-container';
+        moreBtnContainer.innerHTML = `
+            <button id="load-more-trends-btn" class="load-more-btn">
+                <span>이전 트렌드 더보기</span>
+                <span class="more-count">(${trendsPagination.allDates.length - end}일치 더 있음)</span>
+            </button>
+        `;
+        realtimeTrendsContainer.appendChild(moreBtnContainer);
+
+        document.getElementById('load-more-trends-btn').addEventListener('click', () => {
+            trendsPagination.currentPage++;
+            renderNextTrendsPage();
+        });
+    }
 }
 
 // 트렌드에서 학습 시작
@@ -260,6 +332,52 @@ async function startLearningFromTrend(topic) {
 // 초기화
 fetchRealtimeTrends();
 
+// 팝송 목록 가져오기 및 렌더링
+async function fetchSavedSongs() {
+    try {
+        const response = await fetch('/api/songs/saved');
+        const data = await response.json();
+        renderSavedSongs(data.songs || []);
+    } catch (error) {
+        console.error('Failed to fetch songs:', error);
+    }
+}
+
+function renderSavedSongs(songs) {
+    songsContainer.innerHTML = '';
+
+    if (songs.length === 0) {
+        songsContainer.innerHTML = `
+            <div class="trends-empty-state">
+                <div class="empty-icon">🎵</div>
+                <h3>저장된 팝송이 없습니다</h3>
+                <p>데이터 관리 페이지에서 새로운 팝송을 추가해보세요!</p>
+                <button class="go-settings-btn" onclick="window.location.href='/data.html'">팝송 추가하러 가기</button>
+            </div>
+        `;
+        return;
+    }
+
+    songs.forEach(song => {
+        const card = document.createElement('div');
+        card.className = 'realtime-trend-card';
+        
+        card.innerHTML = `
+            <span class="trend-category cat-연애">POP SONG</span>
+            <span class="trend-card-title">${song.title}</span>
+            <div class="trend-card-info">
+                <button class="trend-start-btn">학습 시작</button>
+            </div>
+        `;
+
+        card.querySelector('.trend-start-btn').addEventListener('click', async () => {
+            await startLearningFromTrend(song.title);
+        });
+
+        songsContainer.appendChild(card);
+    });
+}
+
 // 내비게이션 이벤트
 navTrends.addEventListener('click', (e) => {
     e.preventDefault();
@@ -267,14 +385,15 @@ navTrends.addEventListener('click', (e) => {
     fetchRealtimeTrends();
 });
 
+navSongs.addEventListener('click', (e) => {
+    e.preventDefault();
+    showSection('songs-section');
+    fetchSavedSongs();
+});
+
 navTopic.addEventListener('click', (e) => {
     e.preventDefault();
     showSection('topic-section');
-});
-
-navParagraph.addEventListener('click', (e) => {
-    e.preventDefault();
-    showSection('paragraph-section');
 });
 
 startBtn.addEventListener('click', async () => {
@@ -291,65 +410,6 @@ startBtn.addEventListener('click', async () => {
 
     await fetchSentences(topic, difficulty);
 });
-
-// 문단 입력 학습 시작
-paragraphStartBtn.addEventListener('click', async () => {
-    const paragraph = paragraphInput.value.trim();
-    const difficulty = document.getElementById('paragraph-difficulty').value;
-
-    if (!paragraph) {
-        alert('학습할 문단을 입력해 주세요.');
-        return;
-    }
-
-    showSection('learning-section');
-    ttsBtn.classList.add('hidden');
-
-    await analyzeParagraph(paragraph, difficulty);
-});
-
-// 문단 분석 및 학습 함수
-async function analyzeParagraph(paragraph, difficulty) {
-    sentenceEn.textContent = 'AI가 문장별로 분석하고 있습니다...';
-
-    try {
-        const response = await fetch('/api/analyze-paragraph', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paragraph, difficulty })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            console.error('API Error:', data);
-            sentenceEn.textContent = `분석 실패: ${data.error || '알 수 없는 오류'}`;
-            return;
-        }
-
-        if (!data.sentences || !Array.isArray(data.sentences)) {
-            throw new Error('데이터 형식이 올바르지 않습니다.');
-        }
-
-        // 세션 스토리지에 문단 저장
-        sessionStorage.setItem('currentParagraph', paragraph);
-        sessionStorage.setItem('currentTopic', '문장 분석 학습');
-
-        sentences = data.sentences;
-        currentCount = 0;
-
-        // 진행률 텍스트 업데이트
-        currentCountSpan.textContent = currentCount + 1;
-
-        showSentence();
-
-        // 채팅 서버에 문단 전송
-        sendTopicToChat('문장 분석 학습: ' + paragraph.substring(0, 50) + '...');
-    } catch (error) {
-        console.error('Error analyzing paragraph:', error);
-        sentenceEn.textContent = '문단 분석 중 오류가 발생했습니다.';
-    }
-}
 
 // 채팅 서버에 주제 전송 함수
 function sendTopicToChat(topic) {

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 관리 - 트렌드 영어</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <style>
+        .data-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+            margin-top: 1rem;
+        }
+        .data-info {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--primary-light);
+            border-radius: 12px;
+            color: var(--primary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-section">
+            <div class="nav-links">
+                <a href="/" class="nav-link">🏠 홈으로</a>
+                <a href="/settings.html" class="nav-link">⚙️ 설정</a>
+            </div>
+        </div>
+
+        <div class="settings-page-header">
+            <h2>📊 데이터 관리</h2>
+            <p>최신 뉴스 트렌드를 수집하고 학습 콘텐츠를 생성합니다</p>
+        </div>
+
+        <div class="data-card">
+            <div class="data-info">
+                💡 <b>안내:</b> '실시간 트렌드 찾기'를 실행하면 구글 뉴스에서 최신 정보를 가져와 AI가 분석합니다.<br>
+                당일 이미 수집된 데이터가 있다면 <b>새로운 데이터로 덮어씌워집니다.</b>
+            </div>
+
+            <div class="settings-group">
+                <button id="fetch-trends-btn" class="save-btn" style="width: 100%; padding: 1.2rem; font-size: 1.1rem;">
+                    🔍 실시간 뉴스 트렌드 수집 시작
+                </button>
+            </div>
+
+            <!-- 트렌드 수집 진행 상태 -->
+            <div id="trends-progress" class="hidden" style="margin-top: 2rem;">
+                <div class="progress-header" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span id="trends-progress-text" style="font-weight: 600; color: var(--text-main);">준비 중...</span>
+                </div>
+                <div class="progress-bar-container" style="width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden;">
+                    <div id="trends-progress-bar" style="width: 0%; height: 100%; background: var(--primary); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-card" style="margin-top: 2rem;">
+            <div class="settings-page-header" style="text-align: left; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.5rem; color: var(--text-main);">🎶 팝송 가사 추가</h3>
+                <p style="font-size: 0.9rem;">좋아하는 팝송 가사를 입력하면 AI가 학습용으로 분석하여 저장합니다</p>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 1.5rem;">
+                <label for="song-title">곡 제목 (가수 포함)</label>
+                <input type="text" id="song-title" placeholder="예: Bruno Mars - Die With A Smile" style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 1rem;">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 1.5rem;">
+                <label for="song-lyrics">팝송 가사</label>
+                <textarea id="song-lyrics" placeholder="분석할 팝송 가사를 여기에 붙여넣으세요." rows="10" style="min-height: 200px;"></textarea>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 1.5rem;">
+                <label for="song-difficulty">학습 난이도</label>
+                <select id="song-difficulty">
+                    <option value="level1">Level 1 (입문)</option>
+                    <option value="level2">Level 2 (초급)</option>
+                    <option value="level3" selected>Level 3 (중급)</option>
+                    <option value="level4">Level 4 (고급)</option>
+                    <option value="level5">Level 5 (심화)</option>
+                </select>
+            </div>
+
+            <button id="save-song-btn" class="save-btn" style="width: 100%; padding: 1.2rem; font-size: 1.1rem; background-color: #7c3aed;">
+                💾 팝송 저장 및 AI 분석 시작
+            </button>
+
+            <div id="song-progress" class="hidden" style="margin-top: 1.5rem;">
+                <div id="song-status-text" style="font-weight: 600; color: #7c3aed; text-align: center;">AI가 가사를 분석하고 있습니다...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+</body>
+
+</html>

@@ -157,11 +157,25 @@ const db = new sqlite3.Database(dbPath, (err) => {
                         }
 
                         if (!columnNames.includes('difficulty')) {
-                            db.run("ALTER TABLE trends ADD COLUMN difficulty TEXT DEFAULT 'level3'", (err) => {
+                            db.run("ALTER TABLE trends ADD COLUMN difficulty TEXT DEFAULT 'level3'");
+                        }
+                        if (!columnNames.includes('date')) {
+                            db.run("ALTER TABLE trends ADD COLUMN date TEXT", (err) => {
                                 if (err) {
-                                    console.error('Error adding difficulty column:', err.message);
+                                    console.error('Error adding date column:', err.message);
                                 } else {
-                                    console.log('Added difficulty column to trends table');
+                                    console.log('Added date column to trends table');
+                                }
+                            });
+                        }
+                        if (!columnNames.includes('type')) {
+                            db.run("ALTER TABLE trends ADD COLUMN type TEXT DEFAULT 'news'", (err) => {
+                                if (err) {
+                                    console.error('Error adding type column:', err.message);
+                                } else {
+                                    console.log('Added type column to trends table');
+                                    // Update existing rows to be 'news'
+                                    db.run("UPDATE trends SET type = 'news' WHERE type IS NULL");
                                 }
                             });
                         }

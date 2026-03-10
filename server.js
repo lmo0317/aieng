@@ -34,7 +34,9 @@ const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'T
 3. 제공된 주제에 대해 먼저 한국어로 핵심 내용을 아주 짧게(1~2문장) 요약해 준 뒤, 곧바로 영어 학습을 도와주세요.
 
 **문장 생성 규칙 (Generate API 호출 시)**:
-위 주제와 난이도에 맞는 영어 문장 10개를 생성하여 반드시 아래의 순수한 JSON 배열 형식으로만 응답하세요. 설명이나 다른 텍스트를 붙이지 마세요.
+위 주제와 난이도에 맞는 영어 문장 10개를 생성하여 반드시 아래의 순수한 JSON 배열 형식으로만 응답하세요. 
+[중요] JSON 문자열 값 내에 실제 줄바꿈(Enter)을 포함하지 마세요. 줄바꿈이 필요한 경우 반드시 \\n으로 이스케이프 처리하세요.
+설명이나 다른 텍스트를 붙이지 마세요.
 
 1. "en": 영어 문장
 2. "ko": 한국어 해석
@@ -101,7 +103,7 @@ async function callGeminiAPI(apiKey, model, systemPrompt, userPrompt, config = {
         };
     }
 
-    const response = await axios.post(API_URL, requestBody);
+    const response = await axios.post(API_URL, requestBody, { timeout: 60000 }); // 60초로 연장
     return response.data.candidates[0].content.parts[0].text;
 }
 
@@ -126,7 +128,8 @@ async function callGLMAPI(apiKey, model, systemPrompt, userPrompt, config = {}) 
         headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
-        }
+        },
+        timeout: 60000 // 60초로 연장
     });
 
     return response.data.choices[0].message.content;
@@ -153,10 +156,72 @@ async function callGroqAPI(apiKey, model, systemPrompt, userPrompt, config = {})
         headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
-        }
+        },
+        timeout: 60000 // 60초로 연장
     });
 
     return response.data.choices[0].message.content;
+}
+
+// Helper function to robustly clean and parse JSON from AI response
+function cleanAndParseJSON(str) {
+    if (!str || typeof str !== 'string') return str;
+
+    // 1. Markdown code block 제거
+    let cleaned = str.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
+
+    // 2. [ ] 또는 { } 사이의 내용만 추출
+    const firstBracket = cleaned.indexOf('[');
+    const firstBrace = cleaned.indexOf('{');
+    let start = -1;
+    let endChar = '';
+
+    if (firstBracket !== -1 && (firstBrace === -1 || (firstBracket < firstBrace && firstBracket !== -1))) {
+        start = firstBracket;
+        endChar = ']';
+    } else if (firstBrace !== -1) {
+        start = firstBrace;
+        endChar = '}';
+    }
+
+    if (start !== -1) {
+        const lastEnd = cleaned.lastIndexOf(endChar);
+        if (lastEnd !== -1 && lastEnd > start) {
+            cleaned = cleaned.substring(start, lastEnd + 1);
+        }
+    }
+
+    // 3. 구조적 결함 수정 로직 추가
+    // 문자열 내부의 실제 줄바꿈 및 제어 문자 처리
+    cleaned = cleaned.replace(/"([^"\\]*(\\.[^"\\]*)*)"/gs, (match) => {
+        return match.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t');
+    });
+
+    // 4. 마지막 요소 뒤의 쉼표 제거 (Trailing commas)
+    cleaned = cleaned.replace(/,\s*([\]}])/g, '$1');
+
+    try {
+        return JSON.parse(cleaned);
+    } catch (e) {
+        console.error("JSON Parsing Error after cleaning:", e.message);
+        console.log("Original content length:", str.length);
+        
+        // 최종 수단: 모든 제어 문자 제거 및 비정상적인 따옴표 처리 시도
+        try {
+            const extremeClean = cleaned
+                .replace(/[\x00-\x1F]/g, ' ') // 제어 문자 제거
+                .replace(/\\"/g, '[[QUOT]]') // 일단 이스케이프된 따옴표 보호
+                .replace(/"([^"]*)":/g, '[[KEY]]$1[[KEY]]:') // 키 보호
+                // 여기에서 값 내부의 따옴표 문제를 처리해야 하지만 복잡하므로 기본 파싱 시도
+                .replace(/\[\[KEY\]\]/g, '"')
+                .replace(/\[\[QUOT\]\]/g, '\\"');
+                
+            return JSON.parse(extremeClean);
+        } catch (e2) {
+            // 구조가 완전히 깨진 경우 문자열 조작으로 복구 시도 (매우 제한적)
+            throw new Error(`JSON 파싱 실패: ${e.message}`);
+        }
+    }
 }
 
 // Global Settings API endpoints
@@ -293,11 +358,7 @@ app.post('/api/generate', async (req, res) => {
         }
 
         // Clean and parse JSON response
-        content = content.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
-        const firstBracket = content.indexOf('[');
-        if (firstBracket !== -1) content = content.substring(firstBracket);
-
-        const sentences = JSON.parse(content);
+        const sentences = cleanAndParseJSON(content);
         db.run("INSERT INTO learning_history (topic, difficulty, sentences) VALUES (?, ?, ?)",
             [topic, difficulty, JSON.stringify(sentences)]);
 
@@ -306,88 +367,6 @@ app.post('/api/generate', async (req, res) => {
         console.error('Generate Error:', error.message);
         if (error.response) console.error(error.response.data);
         res.status(500).json({ error: 'Failed to generate sentences' });
-    }
-});
-
-// Paragraph Analysis API
-app.post('/api/analyze-paragraph', async (req, res) => {
-    const { paragraph, difficulty } = req.body;
-    const s = await getGlobalSettings();
-
-    const provider = getModelProvider(s.geminiModel);
-    let apiKey;
-    if (provider === 'glm') {
-        apiKey = s.glmApiKey;
-    } else if (provider === 'groq') {
-        apiKey = s.groqApiKey;
-    } else {
-        apiKey = s.geminiApiKey;
-    }
-
-    if (!apiKey) {
-        return res.status(400).json({
-            error: provider === 'glm'
-                ? 'GLM API Key가 설정되지 않았습니다.'
-                : provider === 'groq'
-                ? 'Groq API Key가 설정되지 않았습니다.'
-                : 'Gemini API Key가 설정되지 않았습니다.'
-        });
-    }
-
-    try {
-        // 일괄 분석을 위한 통합 프롬프트
-        const batchPrompt = `다음 영어 문단을 문장 단위로 정밀 분석해주세요. 
-난이도 설정: ${difficulty}
-
-각 문장에 대해 다음 정보를 포함하여 반드시 순수한 JSON 배열 형식으로만 응답하세요 (설명이나 마크다운 코드 블록 제외):
-1. "en": 원문 영어 문장
-2. "ko": 한국어 해석
-3. "sentence_structure": 문장 구조 분석 (주어, 동사, 목적어, 수식어 등)
-4. "explanation": 해당 문장의 핵심 문법 포인트 및 학습 팁
-5. "voca": 핵심 단어 및 숙어 목록 ["단어: 뜻", ...]
-
-문단 내용:
-${paragraph}
-
-[CRITICAL: Output ONLY a valid JSON array of objects. Do NOT wrap the JSON in markdown code blocks. No other text.]`;
-
-        let content;
-        if (provider === 'glm') {
-            content = await callGLMAPI(apiKey, s.geminiModel, s.systemPrompt, batchPrompt, {
-                temperature: 0.5,
-                maxOutputTokens: 8192
-            });
-        } else if (provider === 'groq') {
-            content = await callGroqAPI(apiKey, s.geminiModel, s.systemPrompt, batchPrompt, {
-                temperature: 0.5,
-                maxOutputTokens: 8192
-            });
-        } else {
-            content = await callGeminiAPI(apiKey, s.geminiModel, s.systemPrompt, batchPrompt, {
-                temperature: 0.5,
-                maxOutputTokens: 8192
-            });
-        }
-
-        // JSON 응답 정제 및 파싱
-        content = content.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
-        const firstBracket = content.indexOf('[');
-        const lastBracket = content.lastIndexOf(']');
-        if (firstBracket !== -1 && lastBracket !== -1) {
-            content = content.substring(firstBracket, lastBracket + 1);
-        }
-
-        const analyzedSentences = JSON.parse(content);
-
-        // DB에 저장
-        db.run("INSERT INTO learning_history (topic, difficulty, sentences) VALUES (?, ?, ?)",
-            [`문단 분석: ${paragraph.substring(0, 50)}...`, difficulty, JSON.stringify(analyzedSentences)]);
-
-        res.json({ sentences: analyzedSentences });
-    } catch (error) {
-        console.error('Batch Paragraph Analysis Error:', error.message);
-        if (error.response) console.error('API Error Details:', error.response.data);
-        res.status(500).json({ error: '문단 분석 중 오류가 발생했습니다. (Batch processing failed)' });
     }
 });
 
@@ -450,13 +429,123 @@ function broadcastTrendsProgress(status, message, current, total) {
     });
 }
 
-// Saved Trends API
+// Saved Trends API (News only)
 app.get('/api/trends/saved', (req, res) => {
-    // sentences가 NULL이 아니고 빈 배열('[]')이 아닌 데이터만 조회
-    db.all("SELECT * FROM trends WHERE sentences IS NOT NULL AND sentences != '[]' ORDER BY createdAt DESC", (err, rows) => {
+    // sentences가 NULL이 아니고, date가 존재하며, 빈 배열('[]')이 아닌 데이터 중 type이 'news'인 것만 조회
+    db.all("SELECT * FROM trends WHERE sentences IS NOT NULL AND sentences != '[]' AND date IS NOT NULL AND type = 'news' ORDER BY date DESC, category ASC", (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ trends: rows || [] });
     });
+});
+
+// Saved Songs API
+app.get('/api/songs/saved', (req, res) => {
+    db.all("SELECT * FROM trends WHERE type = 'song' ORDER BY createdAt DESC", (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ songs: rows || [] });
+    });
+});
+
+// Pop Song Processing API
+app.post('/api/songs/fetch', async (req, res) => {
+    const { title, lyrics, difficulty } = req.body;
+    const s = await getGlobalSettings();
+
+    const provider = getModelProvider(s.geminiModel);
+    let apiKey;
+    if (provider === 'glm') apiKey = s.glmApiKey;
+    else if (provider === 'groq') apiKey = s.groqApiKey;
+    else apiKey = s.geminiApiKey;
+
+    if (!apiKey) return res.status(400).json({ error: 'API Key가 설정되지 않았습니다.' });
+
+    try {
+        // 1. 가사 전처리 및 문장 분리
+        const lines = lyrics.split('\n')
+            .map(l => l.trim())
+            .filter(l => l.length > 0 && !l.startsWith('[') && !l.endsWith(']')); // [Chorus] 등 제외
+
+        if (lines.length === 0) throw new Error('분석할 가사 내용이 없습니다.');
+
+        broadcastTrendsProgress('analyzing', `팝송 가사 분석 준비 중... (0/${lines.length})`, 0, lines.length);
+
+        // 2. 가사를 5문장씩 묶어서 순차 분석 (AI 부하 방지 및 진행률 표시)
+        const allAnalyzedSentences = [];
+        const chunkSize = 5;
+        
+        for (let i = 0; i < lines.length; i += chunkSize) {
+            const chunk = lines.slice(i, i + chunkSize);
+            const chunkText = chunk.join('\n');
+            
+            const songPrompt = `당신은 영어 학습 전문가입니다. 다음 팝송 가사 구절을 정밀 분석하여 학습 콘텐츠를 만들어주세요.
+곡 제목: ${title}
+난이도: ${difficulty}
+
+**분석 규칙**:
+1. 제공된 모든 문장을 순서대로 빠짐없이 분석하세요.
+2. 각 문장에 대해 다음 정보를 포함하여 반드시 순수한 JSON 배열 형식으로만 응답하세요:
+   - "en": 원문 영어 가사 문장
+   - "ko": 한국어 해석
+   - "sentence_structure": 문장 구조 분석
+   - "explanation": 가사 속 주요 표현 및 문법 설명
+   - "voca": 핵심 단어 및 숙어 목록 ["단어: 뜻", ...]
+
+가사 구절:
+${chunkText}
+
+[CRITICAL: Output ONLY a valid JSON array of objects. No markdown.]`;
+
+            let retryCount = 0;
+            const maxRetries = 2;
+            let chunkResult = null;
+
+            while (retryCount <= maxRetries) {
+                try {
+                    let content;
+                    if (provider === 'glm') {
+                        content = await callGLMAPI(apiKey, s.geminiModel, s.systemPrompt, songPrompt);
+                    } else if (provider === 'groq') {
+                        content = await callGroqAPI(apiKey, s.geminiModel, s.systemPrompt, songPrompt);
+                    } else {
+                        content = await callGeminiAPI(apiKey, s.geminiModel, s.systemPrompt, songPrompt);
+                    }
+                    chunkResult = cleanAndParseJSON(content);
+                    break;
+                } catch (err) {
+                    retryCount++;
+                    if (retryCount > maxRetries) throw err;
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                }
+            }
+
+            if (Array.isArray(chunkResult)) {
+                allAnalyzedSentences.push(...chunkResult);
+            }
+
+            const currentProgress = Math.min(i + chunkSize, lines.length);
+            broadcastTrendsProgress('analyzing', `가사 분석 중... (${currentProgress}/${lines.length})`, currentProgress, lines.length);
+            
+            // 요청 간 짧은 휴식
+            if (i + chunkSize < lines.length) {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+
+        db.run("INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [title, '팝송', '팝송 가사 전체 학습', '[]', JSON.stringify(allAnalyzedSentences), difficulty, today, 'song'],
+            function(err) {
+                if (err) throw err;
+                broadcastTrendsProgress('complete', `완료! 총 ${lines.length}개의 가사 문장 분석 성공`, lines.length, lines.length);
+                res.json({ success: true, id: this.lastID, count: allAnalyzedSentences.length });
+            }
+        );
+    } catch (error) {
+        console.error('Song Processing Error:', error.message);
+        broadcastTrendsProgress('error', `오류: ${error.message}`, 0, 0);
+        res.status(500).json({ error: '팝송 분석 중 오류가 발생했습니다.' });
+    }
 });
 
 // Get trend by title API
@@ -521,7 +610,7 @@ app.post('/api/trends/fetch', async (req, res) => {
         const httpsAgent = new https.Agent({
             rejectUnauthorized: true,
             keepAlive: true,
-            timeout: 30000
+            timeout: 10000 // 10초로 단축
         });
 
         const headers = {
@@ -530,18 +619,19 @@ app.post('/api/trends/fetch', async (req, res) => {
 
         const results = await Promise.allSettled(
             categories.map(cat => axios.get(cat.url, {
-                timeout: 15000,
+                timeout: 8000, // 개별 요청 8초
                 headers: headers,
                 httpsAgent: httpsAgent
             }))
         );
+        
         let allTrends = [];
-
         results.forEach((result, index) => {
             if (result.status === 'fulfilled') {
                 const xml = result.value.data;
                 const matches = xml.match(/<title>(.*?)<\/title>/g) || [];
-                matches.slice(1, 6).forEach(m => {
+                // 첫 번째 <title>은 채널 제목이므로 제외 (slice(1))
+                matches.slice(1, 8).forEach(m => {
                     let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
                     title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
                     const cleanTitle = title.trim();
@@ -549,11 +639,13 @@ app.post('/api/trends/fetch', async (req, res) => {
                         allTrends.push({ category: categories[index].label, title: cleanTitle });
                     }
                 });
+            } else {
+                console.warn(`RSS fetch failed for ${categories[index].label}:`, result.reason.message);
             }
         });
 
         if (allTrends.length === 0) {
-            broadcastTrendsProgress('error', '트렌드를 가져오지 못했습니다.', 0, 0);
+            broadcastTrendsProgress('error', '뉴스를 수집하지 못했습니다. 다시 시도해 주세요.', 0, 0);
             return res.status(500).json({ error: '트렌드를 가져오지 못했습니다.' });
         }
 
@@ -563,77 +655,121 @@ app.post('/api/trends/fetch', async (req, res) => {
             .sort(() => Math.random() - 0.5)
             .slice(0, 10);
 
-        broadcastTrendsProgress('analyzing', `AI 분석 중... (0/${uniqueTrends.length})`, 0, uniqueTrends.length);
+        broadcastTrendsProgress('analyzing', `뉴스 요약 분석 중... (0/${uniqueTrends.length})`, 0, uniqueTrends.length);
 
-        // 2. AI로 트렌드 분석 (일괄 처리)
-        const trendsForAI = uniqueTrends.map(t => `${t.category}: ${t.title}`).join('\n');
+        // 2. AI로 트렌드 분석 (1개씩 순차적으로 처리하여 503 에러 방지)
+        let analyzedTrends = [];
+        for (let i = 0; i < uniqueTrends.length; i++) {
+            const trend = uniqueTrends[i];
+            const analysisPrompt = `당신은 뉴스 트렌드 분석 전문가입니다. 다음 뉴스 트렌드를 분석하여 요약과 핵심 키워드를 추출하세요. 반드시 아래 JSON 형식으로만 응답하세요:
+{
+  "title": "${trend.title}",
+  "summary": "요약 내용",
+  "keywords": ["키워드1", "키워드2", "키워드3"]
+}`;
 
-        const analysisPrompt = `당신은 뉴스 트렌드 분석 전문가입니다. 다음 10개의 뉴스 트렌드를 분석하여 각각에 대한 요약과 핵심 키워드를 추출하세요. 반드시 아래 JSON 배열 형식으로만 응답하세요:
-[
-  {
-    "title": "뉴스 제목",
-    "summary": "요약 내용",
-    "keywords": ["키워드1", "키워드2", "키워드3"]
-  }
-]`;
+            let retryCount = 0;
+            const maxRetries = 3; // 재시도 횟수 증가
+            let trendAnalyzed = null;
 
-        let aiContent;
-        if (provider === 'glm') {
-            aiContent = await callGLMAPI(apiKey, s.geminiModel, analysisPrompt, trendsForAI, { temperature: 0.7 });
-        } else if (provider === 'groq') {
-            aiContent = await callGroqAPI(apiKey, s.geminiModel, analysisPrompt, trendsForAI, { temperature: 0.7 });
-        } else {
-            aiContent = await callGeminiAPI(apiKey, s.geminiModel, analysisPrompt, trendsForAI, { temperature: 0.7 });
+            while (retryCount <= maxRetries) {
+                try {
+                    let aiContent;
+                    const promptInput = `${trend.category}: ${trend.title}`;
+                    if (provider === 'glm') {
+                        aiContent = await callGLMAPI(apiKey, s.geminiModel, analysisPrompt, promptInput, { temperature: 0.7 });
+                    } else if (provider === 'groq') {
+                        aiContent = await callGroqAPI(apiKey, s.geminiModel, analysisPrompt, promptInput, { temperature: 0.7 });
+                    } else {
+                        aiContent = await callGeminiAPI(apiKey, s.geminiModel, analysisPrompt, promptInput, { temperature: 0.7 });
+                    }
+                    trendAnalyzed = cleanAndParseJSON(aiContent);
+                    break;
+                } catch (err) {
+                    retryCount++;
+                    if (retryCount > maxRetries) throw err;
+                    
+                    const waitTime = retryCount * 4000; // 4초, 8초, 12초로 점진적 증가
+                    console.log(`Analysis Retry ${retryCount}/${maxRetries} for trend ${i}. Waiting ${waitTime}ms...`);
+                    broadcastTrendsProgress('analyzing', `서버 응답 지연으로 재시도 중... (${retryCount}/${maxRetries})`, i, uniqueTrends.length);
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
+                }
+            }
+            
+            analyzedTrends.push(trendAnalyzed || { title: trend.title, summary: '', keywords: [] });
+            broadcastTrendsProgress('analyzing', `뉴스 요약 분석 중... (${i + 1}/${uniqueTrends.length})`, i + 1, uniqueTrends.length);
+            
+            // 분석 요청 사이 1.5초 대기
+            await new Promise(resolve => setTimeout(resolve, 1500));
         }
-
-        aiContent = aiContent.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
-        const firstBracket = aiContent.indexOf('[');
-        if (firstBracket !== -1) aiContent = aiContent.substring(firstBracket);
-        const analyzedTrends = JSON.parse(aiContent);
 
         broadcastTrendsProgress('generating', `학습 콘텐츠 생성 중... (0/${uniqueTrends.length})`, 0, uniqueTrends.length);
 
-        // 3. 각 트렌드에 대해 영어 학습 문장 생성
-        const trendsWithSentences = await Promise.all(uniqueTrends.map(async (trend, index) => {
+        // 3. 각 트렌드에 대해 영어 학습 문장 생성 (순차 처리)
+        const trendsWithSentences = [];
+        let successCount = 0;
+        for (let i = 0; i < uniqueTrends.length; i++) {
+            const trend = uniqueTrends[i];
             try {
                 const userPrompt = `주제: ${trend.title}\n난이도: level3\n\n[CRITICAL: Output ONLY a valid JSON array of exactly 10 objects. No markdown code blocks.]`;
                 
                 let content;
-                if (provider === 'glm') {
-                    content = await callGLMAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt);
-                } else if (provider === 'groq') {
-                    content = await callGroqAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt);
-                } else {
-                    content = await callGeminiAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt);
+                let retryCount = 0;
+                const maxRetries = 3;
+                
+                while (retryCount <= maxRetries) {
+                    try {
+                        if (provider === 'glm') {
+                            content = await callGLMAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt);
+                        } else if (provider === 'groq') {
+                            content = await callGroqAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt);
+                        } else {
+                            content = await callGeminiAPI(apiKey, s.geminiModel, s.systemPrompt, userPrompt);
+                        }
+                        break;
+                    } catch (apiError) {
+                        retryCount++;
+                        if (retryCount > maxRetries) throw apiError;
+                        
+                        const waitTime = retryCount * 5000; // 5초, 10초, 15초 대기
+                        console.log(`API Retry ${retryCount}/${maxRetries} for content ${i}. Waiting ${waitTime}ms...`);
+                        broadcastTrendsProgress('generating', `응답 대기 중... (${retryCount}/${maxRetries})`, i, uniqueTrends.length);
+                        await new Promise(resolve => setTimeout(resolve, waitTime));
+                    }
                 }
 
-                content = content.replace(/^```(json)?/im, '').replace(/```$/m, '').trim();
-                const firstBrk = content.indexOf('[');
-                if (firstBrk !== -1) content = content.substring(firstBrk);
-                const sentences = JSON.parse(content);
-
-                broadcastTrendsProgress('generating', `학습 콘텐츠 생성 중... (${index + 1}/${uniqueTrends.length})`, index + 1, uniqueTrends.length);
-
-                return { ...trend, analyzed: analyzedTrends[index] || {}, sentences };
+                const sentences = cleanAndParseJSON(content);
+                successCount++;
+                broadcastTrendsProgress('generating', `학습 콘텐츠 생성 중... (${i + 1}/${uniqueTrends.length})`, i + 1, uniqueTrends.length);
+                
+                trendsWithSentences.push({ ...trend, analyzed: analyzedTrends[i] || {}, sentences });
+                
+                // 생성 요청 사이 2.5초 대기 (가장 부하가 큰 작업)
+                await new Promise(resolve => setTimeout(resolve, 2500));
             } catch (e) {
-                console.error(`Error for trend ${index}:`, e.message);
-                return { ...trend, analyzed: analyzedTrends[index] || {}, sentences: [] };
+                console.error(`Error for trend ${i}:`, e.message);
+                trendsWithSentences.push({ ...trend, analyzed: analyzedTrends[i] || {}, sentences: [] });
+                broadcastTrendsProgress('generating', `일부 생성 실패 (${i + 1}/${uniqueTrends.length})`, i + 1, uniqueTrends.length);
             }
-        }));
+        }
 
         // 4. 데이터베이스 저장
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD 형식
+
         db.serialize(() => {
-            db.run("DELETE FROM trends");
-            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, difficulty) VALUES (?, ?, ?, ?, ?, ?)");
+            // 당일 트렌드 정보 삭제 (덮어씌우기)
+            db.run("DELETE FROM trends WHERE date = ?", [today]);
+            
+            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date) VALUES (?, ?, ?, ?, ?, ?, ?)");
             trendsWithSentences.forEach(t => {
                 const keywords = t.analyzed?.keywords ? JSON.stringify(t.analyzed.keywords) : '[]';
                 const sentences = t.sentences?.length > 0 ? JSON.stringify(t.sentences) : null;
-                stmt.run(t.title, t.category, t.analyzed?.summary || '', keywords, sentences, 'level3');
+                stmt.run(t.title, t.category, t.analyzed?.summary || '', keywords, sentences, 'level3', today);
             });
             stmt.finalize();
         });
 
-        broadcastTrendsProgress('complete', '완료!', uniqueTrends.length, uniqueTrends.length);
+        broadcastTrendsProgress('complete', `완료! 총 ${uniqueTrends.length}개 중 ${successCount}개 성공`, successCount, uniqueTrends.length);
         res.json({ trends: trendsWithSentences });
 
     } catch (error) {
