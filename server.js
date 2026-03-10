@@ -496,7 +496,7 @@ ${chunkText}
 [CRITICAL: Output ONLY a valid JSON array of objects. No markdown.]`;
 
             let retryCount = 0;
-            const maxRetries = 2;
+            const maxRetries = 3;
             let chunkResult = null;
 
             while (retryCount <= maxRetries) {
@@ -514,7 +514,15 @@ ${chunkText}
                 } catch (err) {
                     retryCount++;
                     if (retryCount > maxRetries) throw err;
-                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    // 429 에러(Rate Limit)인 경우 더 오래 대기
+                    const isRateLimit = err.response && err.response.status === 429;
+                    const waitTime = isRateLimit ? 15000 : (retryCount * 5000); // 429면 15초, 아니면 5/10/15초
+                    
+                    console.log(`Song Analysis Retry ${retryCount}/${maxRetries}. Status: ${err.response?.status}. Waiting ${waitTime}ms...`);
+                    broadcastTrendsProgress('analyzing', `서버 요청 제한으로 잠시 대기 중... (${retryCount}/${maxRetries})`, i, lines.length);
+                    
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
                 }
             }
 
@@ -525,9 +533,9 @@ ${chunkText}
             const currentProgress = Math.min(i + chunkSize, lines.length);
             broadcastTrendsProgress('analyzing', `가사 분석 중... (${currentProgress}/${lines.length})`, currentProgress, lines.length);
             
-            // 요청 간 짧은 휴식
+            // 429 방지를 위해 요청 간 대기 시간을 4초로 연장
             if (i + chunkSize < lines.length) {
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                await new Promise(resolve => setTimeout(resolve, 4000));
             }
         }
 
@@ -777,6 +785,15 @@ app.post('/api/trends/fetch', async (req, res) => {
         broadcastTrendsProgress('error', `오류: ${error.message}`, 0, 0);
         res.status(500).json({ error: `실패: ${error.message}` });
     }
+});
+
+// Delete Trend or Song API
+app.delete('/api/trends/:id', (req, res) => {
+    const { id } = req.params;
+    db.run("DELETE FROM trends WHERE id = ?", [id], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
+    });
 });
 
 // Chat API endpoint using REST
