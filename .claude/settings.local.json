@@ -15,7 +15,9 @@
       "mcp__web-reader__webReader",
       "mcp__web-search-prime__web_search_prime",
       "Bash(\"/c/Program Files/nodejs/node.js\":*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(START:*)",
+      "Bash(/c/Users/lmo03/AppData/Local/ms-playwright-go/1.50.1/node.exe:*)"
     ]
   }
 }

@@ -665,6 +665,74 @@ button:active {
     z-index: 1005;
 }
 
+/* 모바일 반응형 스타일 */
+@media (max-width: 768px) {
+    .chat-modal-container {
+        height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+        width: 100%;
+        max-width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .chat-modal {
+        padding: 0;
+        align-items: stretch;
+        justify-content: stretch;
+    }
+
+    .chat-modal-header {
+        border-radius: 0;
+        flex-shrink: 0;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .chat-input-area {
+        flex-shrink: 0;
+        position: relative;
+        z-index: 10;
+    }
+
+    .video-chat-container {
+        flex-shrink: 0;
+        max-height: 35vh;
+        overflow: hidden;
+    }
+
+    .video-grid {
+        gap: 8px;
+    }
+
+    .video-wrapper {
+        aspect-ratio: 16/9;
+    }
+
+    .ai-emoji {
+        font-size: 2rem;
+        margin-top: 4px;
+    }
+
+    .chat-message-text {
+        max-width: 85%;
+        font-size: 0.95rem;
+    }
+
+    .chat-welcome-message {
+        font-size: 0.95rem;
+        padding: 12px;
+    }
+}
+
 @keyframes modalSlideIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -981,6 +1049,41 @@ button:active {
     30% {
         transform: translateY(-8px);
         opacity: 1;
+    }
+}
+
+/* 추가 모바일 최적화 스타일 */
+@media (max-width: 768px) {
+    .chat-mic-btn, .chat-send-btn {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .chat-input {
+        font-size: 16px; /* iOS 오토줌 방지 */
+    }
+
+    .chat-header-btn, .chat-close-btn {
+        width: 36px !important;
+        height: 36px !important;
+    }
+
+    .chat-modal-header h2 {
+        font-size: 1rem;
+    }
+
+    /* 스크롤바 최적화 */
+    .chat-messages::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
     }
 }
 
