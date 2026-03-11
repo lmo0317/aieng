@@ -469,9 +469,9 @@ app.post('/api/songs/fetch', async (req, res) => {
 
         broadcastTrendsProgress('analyzing', `팝송 가사 분석 준비 중... (0/${lines.length})`, 0, lines.length);
 
-        // 2. 가사를 5문장씩 묶어서 순차 분석 (AI 부하 방지 및 진행률 표시)
+        // 2. 가사를 15문장씩 묶어서 순차 분석 (Lite 티어 RPM 제한 최적화)
         const allAnalyzedSentences = [];
-        const chunkSize = 5;
+        const chunkSize = 15;
         
         for (let i = 0; i < lines.length; i += chunkSize) {
             const chunk = lines.slice(i, i + chunkSize);
@@ -515,12 +515,12 @@ ${chunkText}
                     retryCount++;
                     if (retryCount > maxRetries) throw err;
                     
-                    // 429 에러(Rate Limit)인 경우 더 오래 대기
                     const isRateLimit = err.response && err.response.status === 429;
-                    const waitTime = isRateLimit ? 15000 : (retryCount * 5000); // 429면 15초, 아니면 5/10/15초
+                    // Lite 티어 고려: 429 발생 시 30초 대기
+                    const waitTime = isRateLimit ? 30000 : (retryCount * 5000); 
                     
                     console.log(`Song Analysis Retry ${retryCount}/${maxRetries}. Status: ${err.response?.status}. Waiting ${waitTime}ms...`);
-                    broadcastTrendsProgress('analyzing', `서버 요청 제한으로 잠시 대기 중... (${retryCount}/${maxRetries})`, i, lines.length);
+                    broadcastTrendsProgress('analyzing', isRateLimit ? `API 요청 한도 초과로 30초 대기 중... (${retryCount}/${maxRetries})` : `응답 지연으로 재시도 중... (${retryCount}/${maxRetries})`, i, lines.length);
                     
                     await new Promise(resolve => setTimeout(resolve, waitTime));
                 }
@@ -533,9 +533,9 @@ ${chunkText}
             const currentProgress = Math.min(i + chunkSize, lines.length);
             broadcastTrendsProgress('analyzing', `가사 분석 중... (${currentProgress}/${lines.length})`, currentProgress, lines.length);
             
-            // 429 방지를 위해 요청 간 대기 시간을 4초로 연장
+            // Lite 티어는 5초 대기면 충분히 안정적입니다
             if (i + chunkSize < lines.length) {
-                await new Promise(resolve => setTimeout(resolve, 4000));
+                await new Promise(resolve => setTimeout(resolve, 5000));
             }
         }
 
@@ -794,6 +794,63 @@ app.delete('/api/trends/:id', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ success: true });
     });
+});
+
+// Save Pre-Analyzed Trends API (for Claude Code CLI)
+app.post('/api/trends/save', async (req, res) => {
+    try {
+        const { trends } = req.body;
+
+        if (!Array.isArray(trends) || trends.length === 0) {
+            return res.status(400).json({ error: '트렌드 배열이 필요합니다.' });
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+
+        db.serialize(() => {
+            // 당일 트렌드 삭제 (덮어씌우기)
+            db.run("DELETE FROM trends WHERE date = ? AND (type IS NULL OR type != 'song')", [today]);
+
+            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            trends.forEach(t => {
+                const keywords = t.keywords ? JSON.stringify(t.keywords) : '[]';
+                const sentences = t.sentences?.length > 0 ? JSON.stringify(t.sentences) : null;
+                stmt.run(t.title, t.category, t.summary || '', keywords, sentences, t.difficulty || 'level3', today);
+            });
+            stmt.finalize();
+
+            res.json({ success: true, count: trends.length });
+        });
+    } catch (error) {
+        console.error('Trends save error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Save Pre-Analyzed Song API (for Claude Code CLI)
+app.post('/api/songs/save', async (req, res) => {
+    try {
+        const { title, lyrics, difficulty, sentences } = req.body;
+
+        if (!title || !lyrics) {
+            return res.status(400).json({ error: '제목과 가사가 필요합니다.' });
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        const sentencesJson = sentences && sentences.length > 0 ? JSON.stringify(sentences) : null;
+
+        db.run(
+            "INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [title, '팝송', '팝송 가사 전체 학습', '[]', sentencesJson, difficulty || 'level3', today, 'song'],
+            function(err) {
+                if (err) return res.status(500).json({ error: err.message });
+                res.json({ success: true, id: this.lastID });
+            }
+        );
+    } catch (error) {
+        console.error('Song save error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // Chat API endpoint using REST
