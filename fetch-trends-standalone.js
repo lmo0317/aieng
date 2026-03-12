@@ -1,14 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Claude Code CLI 전용 뉴스 트렌드 수집기
- *
- * 이 스크립트는 Claude Code CLI가 직접 실행하며:
- * 1. Google News RSS에서 뉴스 수집
- * 2. LLM API(Gemini/Groq)로 직접 분석
- * 3. 서버의 /api/trends/save로 결과만 전송하여 DB 저장
- *
- * Usage: node fetch-trends-standalone.js
+ * Claude Code CLI 전용 뉴스 트렌드 수집기 (10개 수집 복구 버전)
  */
 
 const axios = require('axios');
@@ -33,8 +26,7 @@ function loadEnv() {
 
 const env = loadEnv();
 const GEMINI_API_KEY = env.GEMINI_API_KEY;
-const GLM_API_KEY = env.GLM_API_KEY;
-const API_BASE = 'http://localhost:3000';
+const API_BASE = 'http://localhost:80';
 
 // Google News RSS 카테고리
 const CATEGORIES = [
@@ -74,7 +66,7 @@ async function fetchRSS() {
         if (result.status === 'fulfilled') {
             const xml = result.value.data;
             const matches = xml.match(/<title>(.*?)<\/title>/g) || [];
-            matches.slice(1, 8).forEach(m => {
+            matches.slice(1, 10).forEach(m => {
                 let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
                 title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
                 const cleanTitle = title.trim();
@@ -85,7 +77,7 @@ async function fetchRSS() {
         }
     });
 
-    // 중복 제거 및 셔플 후 상위 10개
+    // 중복 제거 및 셔플 후 상위 10개 (기존 요구사항 복구)
     const uniqueTrends = Array.from(new Set(allTrends.map(t => t.title)))
         .map(title => allTrends.find(t => t.title === title))
         .sort(() => Math.random() - 0.5)
@@ -96,35 +88,56 @@ async function fetchRSS() {
 }
 
 /**
- * Gemini API 호출
+ * Gemini API 호출 (재시도 로직 포함)
  */
-async function callGemini(prompt, input) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+async function callGemini(prompt, input, retryCount = 0) {
+    // gemini-2.0-flash 모델 사용 (안정성 확보)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-    const response = await axios.post(url, {
-        contents: [{
-            parts: [{ text: `${prompt}\n\n${input}` }]
-        }],
-        generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048
+    try {
+        const response = await axios.post(url, {
+            contents: [{
+                parts: [{ text: `${prompt}\n\n${input}` }]
+            }],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 4096
+            }
+        });
+
+        if (response.data.candidates && response.data.candidates[0]) {
+            return response.data.candidates[0].content.parts[0].text;
         }
-    });
-
-    if (response.data.candidates && response.data.candidates[0]) {
-        return response.data.candidates[0].content.parts[0].text;
+        throw new Error('No response from Gemini');
+    } catch (error) {
+        if (error.response && error.response.status === 429 && retryCount < 3) {
+            const waitTime = Math.pow(2, retryCount + 1) * 10000; // 20초, 40초, 80초 대기
+            console.log(`   ⚠️ Rate limit (429) 감지. ${waitTime/1000}초 후 재시도 (${retryCount + 1}/3)...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return callGemini(prompt, input, retryCount + 1);
+        }
+        throw error;
     }
-    throw new Error('No response from Gemini');
 }
 
 /**
  * JSON 파싱 (마크다운 제거)
  */
 function cleanAndParseJSON(content) {
-    // 마크다운 코드 블록 제거
     let cleaned = content.replace(/```json\s*/g, '').replace(/```\s*/g, '');
-    // 앞뒤 공백 제거
     cleaned = cleaned.trim();
+    // 가끔 AI가 JSON 외의 텍스트를 붙이는 경우 대비
+    const startBracket = cleaned.indexOf('[');
+    const startBrace = cleaned.indexOf('{');
+    const startIdx = (startBracket !== -1 && (startBrace === -1 || startBracket < startBrace)) ? startBracket : startBrace;
+    const endBracket = cleaned.lastIndexOf(']');
+    const endBrace = cleaned.lastIndexOf('}');
+    const endIdx = (endBracket !== -1 && (endBrace === -1 || endBracket > endBrace)) ? endBracket : endBrace;
+    
+    if (startIdx !== -1 && endIdx !== -1) {
+        cleaned = cleaned.substring(startIdx, endIdx + 1);
+    }
+    
     return JSON.parse(cleaned);
 }
 
@@ -132,7 +145,7 @@ function cleanAndParseJSON(content) {
  * 뉴스 분석
  */
 async function analyzeTrends(trends) {
-    console.log('\n🤖 AI 뉴스 분석 시작...');
+    console.log('\n🤖 AI 뉴스 분석 시작 (안전 지연 시간 적용)...');
 
     const analyzedTrends = [];
 
@@ -146,18 +159,18 @@ async function analyzeTrends(trends) {
 }`;
 
         try {
+            console.log(`   (${i + 1}/${trends.length}) 분석 중: ${trend.title.substring(0, 40)}...`);
             const aiContent = await callGemini(analysisPrompt, `${trend.category}: ${trend.title}`);
             const analyzed = cleanAndParseJSON(aiContent);
             analyzedTrends.push({ ...trend, analyzed });
-            console.log(`   (${i + 1}/${trends.length}) ${trend.title.substring(0, 30)}...`);
         } catch (err) {
             console.warn(`   ⚠️  분석 실패: ${trend.title}`);
             console.warn(`      Error: ${err.message}`);
             analyzedTrends.push({ ...trend, analyzed: { summary: '', keywords: [] } });
         }
 
-        // 속도 제한 (1.5초)
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // 429 방지를 위해 8초 대기
+        await new Promise(resolve => setTimeout(resolve, 8000));
     }
 
     return analyzedTrends;
@@ -167,41 +180,36 @@ async function analyzeTrends(trends) {
  * 학습 문장 생성
  */
 async function generateSentences(trends) {
-    console.log('\n✍️  학습 문장 생성 시작...');
+    console.log('\n✍️  학습 문장 생성 시작 (안전 지연 시간 적용)...');
 
     for (let i = 0; i < trends.length; i++) {
         const trend = trends[i];
+        if (!trend.analyzed || !trend.analyzed.summary) continue;
 
         const prompt = `당신은 영어 교육 전문가입니다. 다음 주제를 바탕으로 한국어 화자를 위한 영어 학습 문장을 만드세요.
 
 주제: ${trend.title}
 난이도: level3 (중급)
 
-CRITICAL: 다음 JSON 배열 형식으로만 응답하세요. 마크다운 코드 블록을 사용하지 마세요:
+중요: 반드시 아래 JSON 배열 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 JSON만 출력하세요.
 [
-  {"en": "English sentence 1", "ko": "한국어 번역 1", "voca": ["vocab1", "vocab2"]},
-  {"en": "English sentence 2", "ko": "한국어 번역 2", "voca": ["vocab3", "vocab4"]},
+  {"en": "English sentence 1", "ko": "한국어 번역 1", "voca": ["word1: 뜻1"]},
   ...
-  {"en": "English sentence 10", "ko": "한국어 번역 10", "voca": ["vocab9", "vocab10"]}
+  {"en": "English sentence 10", "ko": "한국어 번역 10", "voca": ["word10: 뜻10"]}
 ]`;
 
         try {
+            console.log(`   (${i + 1}/${trends.length}) 문장 10개 생성 중...`);
             const aiContent = await callGemini(prompt, '');
             const sentences = cleanAndParseJSON(aiContent);
-
-            if (Array.isArray(sentences) && sentences.length === 10) {
-                trend.sentences = sentences;
-                console.log(`   (${i + 1}/${trends.length}) ${sentences.length}개 문장 생성 완료`);
-            } else {
-                throw new Error('Invalid sentences format');
-            }
+            trend.sentences = sentences;
         } catch (err) {
             console.warn(`   ⚠️  문장 생성 실패: ${trend.title}`);
             trend.sentences = [];
         }
 
-        // 속도 제한 (2초)
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // 429 방지를 위해 10초 대기
+        await new Promise(resolve => setTimeout(resolve, 10000));
     }
 
     return trends;
@@ -227,15 +235,10 @@ async function saveToServer(trends) {
 
         if (response.data.success) {
             console.log(`✅ ${response.data.count}개 트렌드 저장 완료!`);
-            console.log('\n📊 웹 대시보드에서 확인하세요: http://localhost:3000/data.html');
+            console.log('\n📊 웹 대시보드: http://localhost:80/data.html');
         }
     } catch (error) {
-        if (error.code === 'ECONNREFUSED') {
-            console.error('❌ 서버 연결 실패: 서버가 실행 중인지 확인하세요 (npm start)');
-        } else {
-            console.error('❌ 저장 실패:', error.message);
-        }
-        throw error;
+        console.error('❌ 저장 실패:', error.message);
     }
 }
 
@@ -245,37 +248,26 @@ async function saveToServer(trends) {
 async function main() {
     try {
         console.log('========================================');
-        console.log('  Claude Code CLI 뉴스 트렌드 수집기');
+        console.log('  Claude Code CLI 뉴스 트렌드 수집기 (10개)');
         console.log('========================================\n');
 
-        // API 키 확인
         if (!GEMINI_API_KEY) {
-            console.error('❌ GEMINI_API_KEY가 .env 파일에 설정되지 않았습니다.');
+            console.error('❌ GEMINI_API_KEY 미설정');
             process.exit(1);
         }
 
-        // 1. RSS 수집
         const trends = await fetchRSS();
+        if (trends.length === 0) return;
 
-        // 2. AI 분석
-        const analyzedTrends = await analyzeTrends(trends);
+        const analyzed = await analyzeTrends(trends);
+        const withSentences = await generateSentences(analyzed);
+        await saveToServer(withSentences);
 
-        // 3. 학습 문장 생성
-        const trendsWithSentences = await generateSentences(analyzedTrends);
-
-        // 4. 서버에 저장
-        await saveToServer(trendsWithSentences);
-
-        console.log('\n✨ 모든 작업 완료!\n');
+        console.log('\n✨ 모든 작업이 완료되었습니다!\n');
     } catch (error) {
-        console.error('\n❌ 오류 발생:', error.message);
+        console.error('\n❌ 치명적 오류:', error.message);
         process.exit(1);
     }
 }
 
-// 실행
-if (require.main === module) {
-    main();
-}
-
-module.exports = { fetchRSS, analyzeTrends, generateSentences, saveToServer };
+main();
