@@ -25,7 +25,8 @@
       "Bash(\"/c/Program Files/nodejs/npm\" view:*)",
       "Bash(scoop bucket:*)",
       "Bash(git restore:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(dir:*)"
     ]
   }
 }

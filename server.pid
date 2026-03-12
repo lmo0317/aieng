@@ -1,1 +1,0 @@
- sleep 3 echo Server started curl -s http://localhost/
