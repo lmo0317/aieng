@@ -4,12 +4,12 @@ echo  Trend Eng Server Starting...
 echo ========================================
 echo.
 
-cd /d C:\work\git\web\aieng
+cd /d %~dp0
 
 echo Killing existing node processes...
 taskkill /F /IM node.exe >nul 2>&1
 
 echo Starting server...
-node server.js
+node server/server.js
 
 pause

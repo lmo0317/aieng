@@ -6,7 +6,7 @@ echo.
 echo NOTE: Make sure web server is already running
 echo.
 
-node fetch-trends-standalone.js
+node server/fetch-trends-standalone.js
 
 if %ERRORLEVEL% NEQ 0 (
     echo.

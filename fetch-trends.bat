@@ -4,7 +4,7 @@ echo Trend Eng CLI Tool
 echo ============================================
 echo.
 
-node cli-fetch-trends.js %*
+node server/cli-fetch-trends.js %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
