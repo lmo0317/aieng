@@ -23,7 +23,8 @@
       "Bash(\"/c/Program Files/nodejs/npm\" update:*)",
       "Bash(\"/c/Program Files/nodejs/npm\" list:*)",
       "Bash(\"/c/Program Files/nodejs/npm\" view:*)",
-      "Bash(scoop bucket:*)"
+      "Bash(scoop bucket:*)",
+      "Bash(git restore:*)"
     ]
   }
 }
