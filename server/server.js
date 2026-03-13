@@ -439,6 +439,125 @@ app.get('/api/trends/saved', (req, res) => {
     });
 });
 
+// Fix Category API - 카테고리 일괄 수정
+app.post('/api/trends/fix-category', (req, res) => {
+    const { category } = req.body;
+
+    if (!category) {
+        return res.status(400).json({ error: 'category 파라미터가 필요합니다.' });
+    }
+
+    db.run("UPDATE trends SET category = ? WHERE type = 'news'", [category], function(err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+
+        res.json({
+            success: true,
+            updated: this.changes
+        });
+
+        console.log(`✅ [API] Updated ${this.changes} trends to category: ${category}`);
+    });
+});
+
+// Clear Today's Data API - 오늘 날짜의 데이터 삭제
+app.post('/api/trends/clear-today', (req, res) => {
+    const { date } = req.body;
+
+    if (!date) {
+        return res.status(400).json({ error: 'date 파라미터가 필요합니다.' });
+    }
+
+    db.run("DELETE FROM trends WHERE date = ? AND type = 'news'", [date], function(err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+
+        res.json({
+            success: true,
+            deleted: this.changes
+        });
+
+        console.log(`✅ [API] Deleted ${this.changes} trends from date: ${date}`);
+    });
+});
+
+// Import from JSON API - JSON 파일에서 데이터베이스로 Import
+app.post('/api/trends/import-json', async (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+
+    const jsonPath = 'C:\\Users\\lmo03\\Downloads\\news_guide.json';
+
+    try {
+        // JSON 파일 읽기
+        if (!fs.existsSync(jsonPath)) {
+            return res.status(404).json({ error: 'JSON 파일을 찾을 수 없습니다.' });
+        }
+
+        const content = fs.readFileSync(jsonPath, 'utf8');
+        const data = JSON.parse(content);
+
+        if (!data.content || !Array.isArray(data.content)) {
+            return res.status(400).json({ error: 'JSON 형식이 올바르지 않습니다.' });
+        }
+
+        // 1. 오늘 날짜의 기존 뉴스 데이터 삭제
+        const today = new Date().toISOString().split('T')[0];
+        db.run("DELETE FROM trends WHERE date = ? AND type = 'news'", [today], function(err) {
+            if (err) {
+                console.error('Error deleting old data:', err.message);
+                return res.status(500).json({ error: '기존 데이터 삭제 실패: ' + err.message });
+            }
+
+            console.log(`✅ [API] Deleted ${this.changes} old trends from ${today}`);
+
+            // 2. 새로운 데이터 삽입
+            let imported = 0;
+
+            data.content.forEach((article) => {
+                const sentences = article.sentences || [];
+
+                db.run(`INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type, createdAt)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [
+                        article.news_title,
+                        article.category || '뉴스',
+                        '', // summary
+                        '[]', // keywords
+                        JSON.stringify(sentences),
+                        'level3',
+                        today,
+                        'news',
+                        new Date().toISOString()
+                    ],
+                    function(err) {
+                        if (err) {
+                            console.error('Error inserting trend:', err.message);
+                        } else {
+                            imported++;
+                            console.log(`✅ [API] Imported: ${article.news_title} (category: ${article.category || '정치'})`);
+                        }
+                    }
+                );
+            });
+
+            res.json({
+                success: true,
+                imported: imported,
+                deleted: this.changes
+            });
+
+            console.log(`✅ [API] Import complete: ${imported} new trends imported`);
+        });
+
+    } catch (error) {
+        console.error('Error importing JSON:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Saved Songs API
 app.get('/api/songs/saved', (req, res) => {
     db.all("SELECT * FROM trends WHERE type = 'song' ORDER BY createdAt DESC", (err, rows) => {
@@ -850,6 +969,101 @@ app.post('/api/songs/save', async (req, res) => {
         );
     } catch (error) {
         console.error('Song save error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Import JSON News Guide API
+app.post('/api/trends/import', async (req, res) => {
+    try {
+        const { title, content } = req.body;
+
+        if (!title || !Array.isArray(content) || content.length === 0) {
+            return res.status(400).json({ error: 'title과 content 배열이 필요합니다.' });
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        let successCount = 0;
+        const errors = [];
+
+        db.serialize(() => {
+            // 당일 뉴스 트렌드 삭제 (덮어씌우기)
+            db.run("DELETE FROM trends WHERE date = ? AND (type IS NULL OR type = 'news')", [today], (err) => {
+                if (err) {
+                    console.error('Error deleting existing trends:', err.message);
+                    errors.push({ message: '기존 데이터 삭제 실패', error: err.message });
+                }
+            });
+
+            // Process each content item
+            content.forEach((item, index) => {
+                if (!item.news_title || !Array.isArray(item.sentences)) {
+                    errors.push({ index, message: 'news_title 또는 sentences 배열 누락' });
+                    return;
+                }
+
+                // Transform sentences format
+                const transformedSentences = item.sentences.map(sentence => {
+                    // Transform vocabulary string to array format
+                    let vocaArray = [];
+                    if (sentence.vocabulary) {
+                        // Parse vocabulary string like "word1 (meaning1), word2 (meaning2)"
+                        const pairs = sentence.vocabulary.split(/,\s*/);
+                        vocaArray = pairs.map(pair => {
+                            // Match "word (meaning)" pattern
+                            const match = pair.match(/(.+?)\s*\((.+)\)/);
+                            if (match) {
+                                return `${match[1].trim()}: ${match[2].trim()}`;
+                            }
+                            // If no parentheses, return as is
+                            return pair.trim();
+                        });
+                    }
+
+                    return {
+                        en: sentence.english || '',
+                        ko: sentence.korean || '',
+                        sentence_structure: sentence.analysis || '',
+                        explanation: sentence.explanation || '',
+                        voca: vocaArray
+                    };
+                });
+
+                const stmt = db.prepare(
+                    "INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                );
+
+                stmt.run(
+                    item.news_title,
+                    item.category || '뉴스',
+                    `${title} - ${item.news_title}`,
+                    '[]',
+                    JSON.stringify(transformedSentences),
+                    'level3',
+                    today,
+                    'news',
+                    function(err) {
+                        if (err) {
+                            errors.push({ index: index + 1, title: item.news_title, error: err.message });
+                        } else {
+                            successCount++;
+                        }
+
+                        if (index === content.length - 1) {
+                            stmt.finalize();
+                            res.json({
+                                success: true,
+                                total: content.length,
+                                imported: successCount,
+                                errors: errors.length > 0 ? errors : null
+                            });
+                        }
+                    }
+                );
+            });
+        });
+    } catch (error) {
+        console.error('Import error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });

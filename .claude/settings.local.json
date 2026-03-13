@@ -26,7 +26,11 @@
       "Bash(scoop bucket:*)",
       "Bash(git restore:*)",
       "Bash(git reset:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(tr <:*)",
+      "Bash(\"/c/Program Files/nodejs/node\":*)",
+      "Bash(netstat:*)",
+      "Bash(node:*)"
     ]
   }
 }
