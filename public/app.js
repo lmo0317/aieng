@@ -257,12 +257,14 @@ function renderNextTrendsPage() {
             `;
 
             const startBtn = card.querySelector('.trend-start-btn');
+            startBtn.dataset.id = item.id;
             startBtn.dataset.title = item.title;
 
             startBtn.addEventListener('click', async () => {
+                const id = startBtn.dataset.id;
                 const topic = startBtn.dataset.title;
-                if (!topic) return;
-                await startLearningFromTrend(topic);
+                if (!id) return;
+                await startLearningFromTrend(topic, id);
             });
 
             dateGrid.appendChild(card);
@@ -291,40 +293,53 @@ function renderNextTrendsPage() {
 }
 
 // 트렌드에서 학습 시작
-async function startLearningFromTrend(topic) {
-    if (!topic) return;
+async function startLearningFromTrend(topic, id) {
+    if (!topic && !id) return;
 
     showSection('learning-section');
     sessionStorage.setItem('currentTopic', topic);
 
     sentenceEn.textContent = '저장된 학습 데이터를 불러오는 중...';
 
-    // 저장된 학습 데이터만 확인 (신규 생성 fallback 제거)
     try {
-        console.log('Fetching cached trend for:', topic);
-        const response = await fetch(`/api/trends/by-title?title=${encodeURIComponent(topic)}`);
-        const data = await response.json();
-
-        if (response.ok && data.trend && data.trend.sentences) {
-            // 저장된 데이터가 있으면 바로 사용
-            const savedSentences = JSON.parse(data.trend.sentences);
-
-            if (savedSentences && savedSentences.length > 0) {
-                console.log('✅ Using cached sentences for trend:', topic);
-                sentences = savedSentences;
-                currentCount = 0;
-                showSentence();
-                sendTopicToChat(topic);
-                return;
-            }
+        let response;
+        if (id) {
+            console.log('Fetching cached trend by ID:', id);
+            response = await fetch(`/api/trends/by-id/${id}`);
+        } else {
+            console.log('Fetching cached trend by title:', topic);
+            response = await fetch(`/api/trends/by-title?title=${encodeURIComponent(topic)}`);
         }
         
-        // 데이터가 없는 경우 경고창 후 메인으로 이동
-        alert('해당 트렌드의 학습 데이터가 존재하지 않습니다. 설정 페이지에서 트렌드를 다시 생성해주세요.');
+        const data = await response.json();
+        console.log('📦 Data from server:', data);
+
+        if (response.ok && data.trend && data.trend.sentences) {
+            try {
+                // sentences가 이미 객체(Array)일 수도 있고 JSON 문자열일 수도 있음
+                let savedSentences = data.trend.sentences;
+                if (typeof savedSentences === 'string') {
+                    savedSentences = JSON.parse(savedSentences);
+                }
+                
+                console.log('✅ Loaded sentences:', savedSentences);
+
+                if (Array.isArray(savedSentences) && savedSentences.length > 0) {
+                    sentences = savedSentences;
+                    currentCount = 0;
+                    showSentence();
+                    sendTopicToChat(topic);
+                    return;
+                }
+            } catch (parseError) {
+                console.error('❌ Data processing error:', parseError);
+            }
+        }        
+        alert('해당 트렌드의 학습 데이터가 존재하지 않거나 형식이 올바르지 않습니다.');
         showSection('trends-section');
     } catch (error) {
         console.error('❌ Error fetching cached trend:', error);
-        alert('학습 데이터를 불러오는 중 오류가 발생했습니다.');
+        alert('학습 데이터를 불러오는 중 네트워크 오류가 발생했습니다.');
         showSection('trends-section');
     }
 }
@@ -510,19 +525,101 @@ function formatAnalysis(analysis) {
     return analysis.replace(/\n/g, '<br>');
 }
 
-ttsBtn.addEventListener('click', () => {
+// 고급 TTS 함수 - 브라우저 TTS 최적화
+function speakWithBestVoice(text) {
+    return new Promise((resolve, reject) => {
+        if (!window.speechSynthesis) {
+            reject(new Error('TTS를 지원하지 않는 브라우저입니다.'));
+            return;
+        }
+
+        // 이전 TTS 중단
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        // 영어 억양 및 발음 최적화
+        utterance.lang = 'en-US';
+        utterance.rate = 0.85;  // 약간 느리게 (더 명확한 발음)
+        utterance.pitch = 1.0;   // 정상 피치
+        utterance.volume = 1.0;  // 최대 볼륨
+
+        // 사용 가능한 모든 목소리 가져오기
+        const voices = window.speechSynthesis.getVoices();
+
+        // 최고 품질의 영어 목소리 선택 (우선순위)
+        const preferredVoices = [
+            'Google US English',      // Chrome 기본 고급 목소리
+            'Microsoft David',        // Windows 영어 남성
+            'Microsoft Zira',         // Windows 영어 여성
+            'Samantha',               // macOS 영어 여성
+            'Daniel',                 // macOS 영어 남성
+            'Google US English Male', // Google 남성
+            'Google US English Female' // Google 여성
+        ];
+
+        // 영어 목소리만 필터링
+        const englishVoices = voices.filter(voice =>
+            voice.lang.startsWith('en-') && voice.name.includes('English')
+        );
+
+        // 선호 목소리 찾기
+        let selectedVoice = null;
+        for (const preferred of preferredVoices) {
+            selectedVoice = englishVoices.find(voice => voice.name.includes(preferred));
+            if (selectedVoice) break;
+        }
+
+        // 선호 목소리가 없으면 첫 번째 영어 목소리 사용
+        if (!selectedVoice && englishVoices.length > 0) {
+            selectedVoice = englishVoices[0];
+        }
+
+        // 목소리 설정
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            console.log('🔊 선택된 목소리:', selectedVoice.name);
+        }
+
+        utterance.onend = () => resolve();
+        utterance.onerror = (event) => reject(event.error);
+
+        window.speechSynthesis.speak(utterance);
+    });
+}
+
+// 목소리 목록 로드 (Chrome에서 voiceschanged 이벤트 대응)
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices(); // 목소리 미리 로드
+
+    // Chrome에서 목소리 로드 완료 이벤트
+    window.speechSynthesis.onvoiceschanged = () => {
+        console.log('🔊 TTS 목소리 목록 로드 완료');
+    };
+}
+
+ttsBtn.addEventListener('click', async () => {
     if (currentCount >= sentences.length) return;
-    
+
     const current = sentences[currentCount];
     if (!current || !current.en) return;
 
-    window.speechSynthesis.cancel();
+    try {
+        // 버튼 비활성화 및 애니메이션 (중복 클릭 방지)
+        ttsBtn.disabled = true;
+        ttsBtn.classList.add('playing');
 
-    const utterance = new SpeechSynthesisUtterance(current.en);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.9; 
-    
-    window.speechSynthesis.speak(utterance);
+        await speakWithBestVoice(current.en);
+
+        // 버튼 복원
+        ttsBtn.disabled = false;
+        ttsBtn.classList.remove('playing');
+    } catch (error) {
+        console.error('TTS Error:', error);
+        ttsBtn.disabled = false;
+        ttsBtn.classList.remove('playing');
+        alert('음성 재생 중 오류가 발생했습니다: ' + error.message);
+    }
 });
 
 revealBtn.addEventListener('click', () => {

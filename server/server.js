@@ -695,25 +695,51 @@ ${chunkText}
     }
 });
 
-// Get trend by title API
-app.get('/api/trends/by-title', (req, res) => {
-    const { title } = req.query;
-    console.log('🔍 [API] Fetching trend by title:', title);
+// Get trend by ID API (Preferred over title match)
+app.get('/api/trends/by-id/:id', (req, res) => {
+    const { id } = req.params;
+    console.log('🔍 [API] Fetching trend by ID:', id);
 
-    if (!title) {
-        return res.status(400).json({ error: 'Title is required' });
-    }
-
-    db.get("SELECT * FROM trends WHERE title = ? ORDER BY createdAt DESC LIMIT 1", [title], (err, row) => {
+    db.get("SELECT * FROM trends WHERE id = ?", [id], (err, row) => {
         if (err) {
             console.error('❌ [API] Database error:', err.message);
             return res.status(500).json({ error: err.message });
         }
         if (!row) {
-            console.log('❌ [API] Trend not found for title:', title);
+            console.warn('❌ [API] Trend not found for ID:', id);
             return res.status(404).json({ error: 'Trend not found' });
         }
-        console.log('✅ [API] Found trend:', row.title, 'with sentences:', row.sentences ? 'Yes' : 'No');
+        console.log('✅ [API] Found trend by ID:', row.title);
+        res.json({ trend: row });
+    });
+});
+
+// Get trend by title API (Legacy/Fallback)
+app.get('/api/trends/by-title', (req, res) => {
+    let { title } = req.query;
+    
+    // Windows 환경에서 인코딩 불일치 방지를 위해 UTF-8 Buffer로 재변환 고려
+    // 하지만 express.json() 환경에서는 보통 정상. 로그를 통해 실제 들어온 값 확인
+    console.log('🔍 [API] Fetching trend by title:', title, `(Length: ${title ? title.length : 0})`);
+
+    if (!title) {
+        return res.status(400).json({ error: 'Title is required' });
+    }
+
+    // DB 조회 시 제목 문자열을 유연하게 검색 (공백 등 미세 차이 무시)
+    db.get("SELECT * FROM trends WHERE title LIKE ? ORDER BY id DESC LIMIT 1", [`%${title}%`], (err, row) => {
+        if (err) {
+            console.error('❌ [API] Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        
+        if (!row) {
+            console.warn('❌ [API] Trend not found for title:', title);
+            // 만약 못 찾았다면, 공백이나 특수문자 문제일 수 있으므로 유사 검색 시도 (선택 사항)
+            return res.status(404).json({ error: 'Trend not found' });
+        }
+        
+        console.log('✅ [API] Found trend:', row.title, `(ID: ${row.id})`);
         res.json({ trend: row });
     });
 });
@@ -950,11 +976,16 @@ app.post('/api/trends/save', async (req, res) => {
             // 당일 트렌드 삭제 (덮어씌우기)
             db.run("DELETE FROM trends WHERE date = ? AND (type IS NULL OR type != 'song')", [today]);
 
-            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             trends.forEach(t => {
                 const keywords = t.keywords ? JSON.stringify(t.keywords) : '[]';
-                const sentences = t.sentences?.length > 0 ? JSON.stringify(t.sentences) : null;
-                stmt.run(t.title, t.category, t.summary || '', keywords, sentences, t.difficulty || 'level3', today);
+                // sentences가 이미 객체라면 stringify, 아니라면 그대로 저장
+                const sentences = typeof t.sentences === 'object' ? JSON.stringify(t.sentences) : t.sentences;
+                
+                // 제목(title)의 깨짐 방지를 위해 명시적 문자열 처리
+                const cleanTitle = String(t.title || '').trim();
+                
+                stmt.run(cleanTitle, t.category, t.summary || '', keywords, sentences, t.difficulty || 'level3', today, 'news');
             });
             stmt.finalize();
 
@@ -1194,11 +1225,23 @@ const server = app.listen(PORT, async () => {
     wss.on('connection', (ws, req) => {
         console.log('[WS] Client connected');
         let currentTopic = null;
+        let teacherPersona = null; // 선생님 페르소나 저장
 
         ws.on('message', async (message) => {
             try {
                 const data = JSON.parse(message);
                 console.log('[WS] Received:', data.type);
+
+                if (data.type === 'persona') {
+                    // 선생님 페르소나 저장
+                    teacherPersona = {
+                        teacher: data.teacher,
+                        systemPrompt: data.systemPrompt
+                    };
+                    console.log('[WS] Teacher persona set:', data.teacher);
+                    ws.send(JSON.stringify({ type: 'status', status: 'ready' }));
+                    return;
+                }
 
                 if (data.type === 'context') {
                     currentTopic = data.topic;
@@ -1247,7 +1290,26 @@ const server = app.listen(PORT, async () => {
                         }
                     }
 
-                    const systemPrompt = `당신은 'Trend Eng'의 한국어 AI 튜터입니다. 사용자와 한국어로 대화하며 영어 학습을 도와주세요.${learningContext || ''}
+                    // 선생님 페르소나가 있으면 해당 시스템 프롬프트 사용, 없으면 기본값
+                    let systemPrompt;
+                    if (teacherPersona && teacherPersona.systemPrompt) {
+                        let contextInfo = '';
+
+                        // 원어민 선생님일 경우 학습 컨텍스트를 영어로 변환
+                        if (teacherPersona.teacher === 'native' && learningContext) {
+                            contextInfo = `\n\n## Current Learning Topic:\n\n${currentTopic || 'General English Practice'}\n`;
+                            contextInfo += `Focus on conversational English and practical expressions related to this topic.\n`;
+                            contextInfo += `Help the student practice natural English expressions that native speakers use.\n`;
+                        } else if (learningContext) {
+                            contextInfo = learningContext;
+                        }
+
+                        systemPrompt = `${teacherPersona.systemPrompt}${contextInfo}
+
+${currentTopic && teacherPersona.teacher === 'korean' ? `## 현재 학습 주제: ${currentTopic}` : ''}`;
+                        console.log('[WS] Using teacher persona:', teacherPersona.teacher);
+                    } else {
+                        systemPrompt = `당신은 'Trend Eng'의 한국어 AI 튜터입니다. 사용자와 한국어로 대화하며 영어 학습을 도와주세요.${learningContext || ''}
 
 ## 대화 원칙:
 1. **한국어로만 대화하세요** (영어로 답변하지 마세요)
@@ -1257,6 +1319,7 @@ const server = app.listen(PORT, async () => {
 5. 2~3문장으로 간결하고 명확하게 답변하세요
 
 ${currentTopic ? `현재 학습 주제: ${currentTopic}` : ''}`;
+                    }
 
                     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${s.geminiApiKey}`;
 
