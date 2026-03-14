@@ -973,16 +973,11 @@ app.post('/api/trends/save', async (req, res) => {
         const today = new Date().toISOString().split('T')[0];
 
         db.serialize(() => {
-            // 당일 트렌드 삭제 (덮어씌우기)
-            db.run("DELETE FROM trends WHERE date = ? AND (type IS NULL OR type != 'song')", [today]);
-
-            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            // 제목과 날짜가 겹치면 무시하거나 덮어쓰도록 처리 (중복 방지)
+            const stmt = db.prepare("INSERT OR REPLACE INTO trends (title, category, summary, keywords, sentences, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             trends.forEach(t => {
                 const keywords = t.keywords ? JSON.stringify(t.keywords) : '[]';
-                // sentences가 이미 객체라면 stringify, 아니라면 그대로 저장
                 const sentences = typeof t.sentences === 'object' ? JSON.stringify(t.sentences) : t.sentences;
-                
-                // 제목(title)의 깨짐 방지를 위해 명시적 문자열 처리
                 const cleanTitle = String(t.title || '').trim();
                 
                 stmt.run(cleanTitle, t.category, t.summary || '', keywords, sentences, t.difficulty || 'level3', today, 'news');
