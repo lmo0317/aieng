@@ -195,6 +195,15 @@ const db = new sqlite3.Database(dbPath, (err) => {
                                 }
                             });
                         }
+                        if (!columnNames.includes('image')) {
+                            db.run("ALTER TABLE trends ADD COLUMN image TEXT", (err) => {
+                                if (err) {
+                                    console.error('Error adding image column:', err.message);
+                                } else {
+                                    console.log('Added image column to trends table');
+                                }
+                            });
+                        }
                     });
                 }
             });

@@ -1000,7 +1000,7 @@ app.post('/api/trends/save', async (req, res) => {
 // Save Pre-Analyzed Song API (for Claude Code CLI)
 app.post('/api/songs/save', async (req, res) => {
     try {
-        const { title, lyrics, difficulty, sentences } = req.body;
+        const { title, lyrics, difficulty, sentences, image } = req.body;
 
         if (!title || !lyrics) {
             return res.status(400).json({ error: '제목과 가사가 필요합니다.' });
@@ -1010,8 +1010,8 @@ app.post('/api/songs/save', async (req, res) => {
         const sentencesJson = sentences && sentences.length > 0 ? JSON.stringify(sentences) : null;
 
         db.run(
-            "INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [title, '팝송', '팝송 가사 전체 학습', '[]', sentencesJson, difficulty || 'level3', today, 'song'],
+            "INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [title, '팝송', '팝송 가사 전체 학습', '[]', sentencesJson, difficulty || 'level3', today, 'song', image || null],
             function(err) {
                 if (err) return res.status(500).json({ error: err.message });
                 res.json({ success: true, id: this.lastID });

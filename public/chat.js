@@ -129,7 +129,13 @@ const aiVoiceWaves = document.getElementById('ai-voice-waves');
 
 function openChatModal() {
     chatModal.classList.remove('hidden');
+    document.body.classList.add('chat-active');
     ChatState.isOpen = true;
+
+    // 뒤로가기 버튼 제어를 위해 히스토리 상태 추가
+    if (!window.history.state || window.history.state.modal !== 'chat') {
+        window.history.pushState({ modal: 'chat' }, '');
+    }
 
     // 선생님이 선택되지 않았으면 선택 화면 표시
     if (!ChatState.selectedTeacher) {
@@ -198,11 +204,17 @@ function selectTeacher(teacherType) {
     connectWebSocket();
 }
 
-function closeChatModal() {
+function closeChatModal(isPopState = false) {
     chatModal.classList.add('hidden');
+    document.body.classList.remove('chat-active');
     ChatState.isOpen = false;
     stopAllMedia();
     if (ChatState.socket) ChatState.socket.close();
+
+    // 직접 X 버튼을 눌러 닫은 경우 히스토리 뒤로가기 실행 (popstate 중복 방지)
+    if (isPopState !== true && window.history.state && window.history.state.modal === 'chat') {
+        window.history.back();
+    }
 
     // 선생님 선택 초기화 (다시 열면 다시 선택)
     ChatState.selectedTeacher = null;
@@ -211,6 +223,8 @@ function closeChatModal() {
     // UI 초기화
     const teacherSelection = document.getElementById('teacher-selection');
     const chatMessages = document.getElementById('chat-messages');
+    const chatInputArea = document.querySelector('.chat-input-area');
+    const videoChatContainer = document.getElementById('video-chat-container');
     const modalTitle = document.getElementById('chat-modal-title');
     const aiEmoji = document.querySelector('.ai-emoji');
 
@@ -222,6 +236,12 @@ function closeChatModal() {
         // 채팅 메시지 초기화
         chatMessages.innerHTML = '<div class="chat-welcome-message">안녕하세요! Trend Eng AI 튜터입니다.<br>실시간 음성 및 화상 대화로 영어 실력을 키워보세요!<br>하단의 마이크나 상단의 비디오 버튼을 눌러 시작하세요.</div>';
     }
+    if (chatInputArea) {
+        chatInputArea.classList.add('hidden');
+    }
+    if (videoChatContainer) {
+        videoChatContainer.classList.add('hidden');
+    }
     if (modalTitle) {
         modalTitle.textContent = 'AI Real-time Tutor';
     }
@@ -229,6 +249,13 @@ function closeChatModal() {
         aiEmoji.textContent = '🤖';
     }
 }
+
+// 브라우저 뒤로가기 버튼 감지
+window.addEventListener('popstate', (event) => {
+    if (ChatState.isOpen) {
+        closeChatModal(true);
+    }
+});
 
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
