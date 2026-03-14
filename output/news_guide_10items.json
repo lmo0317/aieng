@@ -1,0 +1,765 @@
+{
+  "title": "뉴스 기반 실생활 영어 가이드 (10개 주제)",
+  "content": [
+    {
+      "news_title": "'액세스 할리우드' 30년 만의 폐지",
+      "category": "Entertainment",
+      "sentences": [
+        {
+          "en": "The iconic entertainment news program Access Hollywood is coming to an end after three decades on the air.",
+          "ko": "상징적인 연예 뉴스 프로그램인 '액세스 할리우드'가 30년 만에 막을 내립니다.",
+          "sentence_structure": "주어(The iconic entertainment news program Access Hollywood) + 동사(is coming to) + 목적어(an end)",
+          "explanation": "이 문장은 어떤 긴 역사가 끝날 때 쓰는 표현인 'come to an end'를 잘 보여줍니다. 'iconic'은 단순히 유명하다는 뜻을 넘어 그 분야의 상징이 되었다는 뉘앙스를 풍깁니다. 30년이라는 세월을 'three decades'로 표현하여 그 무게감을 더했습니다. 방송 중이라는 뜻의 'on the air'는 실생활에서도 라디오나 팟캐스트 관련 대화에서 자주 쓰입니다.",
+          "voca": ["iconic: 상징적인", "decade: 10년", "on the air: 방송 중인"]
+        },
+        {
+          "en": "Many viewers were shocked to hear that the show would be canceled so abruptly.",
+          "ko": "많은 시청자들은 그 쇼가 그렇게 갑작스럽게 폐지된다는 소식에 충격을 받았습니다.",
+          "sentence_structure": "주어(Many viewers) + 동사(were shocked) + 보어(to hear that ...)",
+          "explanation": "감정의 원인을 나타내는 'to hear' 구문을 사용하여 소식을 들었을 때의 반응을 설명합니다. 'abruptly'는 예고 없이 갑자기 일어나는 일에 대해 쓰며, 'suddenly'보다 조금 더 격식 있거나 사무적인 느낌을 줄 수 있습니다. 실생활에서 갑작스러운 소식을 접했을 때 이 문장 구조를 활용해 보세요. 'canceled'는 행사나 프로그램 등이 취소될 때 가장 일반적으로 쓰이는 단어입니다.",
+          "voca": ["shocked: 충격받은", "abruptly: 갑작스럽게", "cancel: 취소하다"]
+        },
+        {
+          "en": "It has been a staple of daily television, providing the latest celebrity gossip and red carpet highlights.",
+          "ko": "이 프로그램은 매일 TV 방송의 주요 요소였으며, 최신 연예인 가십과 레드카펫 하이라이트를 제공해 왔습니다.",
+          "sentence_structure": "주어(It) + 동사(has been) + 보어(a staple of daily television)",
+          "explanation": "'staple'은 원래 주식(쌀, 빵 등)을 뜻하지만, 비유적으로 어떤 것의 '주요 요소'나 '기본'을 의미할 때 아주 많이 쓰입니다. 일상 대화에서 'This is a staple in my diet'라고 하면 내가 평소에 자주 먹는 음식이라는 뜻이 됩니다. 현재완료 진행의 느낌을 담아 오랫동안 해온 역할을 설명하고 있습니다. 'celebrity gossip'은 연예계 소식을 가리키는 흔한 표현입니다.",
+          "voca": ["staple: 주요 요소", "celebrity: 연예인", "gossip: 가십"]
+        },
+        {
+          "en": "The producers cited declining viewership numbers as the primary reason for the decision.",
+          "ko": "제작진은 이번 결정의 주요 원인으로 시청률 하락을 꼽았습니다.",
+          "sentence_structure": "주어(The producers) + 동사(cited) + 목적어(declining viewership numbers)",
+          "explanation": "'cite A as B'는 'A를 B의 이유나 예로 들다'라는 뜻의 세련된 표현입니다. 비즈니스 상황이나 뉴스에서 어떤 결정의 근거를 밝힐 때 정말 자주 사용됩니다. 'declining'은 점차 줄어들거나 하락하는 상태를 나타내는 형용사적 용법입니다. 'viewership'은 시청자 층 또는 시청자 수를 총칭하는 단어로 TV 산업에서 필수적입니다. 이 문장은 공식적인 발표 형식을 갖추고 있습니다.",
+          "voca": ["cite: (이유로) 들다", "declining: 하락하는", "viewership: 시청자 수"]
+        },
+        {
+          "en": "The host expressed deep gratitude to the fans who stayed loyal for over thirty years.",
+          "ko": "진행자는 30년 넘게 변함없이 지켜준 팬들에게 깊은 감사를 표했습니다.",
+          "sentence_structure": "주어(The host) + 동사(expressed) + 목적어(deep gratitude)",
+          "explanation": "'gratitude'는 'thankfulness'보다 격식 있는 말로 감사의 마음을 뜻합니다. 'stay loyal'은 '의리를 지키다' 혹은 '변함없이 지지하다'는 뉘앙스로, 브랜드나 인물에 대한 충성도를 말할 때 씁니다. 오랜 기간을 강조할 때 'for over'를 사용하여 숫자와 함께 씁니다. 누군가에게 공식적으로 고마움을 전할 때 이 문장을 패턴으로 익혀두면 좋습니다.",
+          "voca": ["gratitude: 감사", "loyal: 충성스러운", "express: 표현하다"]
+        },
+        {
+          "en": "A new digital-focused series will likely take its place in the time slot.",
+          "ko": "새로운 디지털 중심 시리즈가 해당 시간대를 대체할 것으로 보입니다.",
+          "sentence_structure": "주어(A new digital-focused series) + 동사(will likely take) + 목적어(its place)",
+          "explanation": "'take one's place'는 '~의 자리를 대신하다'는 뜻으로 실생활에서 사람이든 물건이든 교체될 때 씁니다. 'time slot'은 방송 편성 시간대를 의미하는 업계 용어입니다. 'digital-focused'는 요즘 트렌드에 맞게 온라인 콘텐츠에 집중한다는 뜻입니다. 'likely'를 동사 앞에 넣어 '아마 ~할 것 같다'는 추측의 뉘앙스를 자연스럽게 추가했습니다.",
+          "voca": ["take one's place: ~의 자리를 대신하다", "time slot: 시간대", "focused: 집중된"]
+        },
+        {
+          "en": "Social media users are sharing their favorite moments from the show's long history.",
+          "ko": "소셜 미디어 사용자들은 이 프로그램의 긴 역사 속에서 가장 좋아했던 순간들을 공유하고 있습니다.",
+          "sentence_structure": "주어(Social media users) + 동사(are sharing) + 목적어(their favorite moments)",
+          "explanation": "어떤 이슈가 생겼을 때 사람들이 소셜 미디어에서 보이는 반응을 설명하는 아주 전형적인 문장입니다. 'favorite moments'는 최고의 명장면이나 추억을 의미합니다. 'long history'는 30년이라는 세월을 함축적으로 보여주는 표현입니다. 진행형을 사용하여 현재 활발하게 일어나고 있는 현상을 묘사하고 있습니다. 일상적인 인터넷 문화를 이야기할 때 유용합니다.",
+          "voca": ["moment: 순간", "history: 역사", "share: 공유하다"]
+        },
+        {
+          "en": "The cancellation marks the end of an era for traditional Hollywood reporting.",
+          "ko": "이번 폐지는 전통적인 할리우드 보도 시대의 종말을 의미합니다.",
+          "sentence_structure": "주어(The cancellation) + 동사(marks) + 목적어(the end of an era)",
+          "explanation": "'mark the end of an era'는 한 시대가 끝났음을 알리는 아주 멋진 관용구입니다. 큰 변화가 생겼을 때 뉴스 헤드라인에서 단골로 등장합니다. 'traditional'은 변화하는 현대 사회와 대비되는 옛 방식을 강조할 때 씁니다. 'reporting'은 보도 활동 자체를 의미합니다. 세상이 변하고 새로운 트렌드가 올 때 이런 표현을 써서 말해보세요.",
+          "voca": ["cancellation: 취소/폐지", "era: 시대", "reporting: 보도"]
+        },
+        {
+          "en": "Industry experts suggest that streaming platforms are taking over the audience's attention.",
+          "ko": "업계 전문가들은 스트리밍 플랫폼이 시청자들의 관심을 독차지하고 있다고 시사합니다.",
+          "sentence_structure": "주어(Industry experts) + 동사(suggest) + 목적어(that ...)",
+          "explanation": "'suggest'는 제안하다는 뜻도 있지만, 여기서는 '시사하다' 혹은 '~라고 생각하게 만들다'는 뜻으로 쓰였습니다. 'take over'는 지배권을 갖거나 장악한다는 뜻으로, 시장 점유율이나 관심을 가져갈 때 자주 씁니다. 'attention'은 주의나 집중을 뜻하며, 비즈니스에서는 고객의 관심을 의미합니다. 변화하는 미디어 환경을 논할 때 핵심이 되는 문장입니다.",
+          "voca": ["expert: 전문가", "suggest: 시사하다", "attention: 관심"]
+        },
+        {
+          "en": "We will have to wait and see what the next chapter holds for the production team.",
+          "ko": "제작진에게 다음 장이 무엇을 준비하고 있을지 두고 봐야 할 것입니다.",
+          "sentence_structure": "주어(We) + 동사(will have to wait and see) + 목적어(what ...)",
+          "explanation": "'wait and see'는 결과가 어떻게 될지 지켜보자는 뜻의 구어체 표현입니다. 'the next chapter'는 책의 장처럼 인생이나 사업의 다음 단계를 비유적으로 나타냅니다. 'what ... holds'는 미래에 어떤 일이 일어날지 모를 때 사용하는 은유적인 표현입니다. 불확실한 미래나 새로운 시작을 이야기할 때 사용하면 원어민스러운 느낌을 줄 수 있습니다.",
+          "voca": ["wait and see: 두고 보다", "chapter: 장/단계", "production: 제작"]
+        }
+      ]
+    },
+    {
+      "news_title": "라즈베리 시상식: '우주 전쟁' 리메이크 최악의 상 휩쓸어",
+      "category": "Entertainment",
+      "sentences": [
+        {
+          "en": "The Razzie Awards have announced that the 'War of the Worlds' remake dominated the worst categories this year.",
+          "ko": "라즈베리 시상식은 올해 '우주 전쟁' 리메이크작이 최악의 카테고리들을 휩쓸었다고 발표했습니다.",
+          "sentence_structure": "주어(The Razzie Awards) + 동사(have announced) + 목적어(that ...)",
+          "explanation": "'dominate'는 지배하다는 뜻이지만, 시상식에서는 상을 휩쓸거나 독식할 때 자주 쓰입니다. 'worst categories'는 라즈베리 시상식의 특징인 '최악의 상' 부문들을 말합니다. 'War of the Worlds'는 원작이 있는 작품의 재제작을 뜻하는 'remake'와 함께 쓰여 대상을 명확히 합니다. 어떤 경쟁이나 시상식에서 압도적인 결과를 낼 때 이 동사를 사용해 보세요.",
+          "voca": ["dominate: 지배하다/휩쓸다", "category: 부문", "remake: 리메이크"]
+        },
+        {
+          "en": "Critics were particularly harsh on the lead actor's performance, calling it uninspired.",
+          "ko": "평론가들은 특히 주연 배우의 연기에 대해 매우 가혹했으며, 독창성이 없다고 비판했습니다.",
+          "sentence_structure": "주어(Critics) + 동사(were ... harsh) + 전치사구(on the lead actor's performance)",
+          "explanation": "'be harsh on'은 누군가나 무엇에 대해 엄격하거나 가혹하게 대할 때 쓰는 표현입니다. 'lead actor'는 주인공을 의미하며, 'performance'는 배우의 연기를 뜻합니다. 'uninspired'는 영감을 받지 못한, 즉 창의적이지 않고 지루하다는 뉘앙스의 부정적인 평가 형용사입니다. 영화나 예술 작품에 대한 비평을 나눌 때 유용하게 쓰이는 단어들입니다.",
+          "voca": ["critic: 평론가", "harsh: 가혹한", "uninspired: 독창성 없는"]
+        },
+        {
+          "en": "The film took home the 'Worst Picture' award, much to the disappointment of the fans.",
+          "ko": "그 영화는 팬들에게 큰 실망을 안겨주며 '최악의 작품상'을 수상했습니다.",
+          "sentence_structure": "주어(The film) + 동사(took home) + 목적어(the 'Worst Picture' award)",
+          "explanation": "'take home'은 상을 받아 집에 가져간다는 뜻으로, 시상식에서 상을 탔다는 말을 할 때 아주 흔히 쓰입니다. 'much to the disappointment of'는 '~가 아주 실망스럽게도'라는 뜻의 유용한 구문입니다. 결과가 기대에 미치지 못했을 때 문장 뒤에 덧붙여 강조할 수 있습니다. 감정을 나타내는 명사를 바꿔서 'much to the surprise of' 등으로 활용 가능합니다.",
+          "voca": ["take home: 수상하다", "picture: 영화/작품", "disappointment: 실망"]
+        },
+        {
+          "en": "Despite its high budget, the special effects failed to impress the audience.",
+          "ko": "높은 예산에도 불구하고, 특수 효과는 관객들에게 감동을 주는 데 실패했습니다.",
+          "sentence_structure": "전치사구(Despite ...) + 주어(the special effects) + 동사(failed to impress)",
+          "explanation": "'Despite'는 뒤에 명사구가 오며 '~에도 불구하고'라는 뜻으로 반전의 상황을 보여줍니다. 'fail to impress'는 기대한 만큼의 감동이나 깊은 인상을 주지 못했을 때 쓰는 완곡하지만 확실한 부정 표현입니다. 'impress'는 타인에게 좋은 인상을 심어주는 행위를 말합니다. 돈을 많이 들였지만 결과가 좋지 않은 상황을 설명할 때 딱 맞는 문장입니다.",
+          "voca": ["budget: 예산", "special effects: 특수 효과", "impress: 깊은 인상을 주다"]
+        },
+        {
+          "en": "Many moviegoers felt that the plot was too thin and lacked depth.",
+          "ko": "많은 관객들은 줄거리가 너무 빈약하고 깊이가 부족하다고 느꼈습니다.",
+          "sentence_structure": "주어(Many moviegoers) + 동사(felt) + 목적어(that ...)",
+          "explanation": "'moviegoer'는 영화관에 자주 가는 사람들을 뜻합니다. 줄거리가 빈약하다는 말은 'plot was thin'이라고 비유적으로 표현할 수 있습니다. 'lack depth'는 깊이감이 없다는 뜻으로, 캐릭터나 스토리가 입체적이지 않을 때 씁니다. 'lack'은 전치사 없이 바로 목적어를 취하는 타동사로 사용됨에 유의하세요. 영화에 대한 감상평을 구체적으로 말할 때 유용한 표현입니다.",
+          "voca": ["moviegoer: 영화 관람객", "plot: 줄거리", "depth: 깊이"]
+        },
+        {
+          "en": "The director defended the creative choices made during the production process.",
+          "ko": "감독은 제작 과정에서 이루어진 창의적인 선택들을 옹호했습니다.",
+          "sentence_structure": "주어(The director) + 동사(defended) + 목적어(the creative choices)",
+          "explanation": "'defend'는 공격으로부터 방어한다는 뜻 외에도, 비판에 대해 자신의 의견이나 선택이 옳았음을 주장할 때 씁니다. 'creative choices'는 창작자가 내린 결정들을 의미합니다. 'production process'는 영화나 제품이 만들어지는 전체 과정을 말합니다. 누군가의 비판에 대해 자신의 입장을 설명해야 하는 상황에서 활용할 수 있는 구조입니다.",
+          "voca": ["defend: 옹호하다", "creative: 창의적인", "process: 과정"]
+        },
+        {
+          "en": "Some viewers argued that the remake was unnecessary and ruined the original's legacy.",
+          "ko": "일부 시청자들은 리메이크가 불필요했으며 원작의 유산을 망쳤다고 주장했습니다.",
+          "sentence_structure": "주어(Some viewers) + 동사(argued) + 목적어(that ...)",
+          "explanation": "'argue'는 단순히 말다툼하는 것이 아니라 논리적인 근거를 들어 주장할 때 씁니다. 'unnecessary'는 꼭 필요하지 않았던 일을 비판할 때 유용합니다. 'ruin'은 무언가를 완전히 망가뜨리는 것을 의미하며, 'legacy'는 과거로부터 내려온 훌륭한 가치나 유산을 뜻합니다. 명작을 다시 만들었을 때 팬들이 흔히 느끼는 부정적인 감정을 담고 있습니다.",
+          "voca": ["argue: 주장하다", "unnecessary: 불필요한", "legacy: 유산"]
+        },
+        {
+          "en": "The Golden Raspberry Awards often target big-budget films that fail to meet expectations.",
+          "ko": "골든 라즈베리 시상식은 종종 기대에 부응하지 못한 거대 예산 영화들을 타겟으로 삼습니다.",
+          "sentence_structure": "주어(The Golden Raspberry Awards) + 동사(often target) + 목적어(big-budget films)",
+          "explanation": "'target'은 목표로 삼거나 공격 대상으로 정한다는 뜻입니다. 'fail to meet expectations'는 기대치(expectations)를 충족시키지 못했다는 뜻의 매우 격조 있는 표현입니다. 비즈니스 미팅이나 평가에서도 정말 자주 쓰입니다. 'big-budget'은 수천억 원대의 제작비가 들어간 블록버스터를 의미합니다. 시상식의 성격과 목적을 설명하는 문장입니다.",
+          "voca": ["target: 목표로 삼다", "meet: 충족시키다", "expectation: 기대"]
+        },
+        {
+          "en": "Despite the negative feedback, the film still managed to earn a significant amount at the box office.",
+          "ko": "부정적인 피드백에도 불구하고, 그 영화는 여전히 박스오피스에서 상당한 수입을 거두었습니다.",
+          "sentence_structure": "주어(the film) + 동사(managed to earn) + 목적어(a significant amount)",
+          "explanation": "'manage to'는 어려운 상황임에도 불구하고 '가까스로 ~해내다'는 뉘앙스를 줍니다. 'significant amount'는 무시할 수 없을 만큼 꽤 큰 액수를 의미합니다. 'box office'는 영화 티켓 판매를 통한 흥행 수익을 총칭합니다. 비평가들에게는 외면받았지만 상업적으로는 성공한 영화의 전형적인 상황을 묘사할 때 사용합니다.",
+          "voca": ["feedback: 피드백/반응", "manage to: 해내다", "significant: 상당한"]
+        },
+        {
+          "en": "Awards like these remind us that even famous creators can have a bad year.",
+          "ko": "이런 시상식들은 우리에게 유명한 창작자들조차도 운이 나쁜 해를 보낼 수 있다는 점을 상기시켜 줍니다.",
+          "sentence_structure": "주어(Awards like these) + 동사(remind) + 간접목적어(us) + 직접목적어(that ...)",
+          "explanation": "'remind A that ...'은 A에게 ~라는 사실을 다시 한번 생각나게 하거나 깨닫게 할 때 씁니다. 'even'은 '조차도'라는 뜻으로 예외적인 상황을 강조합니다. 'have a bad year'는 일이 잘 풀리지 않는 해를 의미하는 관용적인 표현입니다. 누구나 실패할 수 있다는 보편적인 교훈을 줄 때 이 문장 구조를 사용해 보세요.",
+          "voca": ["remind: 상기시키다", "creator: 창작자", "famous: 유명한"]
+        }
+      ]
+    },
+    {
+      "news_title": "닌텐도 '포코피아'의 엄청난 성공",
+      "category": "Entertainment/Game",
+      "sentences": [
+        {
+          "en": "Nintendo's latest title, 'Pokopia,' has become a global phenomenon overnight.",
+          "ko": "닌텐도의 최신작 '포코피아'가 하룻밤 사이에 세계적인 현상이 되었습니다.",
+          "sentence_structure": "주어(Nintendo's latest title, 'Pokopia') + 동사(has become) + 보어(a global phenomenon)",
+          "explanation": "'phenomenon'은 어떤 놀라운 현상이나 인물, 사물을 뜻하며 아주 대단한 성공을 거뒀을 때 씁니다. 'overnight'는 문자 그대로 밤사이라는 뜻도 있지만, 아주 짧은 시간 안에 갑자기 일어난 일을 강조할 때 자주 쓰이는 부사입니다. 'latest title'은 게임이나 책의 최신작을 부를 때 쓰는 일반적인 용어입니다. 어떤 제품이 대박이 났을 때 이 문장을 써서 축하하거나 설명해 보세요.",
+          "voca": ["latest: 최신의", "phenomenon: 현상", "overnight: 밤사이에/갑자기"]
+        },
+        {
+          "en": "The game features unique mechanics that allow players to build their own digital worlds.",
+          "ko": "이 게임은 플레이어들이 자신만의 디지털 세계를 구축할 수 있게 해주는 독특한 메커니즘을 특징으로 합니다.",
+          "sentence_structure": "주어(The game) + 동사(features) + 목적어(unique mechanics)",
+          "explanation": "'feature'는 명사로는 특징이지만, 동사로는 '~을 핵심으로 담다' 혹은 '~을 특징으로 하다'는 뜻입니다. 게임의 시스템을 설명할 때 'mechanics'라는 단어를 쓰면 전문적인 느낌을 줄 수 있습니다. 'allow A to B'는 A가 B 할 수 있게 허용하거나 가능하게 한다는 뜻의 아주 유용한 패턴입니다. 기술이나 서비스의 장점을 설명할 때 활용해 보세요.",
+          "voca": ["feature: 특징으로 하다", "mechanic: 메커니즘/방식", "unique: 독특한"]
+        },
+        {
+          "en": "Millions of users have already signed up to explore the vibrant landscapes of Pokopia.",
+          "ko": "수백만 명의 사용자들이 이미 포코피아의 활기찬 풍경을 탐험하기 위해 가입했습니다.",
+          "sentence_structure": "주어(Millions of users) + 동사(have ... signed up) + 부사구(to explore ...)",
+          "explanation": "'sign up'은 서비스나 웹사이트에 가입하거나 등록하는 것을 뜻하는 가장 흔한 표현입니다. 'explore'는 단순히 돌아다니는 것을 넘어 새로운 것을 찾아 모험한다는 느낌을 줍니다. 'vibrant'는 생생하고 활기차며 색감이 화려할 때 쓰는 아주 예쁜 형용사입니다. 여행지나 아름다운 게임 그래픽을 묘사할 때 자주 등장하는 단어이니 기억해 두세요.",
+          "voca": ["sign up: 가입하다", "explore: 탐험하다", "vibrant: 활기찬"]
+        },
+        {
+          "en": "The social aspect of the game encourages players to collaborate with friends online.",
+          "ko": "이 게임의 사회적 측면은 플레이어들이 온라인에서 친구들과 협력하도록 독려합니다.",
+          "sentence_structure": "주어(The social aspect of the game) + 동사(encourages) + 목적어(players) + 보어(to collaborate)",
+          "explanation": "'aspect'는 어떤 사물이나 상황의 측면 혹은 양상을 뜻합니다. 'encourage A to B'는 A가 B 하도록 권장하거나 격려한다는 뜻으로 교육이나 서비스 기획에서 많이 쓰입니다. 'collaborate'는 단순히 같이 일하는 것을 넘어 목표를 위해 협력한다는 전문적인 느낌을 줍니다. 사람 간의 상호작용이 중요한 상황을 설명할 때 쓰기 좋습니다.",
+          "voca": ["aspect: 측면", "encourage: 독려하다", "collaborate: 협력하다"]
+        },
+        {
+          "en": "Market analysts predict that Pokopia will break several sales records this year.",
+          "ko": "시장 분석가들은 포코피아가 올해 몇 가지 판매 기록을 경신할 것이라고 예측합니다.",
+          "sentence_structure": "주어(Market analysts) + 동사(predict) + 목적어(that ...)",
+          "explanation": "'predict'는 미래의 일을 예상하거나 예견할 때 쓰는 동사입니다. 'break a record'는 기록을 깨다, 즉 경신한다는 뜻의 정해진 표현입니다. 'several'은 'some'보다 조금 더 많거나 다양한 느낌을 주는 '몇몇의'라는 뜻입니다. 비즈니스 뉴스에서 성장 가능성을 이야기할 때 단골로 쓰이는 문장 구조입니다.",
+          "voca": ["analyst: 분석가", "predict: 예측하다", "record: 기록"]
+        },
+        {
+          "en": "The graphics are praised for their nostalgic charm and attention to detail.",
+          "ko": "그래픽은 향수를 불러일으키는 매력과 세심한 디테일로 찬사를 받고 있습니다.",
+          "sentence_structure": "주어(The graphics) + 동사(are praised) + 전치사구(for their ...)",
+          "explanation": "'be praised for'는 '~로 인해 칭찬받다'는 뜻입니다. 'nostalgic'은 과거를 그리워하게 만드는 향수 어린 느낌을 묘사할 때 씁니다. 'attention to detail'은 '디테일에 대한 신경'이라는 뜻으로, 아주 꼼꼼하게 잘 만들어진 작품을 칭찬할 때 쓰는 핵심 표현입니다. 디자인이나 예술 작품을 평가할 때 이 표현을 쓰면 전문가처럼 들릴 수 있습니다.",
+          "voca": ["praise: 찬사하다", "nostalgic: 향수를 불러일으키는", "detail: 세부 사항"]
+        },
+        {
+          "en": "Players can customize their characters with a wide variety of outfits and items.",
+          "ko": "플레이어들은 아주 다양한 의상과 아이템으로 자신의 캐릭터를 꾸밀 수 있습니다.",
+          "sentence_structure": "주어(Players) + 동사(can customize) + 목적어(their characters)",
+          "explanation": "'customize'는 자신의 취향에 맞게 주문 제작하거나 변경하는 것을 뜻합니다. 'a wide variety of'는 단순히 'many'라고 하는 것보다 훨씬 더 다양하고 폭넓은 종류를 강조하는 멋진 표현입니다. 'outfit'은 옷뿐만 아니라 전체적인 착장을 의미합니다. 선택의 폭이 넓은 서비스를 설명할 때 이 구문을 활용해 보세요.",
+          "voca": ["customize: 맞춤 설정하다", "variety: 다양성", "outfit: 의상"]
+        },
+        {
+          "en": "Nintendo has plans to release regular updates to keep the community engaged.",
+          "ko": "닌텐도는 커뮤니티의 참여를 유지하기 위해 정기적인 업데이트를 출시할 계획을 가지고 있습니다.",
+          "sentence_structure": "주어(Nintendo) + 동사(has) + 목적어(plans to release ...)",
+          "explanation": "'regular'는 일정한 간격의 정기적인 것을 의미합니다. 'keep A engaged'는 A가 계속 흥미를 느끼고 참여하게 만든다는 뜻으로, 마케팅이나 커뮤니티 관리에서 핵심적인 표현입니다. 'engaged'는 몰입한, 혹은 관계를 맺고 있는 상태를 말합니다. 고객 관리를 어떻게 할 것인지 설명하는 상황에서 유용하게 쓰일 수 있습니다.",
+          "voca": ["regular: 정기적인", "release: 출시하다", "engaged: 몰입한/참여하는"]
+        },
+        {
+          "en": "The success of the game has led to an increase in Nintendo's stock prices.",
+          "ko": "이 게임의 성공은 닌텐도의 주가 상승으로 이어졌습니다.",
+          "sentence_structure": "주어(The success of the game) + 동사(has led to) + 목적어(an increase ...)",
+          "explanation": "'lead to'는 어떤 결과로 이어지다 혹은 초래하다는 뜻으로 인과관계를 설명할 때 필수적입니다. 'increase'는 명사로 증가나 상승을 뜻합니다. 'stock price'는 주식 가격, 즉 주가입니다. 어떤 사건이 경제적인 수치 변화를 일으켰을 때 이 문장 구조를 사용합니다. 비즈니스 영어의 기초가 되는 아주 중요한 표현입니다.",
+          "voca": ["lead to: ~로 이어지다", "increase: 증가", "stock price: 주가"]
+        },
+        {
+          "en": "Families are enjoying the game together, proving its appeal across all age groups.",
+          "ko": "가족들이 함께 게임을 즐기며 모든 연령대에 걸친 매력을 입증하고 있습니다.",
+          "sentence_structure": "주어(Families) + 동사(are enjoying) + 목적어(the game)",
+          "explanation": "'prove'는 증명하거나 입증한다는 뜻입니다. 'appeal'은 매력이나 호소력을 의미합니다. 'across all age groups'는 전 연령층을 아우른다는 뜻으로, 특정 세대에 국한되지 않는 인기를 설명할 때 씁니다. 분사구문 'proving'을 사용하여 앞 문장의 결과나 부수적인 상황을 자연스럽게 덧붙였습니다. 범용적인 인기를 설명할 때 이 표현을 기억하세요.",
+          "voca": ["prove: 입증하다", "appeal: 매력", "age group: 연령대"]
+        }
+      ]
+    },
+    {
+      "news_title": "WBC 본선 1라운드 열기",
+      "category": "Sports",
+      "sentences": [
+        {
+          "en": "The first round of the World Baseball Classic has kicked off with intense excitement.",
+          "ko": "월드 베이스볼 클래식의 본선 1라운드가 엄청난 열기 속에 시작되었습니다.",
+          "sentence_structure": "주어(The first round of the WBC) + 동사(has kicked off) + 전치사구(with intense excitement)",
+          "explanation": "'kick off'는 축구에서 경기를 시작할 때 쓰는 말에서 유래하여, 이제는 모든 행사나 프로젝트의 시작을 알리는 아주 흔한 표현이 되었습니다. 'intense'는 강렬하거나 극심한 느낌을 줄 때 쓰는 형용사입니다. 'excitement'는 흥분이나 열기를 뜻합니다. 어떤 큰 행사가 막 시작되었을 때 현장감을 살려 말하기 좋은 문장입니다.",
+          "voca": ["kick off: 시작하다", "intense: 강렬한", "excitement: 흥분/열기"]
+        },
+        {
+          "en": "Fans from all over the world are gathering to cheer for their national teams.",
+          "ko": "전 세계에서 온 팬들이 자국 팀을 응원하기 위해 모여들고 있습니다.",
+          "sentence_structure": "주어(Fans from all over the world) + 동사(are gathering) + 부사구(to cheer for ...)",
+          "explanation": "'all over the world'는 전 세계 곳곳을 뜻하는 숙어입니다. 'gather'는 사람들이 한데 모이는 동작을 말합니다. 'cheer for'는 누군가를 응원한다는 뜻으로 스포츠 경기에서 가장 기본이 되는 표현입니다. 국가 대항전의 축제 분위기를 설명할 때 아주 적절한 구조입니다. 'national team'은 국가대표팀을 의미합니다.",
+          "voca": ["gather: 모이다", "cheer for: ~를 응원하다", "national team: 국가대표팀"]
+        },
+        {
+          "en": "Several underdog teams have surprised the crowd with their impressive performances.",
+          "ko": "몇몇 약체 팀들이 인상적인 경기력으로 관중들을 놀라게 했습니다.",
+          "sentence_structure": "주어(Several underdog teams) + 동사(have surprised) + 목적어(the crowd)",
+          "explanation": "'underdog'은 승리 가능성이 낮은 약자나 팀을 부르는 스포츠 용어로, 실생활에서도 힘든 상황에 처한 사람을 응원할 때 비유적으로 씁니다. 'impressive'는 아주 인상 깊고 훌륭하다는 칭찬의 표현입니다. 'performance'는 스포츠에서는 경기력을 뜻합니다. 예상치 못한 반전이 일어났을 때 이 문장을 사용해 보세요.",
+          "voca": ["underdog: 약자/약체 팀", "impressive: 인상적인", "performance: 경기력/성과"]
+        },
+        {
+          "en": "The atmosphere in the stadium is electric as the rivalry heats up between key nations.",
+          "ko": "주요 국가들 간의 라이벌 관계가 뜨거워지면서 경기장 분위기는 열광적입니다.",
+          "sentence_structure": "주어(The atmosphere) + 동사(is) + 보어(electric)",
+          "explanation": "'atmosphere'는 공기가 아닌 분위기를 뜻할 때 자주 쓰입니다. 'electric'은 전기가 흐르는 것 같은 찌릿찌릿하고 아주 열광적인 분위기를 묘사할 때 쓰는 멋진 형용사입니다. 'rivalry'는 경쟁 관계를 뜻하며, 'heat up'은 상황이 더 치열해지거나 뜨거워질 때 쓰는 구동사입니다. 긴장감 넘치는 현장을 묘사할 때 최고의 표현입니다.",
+          "voca": ["atmosphere: 분위기", "electric: 열광적인", "rivalry: 라이벌 관계"]
+        },
+        {
+          "en": "Top players are demonstrating exceptional skills on the field to secure a win.",
+          "ko": "정상급 선수들이 승리를 확보하기 위해 경기장에서 뛰어난 기량을 선보이고 있습니다.",
+          "sentence_structure": "주어(Top players) + 동사(are demonstrating) + 목적어(exceptional skills)",
+          "explanation": "'demonstrate'는 단순히 보여주는 것을 넘어 실력을 증명하거나 시연한다는 느낌을 줍니다. 'exceptional'은 일반적인 수준을 뛰어넘는 아주 우수한 상태를 말합니다. 'secure a win'은 승리를 확실하게 챙기거나 확보한다는 뜻으로 스포츠 뉴스에서 아주 많이 쓰는 전문적인 표현입니다. 선수들의 활약을 격조 있게 설명할 때 사용하세요.",
+          "voca": ["demonstrate: 선보이다/증명하다", "exceptional: 뛰어난", "secure: 확보하다"]
+        },
+        {
+          "en": "The opening ceremony featured traditional music and dance from the host country.",
+          "ko": "개막식은 개최국의 전통 음악과 춤을 선보였습니다.",
+          "sentence_structure": "주어(The opening ceremony) + 동사(featured) + 목적어(traditional music and dance)",
+          "explanation": "'opening ceremony'는 개막식을 뜻합니다. 여기서 'feature'는 어떤 요소를 주된 특징으로 포함하고 있다는 뜻의 동사입니다. 'host country'는 행사를 주최하는 개최국입니다. 문화 행사나 축제의 구성을 설명할 때 유용한 문장입니다. 'traditional'을 써서 그 나라만의 고유한 문화를 강조하고 있습니다.",
+          "voca": ["opening ceremony: 개막식", "host country: 개최국", "traditional: 전통적인"]
+        },
+        {
+          "en": "Tickets for the final matches were sold out within minutes of going on sale.",
+          "ko": "결승전 티켓은 판매가 시작된 지 몇 분 만에 매진되었습니다.",
+          "sentence_structure": "주어(Tickets for the final matches) + 동사(were sold out)",
+          "explanation": "'sold out'은 매진된 상태를 말합니다. 'within minutes'는 '단 몇 분 만에'라는 뜻으로 아주 빠른 속도를 강조할 때 씁니다. 'go on sale'은 판매가 시작된다는 뜻의 숙어로 실생활에서 쇼핑이나 티켓 예매 시 필수적으로 알아야 합니다. 인기가 폭발적인 공연이나 경기의 상황을 묘사할 때 이 구조를 그대로 쓰시면 됩니다.",
+          "voca": ["sold out: 매진된", "within: ~이내에", "on sale: 판매 중인"]
+        },
+        {
+          "en": "Sports commentators are analyzing every move to predict the tournament outcome.",
+          "ko": "스포츠 해설가들은 토너먼트 결과를 예측하기 위해 모든 동작을 분석하고 있습니다.",
+          "sentence_structure": "주어(Sports commentators) + 동사(are analyzing) + 목적어(every move)",
+          "explanation": "'commentator'는 해설가나 논평가를 뜻합니다. 'analyze'는 꼼꼼하게 분석한다는 동사입니다. 'every move'는 일거수일투족 혹은 모든 플레이를 의미합니다. 'outcome'은 어떤 과정 끝에 나온 최종 결과를 뜻하며, 'result'보다 조금 더 포괄적인 느낌을 줄 수 있습니다. 전문가들의 활동을 묘사하는 문장입니다.",
+          "voca": ["commentator: 해설가", "analyze: 분석하다", "outcome: 결과"]
+        },
+        {
+          "en": "The event provides a great opportunity for global baseball fans to connect.",
+          "ko": "이 행사는 전 세계 야구 팬들이 소통할 수 있는 아주 좋은 기회를 제공합니다.",
+          "sentence_structure": "주어(The event) + 동사(provides) + 목적어(a great opportunity)",
+          "explanation": "'provide a great opportunity'는 아주 좋은 기회를 준다는 뜻으로 비즈니스나 뉴스에서 자주 쓰이는 정중한 표현입니다. 'connect'는 단순히 아는 것을 넘어 서로 마음이 통하거나 유대감을 갖는다는 뜻으로도 쓰입니다. 전 세계적인 교류를 이야기할 때 아주 긍정적인 뉘앙스를 줍니다. 어떤 활동의 유익함을 설명할 때 활용해 보세요.",
+          "voca": ["provide: 제공하다", "opportunity: 기회", "connect: 연결되다/소통하다"]
+        },
+        {
+          "en": "The pride and passion shown by the athletes have touched the hearts of many.",
+          "ko": "선수들이 보여준 자부심과 열정은 많은 이들의 마음을 감동시켰습니다.",
+          "sentence_structure": "주어(The pride and passion ...) + 동사(have touched) + 목적어(the hearts of many)",
+          "explanation": "'pride'는 자부심, 'passion'은 열정을 뜻합니다. 'touch one's heart'는 누군가의 마음을 만지다, 즉 감동시키다는 뜻의 아주 감성적인 표현입니다. 'athlete'는 운동선수를 총칭합니다. 경기 결과와 상관없이 큰 울림을 준 상황을 묘사할 때 쓰기 좋습니다. 실생활에서도 누군가에게 감동받았을 때 이 표현을 써보세요.",
+          "voca": ["pride: 자부심", "passion: 열정", "athlete: 운동선수"]
+        }
+      ]
+    },
+    {
+      "news_title": "LA 갤럭시의 '여성 역사의 달' 기념 경기",
+      "category": "Sports",
+      "sentences": [
+        {
+          "en": "The LA Galaxy hosted a special match to celebrate Women's History Month this year.",
+          "ko": "LA 갤럭시는 올해 '여성 역사의 달'을 기념하기 위해 특별 경기를 개최했습니다.",
+          "sentence_structure": "주어(The LA Galaxy) + 동사(hosted) + 목적어(a special match)",
+          "explanation": "'host'는 명사로는 주인이나 주최자이지만, 동사로는 어떤 행사나 경기를 '개최하다'는 뜻으로 쓰입니다. 'celebrate'는 단순히 파티를 하는 것뿐만 아니라 어떤 의미 있는 날을 기념할 때도 씁니다. 'Women's History Month'는 여성의 공헌을 기리는 기념 달입니다. 사회적 메시지가 담긴 행사를 설명할 때 아주 표준적인 문장입니다.",
+          "voca": ["host: 개최하다", "celebrate: 기념하다", "special: 특별한"]
+        },
+        {
+          "en": "The event aimed to honor the contributions of female athletes to the sport of soccer.",
+          "ko": "이 행사는 축구라는 스포츠에 대한 여성 선수들의 기여를 기리는 것을 목표로 했습니다.",
+          "sentence_structure": "주어(The event) + 동사(aimed) + 보어(to honor ...)",
+          "explanation": "'aim to'는 '~하는 것을 목표로 하다'는 뜻으로 어떤 행동의 목적을 밝힐 때 씁니다. 'honor'는 누군가에게 영광을 돌리거나 존경을 표하며 기린다는 뜻의 격식 있는 단어입니다. 'contribution'은 기여나 공헌을 뜻하며 비즈니스 상황에서도 성과를 이야기할 때 필수적입니다. 공적인 목표를 설명할 때 이 표현들을 조합해 보세요.",
+          "voca": ["aim: 목표로 하다", "honor: 기리다/존경하다", "contribution: 기여"]
+        },
+        {
+          "en": "The stadium was filled with families and young aspiring players looking for inspiration.",
+          "ko": "경기장은 영감을 얻고자 하는 가족들과 야심 찬 어린 선수들로 가득 찼습니다.",
+          "sentence_structure": "주어(The stadium) + 동사(was filled with) + 목적어(families and ...)",
+          "explanation": "'be filled with'는 '~로 가득 차다'는 뜻으로 현장의 북적임을 묘사합니다. 'aspiring'은 장차 무엇이 되기를 간절히 바라는, 즉 '포부 있는' 상태를 말합니다. 'inspiration'은 영감이나 자극을 뜻하며, 훌륭한 롤모델을 보고 무언가 느끼고 싶어 하는 마음을 잘 표현합니다. 꿈을 키우는 사람들의 열기를 전달할 때 쓰기 좋습니다.",
+          "voca": ["fill: 채우다", "aspiring: 포부 있는", "inspiration: 영감"]
+        },
+        {
+          "en": "Special jerseys were designed to highlight the names of influential women in history.",
+          "ko": "역사 속 영향력 있는 여성들의 이름을 강조하기 위해 특별 유니폼이 제작되었습니다.",
+          "sentence_structure": "주어(Special jerseys) + 동사(were designed) + 부사구(to highlight ...)",
+          "explanation": "운동선수들이 입는 옷은 'uniform'도 좋지만 'jersey'라고 부르는 것이 더 일반적입니다. 'highlight'는 형광펜으로 칠하듯 눈에 띄게 강조한다는 뜻입니다. 'influential'은 큰 영향력을 미치는 상태를 말합니다. 어떤 디자인의 의도나 특별한 의미를 설명할 때 이 문장을 활용해 보세요.",
+          "voca": ["jersey: 유니폼", "highlight: 강조하다", "influential: 영향력 있는"]
+        },
+        {
+          "en": "The pre-game ceremony featured local community leaders and pioneers of women's sports.",
+          "ko": "경기 전 행사에는 지역 사회 리더들과 여성 스포츠의 개척자들이 참여했습니다.",
+          "sentence_structure": "주어(The pre-game ceremony) + 동사(featured) + 목적어(local community leaders ...)",
+          "explanation": "'pre-game'은 경기 시작 전을 뜻합니다. 'pioneer'는 아무도 가지 않은 길을 처음 간 '개척자'를 의미하며, 존경을 담아 쓰는 표현입니다. 'local community'는 지역 사회를 뜻합니다. 여기서는 'feature'가 그런 인물들을 주요 손님으로 모셨다는 의미로 쓰였습니다. 행사의 주요 출연진을 소개할 때 자주 쓰는 방식입니다.",
+          "voca": ["ceremony: 의식/행사", "pioneer: 개척자", "community: 지역 사회"]
+        },
+        {
+          "en": "Fans were encouraged to share their stories of strong women in their own lives.",
+          "ko": "팬들은 자신의 삶 속에서 강인한 여성들의 이야기를 공유하도록 독려받았습니다.",
+          "sentence_structure": "주어(Fans) + 동사(were encouraged) + 보어(to share ...)",
+          "explanation": "'be encouraged to'는 누군가에게 ~하도록 권하거나 제안을 받을 때 쓰는 완곡하고 긍정적인 수동태 표현입니다. 'strong women'은 단순히 신체적 힘이 아닌 내면의 강인함이나 주도적인 여성을 의미할 때가 많습니다. 소셜 미디어 캠페인이나 이벤트 참여를 유도할 때 아주 많이 쓰이는 문장 구조입니다.",
+          "voca": ["encourage: 독려하다", "share: 공유하다", "story: 이야기"]
+        },
+        {
+          "en": "The atmosphere was celebratory, with music and food stalls reflecting female empowerment.",
+          "ko": "분위기는 축제 같았으며, 음악과 음식 부스들은 여성의 역량 강화를 반영했습니다.",
+          "sentence_structure": "주어(The atmosphere) + 동사(was) + 보어(celebratory)",
+          "explanation": "'celebratory'는 축하하는, 축제 같은 기분 좋은 분위기를 뜻합니다. 'food stall'은 길거리나 행사장 등에 있는 음식 판매대를 말합니다. 'empowerment'는 권한을 주거나 역량을 강화한다는 뜻으로, 현대 사회에서 아주 중요한 키워드 중 하나입니다. 어떤 행사의 전반적인 테마와 분위기를 설명할 때 활용할 수 있습니다.",
+          "voca": ["celebratory: 축하하는/축제 분위기의", "stall: 부스/가판대", "empowerment: 역량 강화/권한 부여"]
+        },
+        {
+          "en": "A portion of the ticket proceeds will be donated to local women's charities.",
+          "ko": "티켓 수익금의 일부는 지역 여성 자선 단체에 기부될 예정입니다.",
+          "sentence_structure": "주어(A portion of the ticket proceeds) + 동사(will be donated)",
+          "explanation": "'portion'은 전체 중의 일부를 뜻합니다. 'proceeds'는 (행사나 판매를 통해 얻은) 수익금을 뜻하는 단어로 항상 복수형으로 쓰이는 경향이 있습니다. 'donate'는 기부하다는 뜻입니다. 'charity'는 자선 단체입니다. 수익금을 좋은 곳에 쓴다는 공익적인 내용을 전달할 때 쓰는 매우 전형적이고 중요한 문장입니다.",
+          "voca": ["portion: 일부", "proceeds: 수익금", "donate: 기부하다"]
+        },
+        {
+          "en": "The players expressed how meaningful it was to play for such a significant cause.",
+          "ko": "선수들은 그렇게 의미 있는 대의를 위해 경기하는 것이 얼마나 뜻깊은지 표현했습니다.",
+          "sentence_structure": "주어(The players) + 동사(expressed) + 목적어(how meaningful ...)",
+          "explanation": "'meaningful'은 의미가 가득한, 즉 뜻깊다는 뜻입니다. 'cause'는 원인이라는 뜻 외에도 사회적 운동이나 목적을 위한 '대의'라는 뜻으로 아주 자주 쓰입니다. 'significant'는 중대하고 의미가 크다는 뜻입니다. 어떤 가치 있는 일에 참여한 소감을 말할 때 이 문장 구조를 활용하면 진심이 잘 전달됩니다.",
+          "voca": ["meaningful: 뜻깊은", "significant: 중요한/중대한", "cause: 대의/목적"]
+        },
+        {
+          "en": "Such initiatives help foster a more inclusive environment in professional sports.",
+          "ko": "그러한 계획들은 프로 스포츠에서 더 포용적인 환경을 조성하는 데 도움이 됩니다.",
+          "sentence_structure": "주어(Such initiatives) + 동사(help foster) + 목적어(a more inclusive environment)",
+          "explanation": "'initiative'는 어떤 목적을 가지고 새로 시작하는 계획이나 주도적인 활동을 뜻합니다. 'foster'는 아이를 기르는 것뿐만 아니라 어떤 분위기나 능력을 '조성하다' 혹은 '발전시키다'는 뜻으로 비즈니스에서 아주 많이 씁니다. 'inclusive'는 소외되는 사람 없이 모두를 아우르는 '포용적인'이라는 뜻입니다. 사회 발전을 논할 때 꼭 필요한 고급 표현입니다.",
+          "voca": ["initiative: 계획/주도", "foster: 조성하다/육성하다", "inclusive: 포용적인"]
+        }
+      ]
+    },
+    {
+      "news_title": "SGA의 NBA 기록 경신",
+      "category": "Sports",
+      "sentences": [
+        {
+          "en": "Shai Gilgeous-Alexander has delivered another masterclass on the basketball court this week.",
+          "ko": "샤이 길저스-알렉산더는 이번 주 농구 코트에서 또 하나의 완벽한 경기를 선보였습니다.",
+          "sentence_structure": "주어(Shai Gilgeous-Alexander) + 동사(has delivered) + 목적어(another masterclass)",
+          "explanation": "'masterclass'는 원래 거장의 수업을 뜻하지만, 스포츠나 예술에서 한 차원 높은 완벽한 기량을 보여줬을 때 비유적으로 씁니다. 'deliver'는 배달하다는 뜻 외에도 연설이나 경기력을 '선보이다'는 뜻으로 자주 쓰입니다. 'court'는 농구 경기가 열리는 경기장 바닥을 의미합니다. 누군가의 활약이 압도적이었을 때 이 표현을 써보세요.",
+          "voca": ["deliver: 선보이다/해내다", "masterclass: 명강의/완벽한 경기력", "court: 경기장"]
+        },
+        {
+          "en": "The young star continues to impress fans with his scoring consistency and agility.",
+          "ko": "이 젊은 스타는 득점의 일관성과 민첩함으로 팬들에게 계속해서 감동을 주고 있습니다.",
+          "sentence_structure": "주어(The young star) + 동사(continues to impress) + 목적어(fans)",
+          "explanation": "'scoring'은 득점을 의미하며, 'consistency'는 흔들림 없는 '일관성'을 뜻합니다. 운동선수에게 가장 중요한 덕목 중 하나죠. 'agility'는 몸을 빠르고 유연하게 움직이는 '민첩함'입니다. 'continue to'를 사용하여 일시적인 성공이 아닌 지속적인 활약을 강조하고 있습니다. 선수의 장점을 구체적으로 묘사할 때 유용한 표현들입니다.",
+          "voca": ["impress: 감동을 주다", "consistency: 일관성", "agility: 민첩함"]
+        },
+        {
+          "en": "He broke a franchise record for the most points scored in a single season.",
+          "ko": "그는 단일 시즌 최다 득점으로 구단 기록을 경신했습니다.",
+          "sentence_structure": "주어(He) + 동사(broke) + 목적어(a franchise record)",
+          "explanation": "'franchise record'는 특정 구단(팀) 내에서의 최고 기록을 의미합니다. 'single season'은 한 해의 전체 경기 기간을 뜻합니다. 'break a record'는 기록을 깬다는 표현으로 뉴스에서 가장 흔히 쓰입니다. 스포츠 역사에 남을 만한 업적을 이야기할 때 꼭 알아야 하는 문장입니다. 'most points'는 최다 득점을 가리킵니다.",
+          "voca": ["franchise: 구단/프랜차이즈", "record: 기록", "single season: 단일 시즌"]
+        },
+        {
+          "en": "Teammates and rivals alike have praised his work ethic and dedication to the game.",
+          "ko": "팀 동료들과 라이벌들 모두 그의 직업윤리와 경기에 대한 헌신을 찬양했습니다.",
+          "sentence_structure": "주어(Teammates and rivals alike) + 동사(have praised) + 목적어(his work ethic ...)",
+          "explanation": "'A and B alike'는 'A와 B 둘 다 마찬가지로'라는 뜻으로 강조할 때 씁니다. 'work ethic'은 성실함이나 직업에 임하는 자세인 '직업윤리'를 뜻하며, 성공한 사람들을 묘사할 때 필수적인 단어입니다. 'dedication'은 무언가에 온 마음을 다하는 '헌신'을 의미합니다. 실력뿐만 아니라 인성이나 태도를 칭찬할 때 사용해 보세요.",
+          "voca": ["alike: 마찬가지로", "work ethic: 직업윤리", "dedication: 헌신"]
+        },
+        {
+          "en": "His ability to maintain calm under pressure sets him apart from other players.",
+          "ko": "압박감 속에서도 평온함을 유지하는 그의 능력은 그를 다른 선수들과 차별화시킵니다.",
+          "sentence_structure": "주어(His ability ...) + 동사(sets ... apart) + 목적어(him)",
+          "explanation": "'under pressure'는 긴박하거나 힘든 '압박감이 있는 상황'을 뜻합니다. 'set someone apart'는 누군가를 돋보이게 하거나 다른 사람들과 구별 짓게 만드는 특징을 말할 때 쓰는 아주 세련된 표현입니다. 경쟁력이나 독보적인 재능을 설명할 때 정말 유용합니다. 평소 실생활에서도 '이게 이 제품을 다른 것과 차별화하는 점이야'라고 말할 때 써보세요.",
+          "voca": ["calm: 평온함", "pressure: 압박", "set apart: 차별화시키다"]
+        },
+        {
+          "en": "Many experts consider him a strong candidate for the MVP award this year.",
+          "ko": "많은 전문가들은 그를 올해 MVP 상의 강력한 후보로 고려하고 있습니다.",
+          "sentence_structure": "주어(Many experts) + 동사(consider) + 목적어(him) + 보어(a strong candidate)",
+          "explanation": "'consider A B'는 A를 B라고 생각하거나 여긴다는 뜻입니다. 'candidate'는 후보자입니다. 'strong'은 여기선 힘이 센 게 아니라 가능성이 아주 높은 '유력한'이라는 의미로 쓰였습니다. 시상식이나 승진 등 어떤 자리를 놓고 경쟁하는 상황에서 가능성을 점칠 때 이 문장 구조를 사용합니다.",
+          "voca": ["consider: 고려하다/여기다", "candidate: 후보자", "award: 상"]
+        },
+        {
+          "en": "The stadium crowds often chant his name whenever he takes a shot.",
+          "ko": "그가 슛을 쏠 때마다 경기장 관중들은 종종 그의 이름을 연호합니다.",
+          "sentence_structure": "주어(The stadium crowds) + 동사(often chant) + 목적어(his name)",
+          "explanation": "'chant'는 구호나 이름을 리듬감 있게 반복해서 외치는 것을 뜻합니다. 'whenever'는 '~할 때마다'라는 뜻으로 빈번한 상황을 강조합니다. 'take a shot'은 농구에서 슛을 쏘는 동작을 말하며, 일상에서는 '한번 해보다'라는 뜻으로도 쓰입니다. 스포츠 현장의 뜨거운 열기와 팬들의 사랑을 묘사하는 문장입니다.",
+          "voca": ["chant: 연호하다/구호를 외치다", "whenever: ~할 때마다", "shot: 슛/시도"]
+        },
+        {
+          "en": "His highlight reels are widely shared on social media platforms daily.",
+          "ko": "그의 하이라이트 영상들은 매일 소셜 미디어 플랫폼에서 널리 공유됩니다.",
+          "sentence_structure": "주어(His highlight reels) + 동사(are widely shared)",
+          "explanation": "'highlight reel'은 멋진 장면들만 모아놓은 영상을 뜻합니다. 'widely'는 광범위하게, 즉 아주 널리라는 뜻입니다. 수동태 'are shared'를 사용하여 정보가 퍼져나가는 현상을 설명합니다. 인터넷상에서 유행하거나 화제가 되는 콘텐츠에 대해 이야기할 때 이 문장 패턴을 활용하면 좋습니다.",
+          "voca": ["highlight: 하이라이트/명장면", "widely: 널리", "platform: 플랫폼"]
+        },
+        {
+          "en": "Coach praised his leadership skills, noting how he motivates his teammates.",
+          "ko": "감독은 그가 팀 동료들에게 어떻게 동기를 부여하는지 언급하며 그의 리더십 능력을 칭찬했습니다.",
+          "sentence_structure": "주어(Coach) + 동사(praised) + 목적어(his leadership skills)",
+          "explanation": "'praise'는 칭찬하다는 뜻입니다. 'note'는 단순히 적는 게 아니라 어떤 사실에 '주목하거나 언급하다'는 뜻으로 격식 있게 쓰입니다. 'motivate'는 동기를 부여하여 행동하게 만든다는 중요한 단어입니다. 리더의 역할을 설명할 때 아주 핵심적인 문장입니다. 타인에게 긍정적인 영향을 주는 사람을 묘사할 때 사용해 보세요.",
+          "voca": ["leadership: 리더십", "motivate: 동기를 부여하다", "note: 언급하다/주목하다"]
+        },
+        {
+          "en": "We are witnessing the rise of a future legend in the world of basketball.",
+          "ko": "우리는 농구계에서 미래 전설의 탄생을 목격하고 있습니다.",
+          "sentence_structure": "주어(We) + 동사(are witnessing) + 목적어(the rise of ...)",
+          "explanation": "'witness'는 어떤 역사적인 순간이나 사건을 직접 눈으로 본다는 '목격하다'는 뜻입니다. 'the rise of'는 무언가가 떠오르거나 성장하는 '부상' 또는 '탄생'을 의미합니다. 'legend'는 전설적인 인물입니다. 아주 뛰어난 유망주나 새로운 트렌드가 등장했을 때 경외감을 담아 표현하기 좋은 문장입니다.",
+          "voca": ["witness: 목격하다", "rise: 부상/상승", "legend: 전설"]
+        }
+      ]
+    },
+    {
+      "news_title": "메타(Meta) 대규모 감원",
+      "category": "Tech",
+      "sentences": [
+        {
+          "en": "Meta has announced another round of layoffs as part of its strategic restructuring.",
+          "ko": "메타는 전략적 구조조정의 일환으로 또 한 번의 대규모 감원을 발표했습니다.",
+          "sentence_structure": "주어(Meta) + 동사(has announced) + 목적어(another round of layoffs)",
+          "explanation": "'layoff'는 해고를 뜻하지만, 회사의 경영 사정으로 인한 인원 감축을 완곡하게 표현할 때 주로 씁니다. 'another round'는 일련의 과정 중 '또 한 차례'를 의미합니다. 'restructuring'은 조직의 구조를 다시 짜는 구조조정을 말합니다. 비즈니스 뉴스에서 인력 조정 소식을 전할 때 아주 공식적으로 쓰이는 문구입니다.",
+          "voca": ["layoff: 감원/해고", "strategic: 전략적인", "restructuring: 구조조정"]
+        },
+        {
+          "en": "The tech giant is shifting its focus more toward artificial intelligence development.",
+          "ko": "이 거대 기술 기업은 인공지능 개발 쪽으로 그 초점을 더 옮기고 있습니다.",
+          "sentence_structure": "주어(The tech giant) + 동사(is shifting) + 목적어(its focus)",
+          "explanation": "'tech giant'는 메타, 구글 같은 거대 IT 기업을 부르는 흔한 표현입니다. 'shift focus'는 집중하던 대상을 다른 곳으로 옮긴다는 뜻으로 사업 방향을 바꿀 때 자주 씁니다. 'toward'는 '~를 향하여'라는 방향성을 나타냅니다. 기업이 새로운 기술에 투자하기 위해 기존 인력을 줄이는 상황을 잘 설명해주고 있습니다.",
+          "voca": ["giant: 거대 기업", "shift: 옮기다/바꾸다", "focus: 초점"]
+        },
+        {
+          "en": "Many employees expressed concerns about their job security following the announcement.",
+          "ko": "발표 이후 많은 직원들이 자신들의 고용 안정성에 대해 우려를 표했습니다.",
+          "sentence_structure": "주어(Many employees) + 동사(expressed) + 목적어(concerns)",
+          "explanation": "'concern'은 걱정이나 우려를 뜻합니다. 'job security'는 직업을 잃지 않고 계속 다닐 수 있는 '고용 안정성'을 의미하는 중요한 경제 용어입니다. 'following'은 '~ 이후에'라는 뜻으로 전치사처럼 쓰여 사건의 순서를 나타냅니다. 갑작스러운 변화로 인해 불안해하는 사람들의 심리를 묘사할 때 활용할 수 있습니다.",
+          "voca": ["employee: 직원", "security: 안정성/보안", "concern: 우려"]
+        },
+        {
+          "en": "The CEO stated that the company needs to be more efficient and leaner.",
+          "ko": "CEO는 회사가 더 효율적이고 군더더기 없어야 한다고 언급했습니다.",
+          "sentence_structure": "주어(The CEO) + 동사(stated) + 목적어(that ...)",
+          "explanation": "'state'는 공식적으로 언급하거나 진술한다는 뜻입니다. 'efficient'는 효율적인 상태를 말합니다. 'lean'은 원래 고기에 비계가 없는 '살코기'라는 뜻이지만, 기업 경영에서는 불필요한 비용이나 인력을 줄인 '슬림하고 효율적인' 조직을 의미합니다. 경영진이 조직 개편의 정당성을 설명할 때 자주 쓰는 표현입니다.",
+          "voca": ["state: 언급하다", "efficient: 효율적인", "lean: 군더더기 없는/효율적인"]
+        },
+        {
+          "en": "Impacted workers will receive severance packages and career transition support.",
+          "ko": "영향을 받은 근로자들은 퇴직금 패키지와 전직 지원을 받게 될 것입니다.",
+          "sentence_structure": "주어(Impacted workers) + 동사(will receive) + 목적어(severance packages ...)",
+          "explanation": "'impacted'는 영향을 받은, 즉 여기서는 해고 대상이 된 사람들을 부드럽게 지칭합니다. 'severance package'는 해고될 때 받는 퇴직금과 각종 혜택을 말합니다. 'career transition'은 다른 직장으로 옮기는 '경력 전환'을 뜻합니다. 해고 이후의 보상이나 대책에 대해 설명하는 매우 실무적인 문장입니다.",
+          "voca": ["impacted: 영향을 받은", "severance: 퇴직/해고", "transition: 전환"]
+        },
+        {
+          "en": "Industry experts believe this move reflects the current challenges in the ad market.",
+          "ko": "업계 전문가들은 이번 조치가 광고 시장의 현재 어려움을 반영한다고 믿습니다.",
+          "sentence_structure": "주어(Industry experts) + 동사(believe) + 목적어(this move reflects ...)",
+          "explanation": "'move'는 움직임 외에도 '조치'나 '결정'이라는 뜻으로 자주 쓰입니다. 'reflect'는 거울처럼 비추다, 즉 현실을 '반영하다'는 뜻입니다. 'ad market'은 광고 시장을 줄여 부르는 말입니다. 어떤 사회적 현상이나 기업의 결정 뒤에 숨겨진 배경 원인을 분석할 때 이 문장 구조를 사용하면 전문가적인 느낌을 줍니다.",
+          "voca": ["reflect: 반영하다", "challenge: 어려움/도전", "market: 시장"]
+        },
+        {
+          "en": "Meta is prioritizing long-term goals over short-term stability for now.",
+          "ko": "메타는 현재로서는 단기적인 안정보다 장기적인 목표를 우선시하고 있습니다.",
+          "sentence_structure": "주어(Meta) + 동사(is prioritizing) + 목적어(long-term goals)",
+          "explanation": "'prioritize'는 우선순위를 정해 먼저 처리한다는 뜻입니다. 'long-term'은 장기적인, 'short-term'은 단기적인 것을 의미합니다. 'A over B'를 써서 B보다 A를 더 중요하게 생각한다는 비교의 의미를 담았습니다. 현재의 고통을 감수하고 미래를 준비하는 상황을 설명할 때 아주 명확한 문장입니다.",
+          "voca": ["prioritize: 우선순위를 정하다", "stability: 안정성", "for now: 현재로서는"]
+        },
+        {
+          "en": "The news caused a brief fluctuation in the company's share price.",
+          "ko": "그 소식은 회사의 주가에 일시적인 변동을 일으켰습니다.",
+          "sentence_structure": "주어(The news) + 동사(caused) + 목적어(a brief fluctuation)",
+          "explanation": "'brief'는 짧거나 일시적인 것을 뜻합니다. 'fluctuation'은 수치가 오르락내리락하는 '변동'이나 '등락'을 의미하는 고급 경제 단어입니다. 'share price'는 주가를 뜻하며 'stock price'와 바꿔 쓸 수 있습니다. 시장의 반응을 설명할 때 'fluctuation' 같은 단어를 쓰면 훨씬 전문적으로 들릴 수 있습니다.",
+          "voca": ["brief: 일시적인/짧은", "fluctuation: 변동", "share price: 주가"]
+        },
+        {
+          "en": "Competitors are watching closely to see how the market responds to these changes.",
+          "ko": "경쟁사들은 시장이 이러한 변화에 어떻게 반응하는지 주의 깊게 지켜보고 있습니다.",
+          "sentence_structure": "주어(Competitors) + 동사(are watching) + 부사구(closely to see ...)",
+          "explanation": "'competitor'는 경쟁자나 경쟁 업체를 뜻합니다. 'watch closely'는 아주 면밀하게, 혹은 주의 깊게 관찰한다는 뜻입니다. 'respond to'는 '~에 반응하거나 응답하다'는 뜻의 필수 숙어입니다. 어떤 큰 변화가 생겼을 때 주변의 눈치를 보거나 반응을 살피는 상황을 묘사할 때 쓰기 좋습니다.",
+          "voca": ["competitor: 경쟁사", "closely: 주의 깊게", "respond: 반응하다"]
+        },
+        {
+          "en": "The transition marks a pivotal moment in the history of social media platforms.",
+          "ko": "이러한 전환은 소셜 미디어 플랫폼 역사에서 중대한 순간을 나타냅니다.",
+          "sentence_structure": "주어(The transition) + 동사(marks) + 목적어(a pivotal moment)",
+          "explanation": "'pivotal'은 중심축이 되는, 즉 아주 '중대한' 또는 '결정적인'이라는 뜻의 강력한 형용사입니다. 어떤 큰 변화의 시점을 강조할 때 'pivotal moment'라고 표현하면 그 중요성이 확 살아납니다. 역사적인 흐름 속에서 어떤 사건의 위치를 정의할 때 쓰는 아주 멋진 문장입니다. 실생활에서 중요한 인생의 전환점을 말할 때도 써보세요.",
+          "voca": ["pivotal: 중대한/결정적인", "moment: 순간", "history: 역사"]
+        }
+      ]
+    },
+    {
+      "news_title": "포트나이트 'Power Hour' 이벤트",
+      "category": "Tech/Game",
+      "sentences": [
+        {
+          "en": "Fortnite has introduced a new 'Power Hour' event to prepare for its Chapter 7 transition.",
+          "ko": "포트나이트는 챕터 7 전환을 준비하기 위해 새로운 '파워 아워' 이벤트를 도입했습니다.",
+          "sentence_structure": "주어(Fortnite) + 동사(has introduced) + 목적어(a new 'Power Hour' event)",
+          "explanation": "'introduce'는 사람을 소개할 때도 쓰지만, 새로운 시스템이나 기능을 '도입하다'는 뜻으로 기술/게임 분야에서 정말 많이 씁니다. 'transition'은 한 상태에서 다른 상태로 넘어가는 '전환'을 의미합니다. 대규모 업데이트 전에 열리는 특별한 기간을 설명하는 문장입니다. 새로운 시작을 앞두고 분위기를 고조시킬 때 이런 표현을 사용합니다.",
+          "voca": ["introduce: 도입하다", "transition: 전환", "prepare: 준비하다"]
+        },
+        {
+          "en": "Players can earn double experience points during this limited-time event.",
+          "ko": "플레이어들은 이 한정 기간 이벤트 동안 두 배의 경험치를 획득할 수 있습니다.",
+          "sentence_structure": "주어(Players) + 동사(can earn) + 목적어(double experience points)",
+          "explanation": "'earn'은 돈을 벌거나 점수를 획득할 때 씁니다. 'experience points'는 게임에서 흔히 말하는 '경험치(XP)'입니다. 'limited-time'은 시간이 정해져 있는 '한정된'이라는 뜻으로 마케팅에서 긴박감을 줄 때 단골로 쓰입니다. 쇼핑몰의 타임 세일이나 이벤트 공지를 이해할 때 꼭 필요한 표현입니다.",
+          "voca": ["earn: 획득하다", "experience: 경험", "limited-time: 한정 기간의"]
+        },
+        {
+          "en": "The update includes several map changes that hint at the upcoming storyline.",
+          "ko": "이번 업데이트는 다가올 줄거리를 암시하는 몇 가지 지도 변화를 포함하고 있습니다.",
+          "sentence_structure": "주어(The update) + 동사(includes) + 목적어(several map changes)",
+          "explanation": "'include'는 포함하다는 뜻입니다. 'hint at'은 무언가를 직접 말하지 않고 '은근히 암시하다' 혹은 '힌트를 주다'는 뜻의 아주 유용한 구동사입니다. 'upcoming'은 곧 일어날, 혹은 다가오는 일을 뜻합니다. 영화 예고편이나 신제품 출시 전의 루머를 이야기할 때 'hint at'을 써서 추측해 보세요.",
+          "voca": ["include: 포함하다", "hint at: ~를 암시하다", "upcoming: 다가오는"]
+        },
+        {
+          "en": "Fans are speculating about the new themes and characters based on the teaser clips.",
+          "ko": "팬들은 티저 영상을 바탕으로 새로운 테마와 캐릭터에 대해 추측하고 있습니다.",
+          "sentence_structure": "주어(Fans) + 동사(are speculating) + 전치사구(about the new themes ...)",
+          "explanation": "'speculate'는 명확한 증거 없이 정보를 바탕으로 '추측하다' 혹은 '짐작하다'는 뜻으로, 단순히 'guess'보다 조금 더 진지한 분석이 들어간 느낌을 줍니다. 'teaser clip'은 호기심을 자극하기 위해 짧게 보여주는 티저 영상입니다. 'based on'은 '~에 근거하여'라는 뜻의 필수 표현입니다. 새로운 정보에 대해 토론할 때 아주 유용합니다.",
+          "voca": ["speculate: 추측하다", "teaser: 티저/예고", "based on: ~에 근거하여"]
+        },
+        {
+          "en": "The developers aim to provide a more immersive gameplay experience for the community.",
+          "ko": "개발자들은 커뮤니티를 위해 더욱 몰입감 넘치는 게임 플레이 경험을 제공하는 것을 목표로 합니다.",
+          "sentence_structure": "주어(The developers) + 동사(aim) + 보어(to provide ...)",
+          "explanation": "'immersive'는 마치 그 안에 푹 빠진 것 같은 '몰입감 있는'이라는 뜻으로, 요즘 VR이나 고품질 게임을 설명할 때 가장 많이 쓰이는 형용사 중 하나입니다. 'aim to'는 목표를 나타냅니다. 'community'는 사용자 집단을 뜻합니다. 제작자가 사용자들에게 어떤 가치를 전달하고 싶어 하는지 설명할 때 딱 좋은 문장입니다.",
+          "voca": ["developer: 개발자", "immersive: 몰입감 있는", "gameplay: 게임 플레이"]
+        },
+        {
+          "en": "In-game challenges have been refreshed to keep players engaged throughout the week.",
+          "ko": "플레이어들이 일주일 내내 몰입할 수 있도록 게임 내 챌린지들이 새롭게 바뀌었습니다.",
+          "sentence_structure": "주어(In-game challenges) + 동사(have been refreshed)",
+          "explanation": "'refresh'는 새로고침하듯 내용을 새롭게 바꾼다는 뜻입니다. 'throughout'은 '~내내' 혹은 '~ 도처에'라는 뜻으로 시간이나 공간의 전체를 아우를 때 씁니다. 'keep someone engaged'는 누군가를 계속 집중하게 만든다는 뜻입니다. 서비스가 지루하지 않게 유지되는 비결을 설명할 때 이 표현을 사용해 보세요.",
+          "voca": ["challenge: 도전/과제", "refresh: 새롭게 하다", "throughout: ~내내"]
+        },
+        {
+          "en": "Special cosmetic items will be available exclusively to those who participate in the event.",
+          "ko": "이벤트에 참여하는 사람들에게만 독점적으로 특별 꾸미기 아이템이 제공될 예정입니다.",
+          "sentence_structure": "주어(Special cosmetic items) + 동사(will be available)",
+          "explanation": "'cosmetic item'은 성능에는 영향을 주지 않고 겉모습만 바꿔주는 아이템을 뜻합니다. 'available'은 구할 수 있거나 이용 가능하다는 뜻의 필수 단어입니다. 'exclusively'는 다른 곳에는 없고 오직 여기만 있는 '독점적으로'라는 뜻입니다. 특별한 혜택이나 멤버십 전용 서비스를 안내할 때 아주 유용한 문구입니다.",
+          "voca": ["cosmetic: 꾸미기용/외관의", "available: 이용 가능한", "exclusively: 독점적으로"]
+        },
+        {
+          "en": "Server capacity has been increased to handle the expected surge of online players.",
+          "ko": "예상되는 온라인 플레이어들의 급증에 대비하여 서버 용량이 증설되었습니다.",
+          "sentence_structure": "주어(Server capacity) + 동사(has been increased)",
+          "explanation": "'capacity'는 수용량이나 용량을 뜻합니다. 'handle'은 처리하거나 다루다는 뜻입니다. 'surge'는 파도가 밀려오듯 수치가 '격하게 급증'하는 것을 의미합니다. 많은 사람이 한꺼번에 몰리는 상황을 기술적으로 준비할 때 쓰는 전문적인 표현입니다. 웹사이트 트래픽이나 주문 급증 등을 이야기할 때도 활용 가능합니다.",
+          "voca": ["capacity: 용량", "handle: 다루다/처리하다", "surge: 급증"]
+        },
+        {
+          "en": "The event also features a live virtual concert by a world-famous artist.",
+          "ko": "이번 이벤트는 세계적으로 유명한 아티스트의 실시간 가상 콘서트도 특징으로 합니다.",
+          "sentence_structure": "주어(The event) + 동사(features) + 목적어(a live virtual concert)",
+          "explanation": "'virtual'은 컴퓨터를 통한 '가상의'라는 뜻입니다. 'live'는 생중계되는 실시간을 의미합니다. 여기서 'feature'는 어떤 특별한 구성을 핵심 콘텐츠로 담고 있다는 뜻입니다. 게임이 단순히 놀이를 넘어 문화 예술의 플랫폼이 되고 있는 현상을 잘 보여주는 문장입니다. 행사의 특별한 세부 프로그램을 소개할 때 사용하세요.",
+          "voca": ["virtual: 가상의", "concert: 콘서트", "feature: 특징으로 하다"]
+        },
+        {
+          "en": "The transition to Chapter 7 is expected to be a major turning point for the game.",
+          "ko": "챕터 7으로의 전환은 이 게임에 있어 중요한 전환점이 될 것으로 예상됩니다.",
+          "sentence_structure": "주어(The transition ...) + 동사(is expected to be) + 보어(a major turning point)",
+          "explanation": "'be expected to'는 '~할 것으로 예상되다'는 뜻으로 미래를 전망할 때 씁니다. 'major'는 주요한, 'turning point'는 상황이 바뀌는 결정적인 '전환점'을 뜻합니다. 인생이나 비즈니스에서 큰 변화가 생길 때 'This is a turning point'라고 말해보세요. 매우 긍정적이고 희망찬 변화를 암시할 때 자주 쓰이는 멋진 표현입니다.",
+          "voca": ["transition: 전환", "major: 주요한", "turning point: 전환점"]
+        }
+      ]
+    },
+    {
+      "news_title": "엔비디아의 새로운 AI 추론용 칩 발표",
+      "category": "Tech",
+      "sentences": [
+        {
+          "en": "Nvidia has unveiled its latest AI inference chip designed to handle massive amounts of data.",
+          "ko": "엔비디아는 방대한 양의 데이터를 처리하도록 설계된 최신 AI 추론용 칩을 공개했습니다.",
+          "sentence_structure": "주어(Nvidia) + 동사(has unveiled) + 목적어(its latest AI inference chip)",
+          "explanation": "'unveil'은 베일을 벗기다, 즉 신제품이나 계획을 처음으로 '공개하다'는 뜻으로 테크 뉴스에서 정말 많이 쓰입니다. 'inference'는 AI가 학습된 데이터를 바탕으로 결론을 도출하는 '추론' 과정을 뜻합니다. 'massive'는 아주 거대하고 방대한 양을 강조할 때 씁니다. 고성능 기술 제품을 소개할 때 핵심이 되는 문장입니다.",
+          "voca": ["unveil: 공개하다", "inference: 추론", "massive: 방대한"]
+        },
+        {
+          "en": "The new hardware promises to deliver significantly faster processing speeds.",
+          "ko": "새로운 하드웨어는 현저히 빠른 처리 속도를 제공할 것을 약속합니다.",
+          "sentence_structure": "주어(The new hardware) + 동사(promises to deliver) + 목적어(faster processing speeds)",
+          "explanation": "'promise to'는 사람이 약속하는 것뿐만 아니라, 제품이나 기술이 어떤 성능을 '보장하다' 혹은 '~할 가능성이 높다'는 뜻으로 쓰입니다. 'significantly'는 눈에 띄게, 혹은 '현저히'라는 뜻으로 변화의 폭이 클 때 사용합니다. 기술적인 우위를 강조할 때 'significantly faster' 같은 표현을 써보세요.",
+          "voca": ["hardware: 하드웨어", "promise: 약속하다/보장하다", "processing: 처리"]
+        },
+        {
+          "en": "Industry leaders are excited about the potential applications in self-driving cars.",
+          "ko": "업계 리더들은 자율 주행 자동차에서의 잠재적인 응용 분야에 대해 기대하고 있습니다.",
+          "sentence_structure": "주어(Industry leaders) + 동사(are excited) + 전치사구(about the potential applications ...)",
+          "explanation": "'potential'은 잠재적인 가능성을 뜻합니다. 'application'은 스마트폰 앱이기도 하지만, 기술이 실제로 쓰이는 '응용'이나 '적용' 분야를 의미하기도 합니다. 'self-driving'은 스스로 운전하는 자율 주행을 뜻합니다. 새로운 기술이 어디에 쓰일 수 있을지 논의할 때 아주 표준적인 문장 구조입니다.",
+          "voca": ["potential: 잠재적인", "application: 응용/적용", "self-driving: 자율 주행"]
+        },
+        {
+          "en": "The chip's energy efficiency is a key selling point for environmentally conscious companies.",
+          "ko": "이 칩의 에너지 효율성은 환경을 생각하는 기업들에게 주요 판매 포인트입니다.",
+          "sentence_structure": "주어(The chip's energy efficiency) + 동사(is) + 보어(a key selling point)",
+          "explanation": "'efficiency'는 효율성을 뜻합니다. 'selling point'는 어떤 물건을 사게 만드는 매력적인 특징인 '판매 강점'입니다. 'environmentally conscious'는 환경에 대해 의식하는, 즉 '친환경적인 마인드를 가진'이라는 뜻의 고급 표현입니다. 요즘 기업들이 가장 중요하게 생각하는 가치들을 담고 있는 문장입니다.",
+          "voca": ["efficiency: 효율성", "selling point: 판매 강점", "conscious: 의식하는"]
+        },
+        {
+          "en": "Nvidia continues to dominate the global market for high-performance computing components.",
+          "ko": "엔비디아는 고성능 컴퓨팅 부품의 글로벌 시장을 계속해서 장악하고 있습니다.",
+          "sentence_structure": "주어(Nvidia) + 동사(continues to dominate) + 목적어(the global market)",
+          "explanation": "'dominate'는 시장 점유율이 압도적일 때 '장악하다'는 뜻으로 씁니다. 'component'는 전체를 구성하는 '부품'이나 '요소'를 뜻합니다. 'high-performance'는 고성능을 의미합니다. 어떤 기업이 특정 분야에서 독보적인 1위일 때 이 표현을 사용합니다. 비즈니스 시장 분석 뉴스에서 아주 자주 보이는 구조입니다.",
+          "voca": ["dominate: 장악하다", "component: 부품", "performance: 성능/기량"]
+        },
+        {
+          "en": "Analysts suggest that this release will further boost the company's annual revenue.",
+          "ko": "분석가들은 이번 출시가 회사의 연간 수익을 더욱 끌어올릴 것이라고 시사합니다.",
+          "sentence_structure": "주어(Analysts) + 동사(suggest) + 목적어(that ... boost ...)",
+          "explanation": "'boost'는 뒤에서 밀어주듯 수치를 '끌어올리다' 혹은 '부양하다'는 뜻으로 경제 뉴스에서 사랑받는 단어입니다. 'annual revenue'는 연간 총수입을 뜻합니다. 'further'는 '더욱' 혹은 '추가로'라는 의미로 정도를 강조합니다. 신제품 출시가 재무적인 결과에 어떤 영향을 줄지 예측할 때 쓰기 좋은 문장입니다.",
+          "voca": ["boost: 끌어올리다/증대시키다", "annual: 연간의", "revenue: 수익"]
+        },
+        {
+          "en": "The competition in the AI hardware space is becoming increasingly fierce.",
+          "ko": "AI 하드웨어 분야의 경쟁이 점점 더 치열해지고 있습니다.",
+          "sentence_structure": "주어(The competition ...) + 동사(is becoming) + 보어(fierce)",
+          "explanation": "'space'는 우주뿐만 아니라 비즈니스의 '영역'이나 '분야'를 뜻할 때가 많습니다. 'increasingly'는 시간이 갈수록 '점점 더'라는 뜻입니다. 'fierce'는 동물이 사나운 것처럼 경쟁이 아주 '치열하고 날카로운' 상태를 묘사합니다. 치열한 시장 상황을 묘사할 때 'fierce competition'은 짝꿍처럼 쓰이는 표현입니다.",
+          "voca": ["fierce: 치열한", "increasingly: 점점 더", "competition: 경쟁"]
+        },
+        {
+          "en": "Engineers have worked tirelessly to optimize the chip's architecture for AI workloads.",
+          "ko": "엔지니어들은 AI 작업 부하에 맞게 칩 구조를 최적화하기 위해 끊임없이 노력해 왔습니다.",
+          "sentence_structure": "주어(Engineers) + 동사(have worked tirelessly) + 부사구(to optimize ...)",
+          "explanation": "'tirelessly'는 지치지 않고 '끊임없이' 노력할 때 쓰는 칭찬의 부사입니다. 'optimize'는 가장 효율적인 상태로 만드는 '최적화하다'는 뜻입니다. 'workload'는 감당해야 할 작업의 양을 뜻합니다. 기술적인 성취 뒤에 숨은 노력을 강조하고 싶을 때 이 문장을 활용해 보세요.",
+          "voca": ["tirelessly: 끊임없이", "optimize: 최적화하다", "workload: 작업량"]
+        },
+        {
+          "en": "This breakthrough could pave the way for more sophisticated AI services in the future.",
+          "ko": "이 획기적인 발전은 미래에 더 정교한 AI 서비스를 위한 길을 열어줄 수 있습니다.",
+          "sentence_structure": "주어(This breakthrough) + 동사(could pave the way for)",
+          "explanation": "'breakthrough'는 막힌 곳을 뚫고 나가는 '획기적인 발전'이나 '돌파구'를 뜻합니다. 'pave the way for'는 도로를 포장하듯 '~를 위한 길을 닦다' 혹은 '토대를 마련하다'는 아주 멋진 관용구입니다. 'sophisticated'는 매우 복잡하고 정교하며 수준 높은 상태를 말합니다. 기술의 미래 비전을 제시할 때 사용하세요.",
+          "voca": ["breakthrough: 획기적 발전", "pave the way: 길을 닦다/토대를 마련하다", "sophisticated: 정교한"]
+        },
+        {
+          "en": "We are entering a new era where AI is integrated into every aspect of our lives.",
+          "ko": "우리는 AI가 우리 삶의 모든 측면에 통합되는 새로운 시대로 진입하고 있습니다.",
+          "sentence_structure": "주어(We) + 동사(are entering) + 목적어(a new era)",
+          "explanation": "'era'는 시대를 뜻합니다. 'integrate'는 떼려야 뗄 수 없게 '통합하다' 혹은 '결합하다'는 뜻입니다. 'every aspect of our lives'는 우리 삶의 모든 부분이라는 뜻으로 세상의 변화를 강조할 때 쓰는 표현입니다. 거시적인 변화를 요약하고 미래를 전망하는 마무리 문장으로 아주 훌륭합니다.",
+          "voca": ["era: 시대", "integrate: 통합하다", "aspect: 측면/부분"]
+        }
+      ]
+    },
+    {
+      "news_title": "틱톡의 100억 달러 미국 딜 최종 합의",
+      "category": "Tech/Business",
+      "sentences": [
+        {
+          "en": "TikTok has finally reached a landmark agreement regarding its operations in the United States.",
+          "ko": "틱톡이 마침내 미국 내 운영과 관련하여 역사적인 합의에 도달했습니다.",
+          "sentence_structure": "주어(TikTok) + 동사(has ... reached) + 목적어(a landmark agreement)",
+          "explanation": "'reach an agreement'는 합의에 도달하다는 정해진 표현입니다. 'landmark'는 이정표라는 뜻으로, 역사적으로 아주 중요한 '기념비적인' 혹은 '획기적인' 사건을 수식할 때 씁니다. 'regarding'은 '~에 관하여'라는 뜻으로 'about'보다 조금 더 격식 있는 표현입니다. 오랫동안 끌어온 협상이 마무리되었음을 알리는 뉴스 문장입니다.",
+          "voca": ["landmark: 역사적인/중요한", "agreement: 합의", "operation: 운영"]
+        },
+        {
+          "en": "The deal, valued at $10 billion, aims to resolve national security concerns.",
+          "ko": "100억 달러 가치로 평가되는 이번 딜은 국가 안보 우려를 해소하는 것을 목표로 합니다.",
+          "sentence_structure": "주어(The deal) + 동사(aims) + 보어(to resolve ...)",
+          "explanation": "'be valued at'은 얼마의 가치로 평가받는다는 뜻으로 비즈니스 거래에서 가격을 말할 때 필수입니다. 'resolve'는 갈등이나 문제를 '해결하다' 혹은 '해소하다'는 뜻입니다. 'national security'는 국가 안보입니다. 복잡한 정치적, 경제적 문제를 해결하기 위한 목적을 설명할 때 이 구조를 사용합니다.",
+          "voca": ["value: 가치/평가하다", "resolve: 해결하다", "security: 안보/보안"]
+        },
+        {
+          "en": "A new U.S.-based entity will be created to manage American user data safely.",
+          "ko": "미국 사용자 데이터를 안전하게 관리하기 위해 미국에 기반을 둔 새로운 법인이 설립될 것입니다.",
+          "sentence_structure": "주어(A new U.S.-based entity) + 동사(will be created)",
+          "explanation": "'entity'는 실체나 본체라는 뜻이지만, 비즈니스에서는 '독립 법인'이나 '회사'를 부르는 격식 있는 용어입니다. 'U.S.-based'는 미국에 거점을 둔다는 의미입니다. 데이터를 'safely'하게 관리한다는 점을 강조하여 신뢰를 주려 하고 있습니다. 회사가 새로운 지사를 세우거나 조직을 분리할 때 유용한 표현입니다.",
+          "voca": ["entity: 법인/실체", "manage: 관리하다", "safely: 안전하게"]
+        },
+        {
+          "en": "Investors reacted positively to the news, leading to a surge in related stock prices.",
+          "ko": "투자자들은 그 소식에 긍정적으로 반응했으며, 이는 관련 주가의 급등으로 이어졌습니다.",
+          "sentence_structure": "주어(Investors) + 동사(reacted) + 부사(positively)",
+          "explanation": "'react to'는 어디에 반응하다는 뜻입니다. 분사구문 'leading to'는 앞의 상황이 어떤 결과를 초래했는지 자연스럽게 설명해 줍니다. 'surge'는 앞에서 본 것처럼 수치가 '급증'하는 것을 말합니다. 시장의 호재가 발표되었을 때 경제 뉴스에서 가장 흔하게 볼 수 있는 문장 패턴 중 하나입니다.",
+          "voca": ["investor: 투자자", "positively: 긍정적으로", "surge: 급증/급등"]
+        },
+        {
+          "en": "The agreement includes strict oversight from the U.S. government regarding data privacy.",
+          "ko": "이번 합의에는 데이터 개인정보 보호와 관련한 미국 정부의 엄격한 감독이 포함되어 있습니다.",
+          "sentence_structure": "주어(The agreement) + 동사(includes) + 목적어(strict oversight)",
+          "explanation": "'strict'는 엄격한 상태를 말합니다. 'oversight'는 어떤 일이 제대로 되는지 지켜보는 '감독'이나 '감시'를 뜻하는 단어로 정부나 기관의 역할을 말할 때 자주 씁니다. 'data privacy'는 개인정보 보호를 의미합니다. 규제나 법적 합의 사항을 설명할 때 이런 단어들을 조합하여 사용하면 매우 정확한 전달이 가능합니다.",
+          "voca": ["strict: 엄격한", "oversight: 감독/감시", "privacy: 개인정보/사생활"]
+        },
+        {
+          "en": "Tech experts are debating whether this move will truly protect user information.",
+          "ko": "기술 전문가들은 이러한 조치가 진정으로 사용자 정보를 보호할 것인지에 대해 토론하고 있습니다.",
+          "sentence_structure": "주어(Tech experts) + 동사(are debating) + 목적어(whether ...)",
+          "explanation": "'debate'는 찬반 논란이 있는 주제에 대해 토론한다는 뜻입니다. 'whether'는 '~인지 아닌지'라는 불확실한 가능성을 나타냅니다. 'truly'는 진심으로 혹은 진정으로라는 뜻으로 진정성을 강조할 때 씁니다. 어떤 정책의 효과에 대해 의구심이 있거나 다양한 의견이 갈리는 상황을 묘사할 때 쓰기 좋은 문장입니다.",
+          "voca": ["debate: 토론하다", "truly: 진정으로", "information: 정보"]
+        },
+        {
+          "en": "TikTok's CEO expressed confidence that the platform's future in the U.S. is secure.",
+          "ko": "틱톡의 CEO는 플랫폼의 미국 내 미래가 안정적이라는 자신감을 표명했습니다.",
+          "sentence_structure": "주어(TikTok's CEO) + 동사(expressed confidence) + 목적어(that ...)",
+          "explanation": "'express confidence'는 자신감을 드러내거나 확신한다는 뜻입니다. 'secure'는 안전하거나 확실하게 확보된 상태를 말합니다. 리더가 위기 상황을 극복하고 대중이나 투자자를 안심시키고 싶을 때 이런 표현을 사용합니다. 'I am confident that...'으로 시작하는 문장과 의미가 같지만 더 격식 있게 들립니다.",
+          "voca": ["confidence: 자신감", "secure: 안정적인/확보된", "future: 미래"]
+        },
+        {
+          "en": "The deal could serve as a template for other foreign-owned tech companies.",
+          "ko": "이번 딜은 다른 외국 소유 기술 기업들에게 본보기가 될 수 있습니다.",
+          "sentence_structure": "주어(The deal) + 동사(could serve as) + 보어(a template)",
+          "explanation": "'serve as'는 어떤 역할이나 기능을 한다는 뜻의 아주 유용한 표현입니다. 'template'은 원래 양식이지만, 여기서는 따라 할 수 있는 '본보기'나 '표본'이라는 뜻으로 쓰였습니다. 'foreign-owned'는 외국 자본이 소유한 것을 의미합니다. 선례가 되는 중요한 사건의 가치를 설명할 때 이 문장 구조를 활용해 보세요.",
+          "voca": ["serve as: ~의 역할을 하다", "template: 본보기/양식", "foreign-owned: 외국 소유의"]
+        },
+        {
+          "en": "Legal battles surrounding the platform had been ongoing for several years.",
+          "ko": "플랫폼을 둘러싼 법적 공방이 수년 동안 지속되어 왔습니다.",
+          "sentence_structure": "주어(Legal battles ...) + 동사(had been ongoing)",
+          "explanation": "'legal battle'은 법정 싸움이나 법적 공방을 뜻합니다. 'surrounding'은 '~을 둘러싼' 혹은 '~에 관한'이라는 뜻으로 문제의 핵심을 지칭할 때 씁니다. 'ongoing'은 멈추지 않고 '계속 진행 중인' 상태를 말합니다. 오랜 시간 동안 해결되지 않았던 갈등의 배경을 설명할 때 쓰기 아주 적절한 문장입니다.",
+          "voca": ["legal: 법적인", "battle: 전투/공방", "ongoing: 진행 중인"]
+        },
+        {
+          "en": "This final agreement brings clarity and relief to the millions of creators on TikTok.",
+          "ko": "이번 최종 합의는 틱톡의 수백만 크리에이터들에게 명확함과 안도감을 가져다줍니다.",
+          "sentence_structure": "주어(This final agreement) + 동사(brings) + 목적어(clarity and relief)",
+          "explanation": "'clarity'는 불투명했던 상황이 맑아지는 '명확함'을 뜻합니다. 'relief'는 걱정이 사라졌을 때 느끼는 '안도감'입니다. 'bring A to B'는 A를 B에게 가져다준다는 뜻입니다. 혼란스러운 상황이 정리되고 많은 사람이 안도하게 된 긍정적인 결과를 강조하며 마무리하는 문장입니다.",
+          "voca": ["clarity: 명확함", "relief: 안도/다행", "creator: 크리에이터"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,12 +1,28 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 
-const dbPath = path.resolve(__dirname, '..', 'db', 'database.sqlite');
+// Ensure db directory exists
+const dbDir = process.env.DB_PATH ? path.dirname(path.resolve(process.env.DB_PATH)) : path.resolve(__dirname, '..', 'db');
+console.log(`[DB] Database directory: ${dbDir}`);
+if (!fs.existsSync(dbDir)) {
+    console.log(`[DB] Creating missing directory: ${dbDir}`);
+    try {
+        fs.mkdirSync(dbDir, { recursive: true });
+    } catch (err) {
+        console.error(`[DB] Failed to create directory: ${err.message}`);
+    }
+} else {
+    console.log(`[DB] Directory exists.`);
+}
+
+const dbPath = process.env.DB_PATH ? path.resolve(process.env.DB_PATH) : path.join(dbDir, 'database.sqlite');
+console.log(`[DB] Opening database at: ${dbPath}`);
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
-        console.error('Error opening database', err.message);
+        console.error('[DB] Error opening database:', err.message);
     } else {
-        console.log('Connected to the SQLite database.');
+        console.log('[DB] Connected to the SQLite database.');
 
         db.serialize(() => {
             // Create Global Settings table (basic version for compatibility)

@@ -3,5 +3,5 @@ node_modules/
 *.log
 server.pid
 archive/
-database.sqlite
-*.sqlite
+# database.sqlite
+# *.sqlite
