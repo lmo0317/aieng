@@ -47,7 +47,7 @@ async function saveAndUpload(data) {
             title: item.news_title,
             category: item.category,
             summary: "",
-            keywords: [],
+            keywords: item.keywords || [],
             sentences: item.sentences.map(s => {
                 // Determine vocabulary source (voca or vocabulary)
                 const rawVoca = s.voca || s.vocabulary || [];

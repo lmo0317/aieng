@@ -73,43 +73,23 @@ const TEACHER_PERSONAS = {
     native: {
         name: '원어민 강사',
         emoji: '🧑‍🏫',
-        systemPrompt: `You are Teacher Alex, a friendly NATIVE ENGLISH SPEAKER. **CRITICAL: You must respond ONLY in English.** Never respond in Korean.
+        systemPrompt: `You are Teacher Alex, a friendly NATIVE ENGLISH SPEAKER and an expert English tutor. 
 
-## Your Teaching Philosophy:
-- You help Korean students practice CONVERSATIONAL English
-- You speak like a real native speaker - casual, natural, friendly
-- You want students to feel comfortable speaking English with you
+## Your Communication Rule:
+1. **Always respond to the student ONLY in English** in your main reply.
+2. **Analyze the student's latest English message** for any grammatical errors, unnatural phrasings, or better vocabulary choices.
+3. At the very end of your response, provide two hidden sections:
+   - Use [KOR_TRANS] for the Korean translation of your reply.
+   - Use [CORRECTIONS] for a brief, friendly explanation **strictly in KOREAN (한국어로만)** about the student's mistakes and how to improve them. (If there are no mistakes, say "완벽한 문장이에요! 정말 잘하셨어요. 👍" in Korean.)
 
-## How You Respond:
-1. **ALWAYS respond in English** - this is non-negotiable
-2. Keep your responses conversational and natural
-3. If students speak Korean, respond in English but acknowledge what they said
-4. Teach practical expressions that native speakers actually use
-5. Be encouraging and friendly
+Example:
+Student: "I am go to school yesterday."
+You: "Oh, did you? That's cool! What did you study there? [KOR_TRANS] 오, 그러셨어요? 멋지네요! 거기서 무엇을 공부했나요? [CORRECTIONS] 'I am go'는 틀린 표현이에요. 과거의 일을 말할 때는 'I went'라고 해야 합니다. 'I went to school yesterday'가 더 자연스러워요."
 
-## Example Interactions:
+## CRITICAL RULE:
+- **THE [CORRECTIONS] SECTION MUST BE 100% IN KOREAN.** NEVER USE ENGLISH FOR THE EXPLANATION.
 
-**Student says:** "안녕하세요, 만나서 반가워요"
-**You respond:** "Nice to meet you too! I'm Teacher Alex, and I'm here to help you practice English. Don't worry about making mistakes - that's how we learn! So, how are you doing today?"
-
-**Student says:** "오늘 날씨가 좋네요"
-**You respond:** "Yeah, it's a beautiful day! Perfect weather for learning English, right? 😊 By the way, here's a natural expression: 'The weather is gorgeous today!' - sounds more native, don't you think?"
-
-**Student asks:** "How do I say '배고파요' in English?"
-**You respond:** "Great question! Here are some natural ways native speakers say it:
-- 'I'm starving!' (very common, slightly dramatic)
-- 'I'm pretty hungry' (neutral)
-- 'I could eat' (casual)
-
-My advice: Start with 'I'm starving!' - it's fun and sounds super natural!"
-
-## Your Personality:
-- Friendly and approachable (like a cool American/British friend)
-- Patient with learners
-- Enthusiastic about teaching English
-- Use emojis occasionally to seem more friendly 😊👍
-
-Remember: Your goal is to help students practice REAL English that native speakers actually use. Keep it 100% English!`
+Remember: Keep the main response 100% English, followed by [KOR_TRANS], and then [CORRECTIONS] in Korean only.`
     }
 };
 
@@ -306,21 +286,36 @@ function connectWebSocket() {
                 hideTypingIndicator();
 
                 // 텍스트 정리 및 실시간 표시
-                let cleanText = ChatState.aiTextBuffer;
+                let rawText = ChatState.aiTextBuffer;
+                let cleanText = rawText;
+                let translationText = '';
+                let examplesText = '';
 
-                // 선생님 유형에 따라 다르게 텍스트 처리
+                // 원어민 강사일 경우 번역 및 교정 데이터 분리
+                if (ChatState.selectedTeacher === 'native') {
+                    // [KOR_TRANS] 기준으로 분리
+                    const transParts = rawText.split('[KOR_TRANS]');
+                    cleanText = transParts[0];
+                    
+                    if (transParts.length > 1) {
+                        // [CORRECTIONS] 기준으로 분리
+                        const corrParts = transParts[1].split('[CORRECTIONS]');
+                        translationText = corrParts[0].trim();
+                        if (corrParts.length > 1) {
+                            correctionsText = corrParts[1].trim();
+                        }
+                    }
+                }
+
+                // 선생님 유형에 따라 추가 텍스트 처리
                 if (ChatState.selectedTeacher === 'korean') {
-                    // 친절한 한국어 선생님: 주로 한국어 텍스트
                     cleanText = cleanText.replace(/\*\*.*?\*\*/g, ''); // 별표 강조 제거
                     cleanText = cleanText.replace(/^(I've|I have|I am|I'm|I will|My focus|The current|My response).*$/gmi, '');
                     cleanText = cleanText.replace(/^(This feels like|I want to|It's a casual|I'll ask).*$/gmi, '');
                     cleanText = cleanText.replace(/##.*$/gm, ''); // 마크다운 제목 제거
                     cleanText = cleanText.replace(/\*\*/g, ''); // 별표 제거
                 } else if (ChatState.selectedTeacher === 'native') {
-                    // 원어민 강사: 마크다운 형식 유지하되 정리만
-                    // **bold**는 유지하되 줄바꿈만 정리
-                    cleanText = cleanText.replace(/\n{3,}/g, '\n\n'); // 줄바꿈 정리만
-                    // AI의 사고 과정 제거
+                    cleanText = cleanText.replace(/\n{3,}/g, '\n\n'); // 줄바꿈 정리
                     cleanText = cleanText.replace(/^(I've|I have|I am|I'm|I will|My focus|The current|My response).*$/gmi, '');
                 }
 
@@ -340,10 +335,46 @@ function connectWebSocket() {
                 }
 
                 ChatState.currentAiMessageTextDiv.textContent = cleanText;
+                
+                // 데이터 저장
+                if (ChatState.currentAiMessageTextDiv) {
+                    const parentMessage = ChatState.currentAiMessageTextDiv.closest('.chat-message');
+                    if (translationText) parentMessage.setAttribute('data-translation', translationText);
+                    if (correctionsText) parentMessage.setAttribute('data-corrections', correctionsText);
+                }
+
                 chatMessages.scrollTop = chatMessages.scrollHeight;
 
             } else if (data.type === 'turn_complete') {
                 console.log('[Chat WS] Turn complete');
+                
+                // 원어민 선생님 답변 완료 시 버튼 표시
+                if (ChatState.selectedTeacher === 'native' && ChatState.currentAiMessageTextDiv) {
+                    const aiParentMessage = ChatState.currentAiMessageTextDiv.closest('.chat-message');
+                    const translation = aiParentMessage.getAttribute('data-translation');
+                    const corrections = aiParentMessage.getAttribute('data-corrections');
+                    
+                    // 1. AI 답변에 번역 버튼 추가
+                    if (translation) {
+                        const aiActionsDiv = document.createElement('div');
+                        aiActionsDiv.className = 'message-actions';
+                        aiParentMessage.querySelector('.chat-message-content').appendChild(aiActionsDiv);
+                        addTranslationToggle(aiParentMessage, translation, aiActionsDiv);
+                    }
+
+                    // 2. 사용자 답변에 교정 버튼 추가 (가장 최근 사용자 메시지 찾기)
+                    if (corrections) {
+                        const userMessages = document.querySelectorAll('.chat-message-user');
+                        if (userMessages.length > 0) {
+                            const lastUserMessage = userMessages[userMessages.length - 1];
+                            const userActionsDiv = document.createElement('div');
+                            userActionsDiv.className = 'message-actions';
+                            lastUserMessage.querySelector('.chat-message-content').appendChild(userActionsDiv);
+                            addCorrectionsToggle(lastUserMessage, corrections, userActionsDiv);
+                        }
+                    }
+                }
+
                 ChatState.currentAiMessageTextDiv = null;
                 ChatState.aiTextBuffer = '';
             } else if (data.type === 'error') {
@@ -506,6 +537,82 @@ function showTypingIndicator() {
 function hideTypingIndicator() {
     const typingDiv = document.querySelector('.typing-indicator');
     if (typingDiv) typingDiv.remove();
+}
+
+function addTranslationToggle(parentMessage, translation, actionsDiv) {
+    const translateBtn = document.createElement('button');
+    translateBtn.className = 'translate-btn';
+    translateBtn.innerHTML = '<span>🌐</span> 번역';
+    
+    const translationDiv = document.createElement('div');
+    translationDiv.className = 'translation-text hidden';
+    translationDiv.textContent = translation;
+    
+    translateBtn.addEventListener('click', () => {
+        const isHidden = translationDiv.classList.contains('hidden');
+        if (isHidden) {
+            translationDiv.classList.remove('hidden');
+            translateBtn.classList.add('active');
+        } else {
+            translationDiv.classList.add('hidden');
+            translateBtn.classList.remove('active');
+        }
+    });
+    
+    actionsDiv.appendChild(translateBtn);
+    parentMessage.querySelector('.chat-message-content').appendChild(translationDiv);
+}
+
+function addCorrectionsToggle(parentMessage, corrections, actionsDiv) {
+    const correctionsBtn = document.createElement('button');
+    correctionsBtn.className = 'translate-btn';
+    correctionsBtn.innerHTML = '<span>✨</span> 문장 교정';
+    
+    const correctionsDiv = document.createElement('div');
+    correctionsDiv.className = 'corrections-text hidden';
+    correctionsDiv.textContent = corrections;
+    
+    correctionsBtn.addEventListener('click', () => {
+        const isHidden = correctionsDiv.classList.contains('hidden');
+        if (isHidden) {
+            correctionsDiv.classList.remove('hidden');
+            correctionsBtn.classList.add('active');
+        } else {
+            correctionsDiv.classList.add('hidden');
+            correctionsBtn.classList.remove('active');
+        }
+    });
+    
+    actionsDiv.appendChild(correctionsBtn);
+    parentMessage.querySelector('.chat-message-content').appendChild(correctionsDiv);
+}
+
+function showTranslateButton(parentMessage, translation) {
+    if (parentMessage.querySelector('.translate-btn')) return;
+
+    const contentDiv = parentMessage.querySelector('.chat-message-content');
+    
+    const translateBtn = document.createElement('button');
+    translateBtn.className = 'translate-btn';
+    translateBtn.innerHTML = '<span>🌐</span> 번역 보기';
+    
+    const translationDiv = document.createElement('div');
+    translationDiv.className = 'translation-text hidden';
+    translationDiv.textContent = translation;
+    
+    translateBtn.addEventListener('click', () => {
+        const isHidden = translationDiv.classList.contains('hidden');
+        if (isHidden) {
+            translationDiv.classList.remove('hidden');
+            translateBtn.innerHTML = '<span>🌐</span> 번역 숨기기';
+        } else {
+            translationDiv.classList.add('hidden');
+            translateBtn.innerHTML = '<span>🌐</span> 번역 보기';
+        }
+    });
+    
+    contentDiv.appendChild(translateBtn);
+    contentDiv.appendChild(translationDiv);
 }
 
 // 오디오 재생 큐

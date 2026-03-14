@@ -979,6 +979,92 @@ body.chat-active .ai-chat-btn {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+.translate-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    background: #f1f5f9 !important;
+    color: #64748b !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 4px 10px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: unset !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.translate-btn:hover {
+    background: #e2e8f0 !important;
+    color: var(--primary) !important;
+}
+
+.translation-text, .corrections-text {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background-color: #f8fafc;
+    border-left: 3px solid #cbd5e1;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    border-radius: 4px 8px 8px 4px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.corrections-text {
+    background-color: #f0fdf4;
+    border-left-color: #4ade80;
+    color: #166534;
+}
+
+.chat-input-area {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.translate-btn.active {
+    background: var(--primary-light) !important;
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.examples-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.example-chip {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1.4;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.example-chip:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+    transform: translateX(4px);
+}
+
+.example-chip:active {
+    transform: scale(0.98);
+}
+
 .chat-input-area {
     padding: 16px;
     background-color: white;
