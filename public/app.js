@@ -248,11 +248,15 @@ function renderNextTrendsPage() {
             const catClass = `cat-${(item.category || '일반').replace(/\s+/g, '')}`;
 
             card.innerHTML = `
-                <span class="trend-category ${catClass}">${item.category || '일반'}</span>
-                <span class="trend-card-title">${item.title}</span>
-                <div class="trend-card-info">
+                <div class="trend-card-top">
+                    <span class="trend-category ${catClass}">${item.category || '일반'}</span>
+                </div>
+                <div class="trend-card-body">
+                    <h4 class="trend-card-title">${item.title}</h4>
                     ${keywordsHtml ? `<div class="trend-card-keywords">${keywordsHtml}</div>` : ''}
-                    <button class="trend-start-btn">학습 시작</button>
+                </div>
+                <div class="trend-card-footer">
+                    <button class="trend-start-btn">학습 시작 →</button>
                 </div>
             `;
 
@@ -378,10 +382,14 @@ function renderSavedSongs(songs) {
         card.className = 'realtime-trend-card';
         
         card.innerHTML = `
-            <span class="trend-category cat-연애">POP SONG</span>
-            <span class="trend-card-title">${song.title}</span>
-            <div class="trend-card-info">
-                <button class="trend-start-btn">학습 시작</button>
+            <div class="trend-card-top">
+                <span class="trend-category cat-연애">POP SONG</span>
+            </div>
+            <div class="trend-card-body">
+                <h4 class="trend-card-title">${song.title}</h4>
+            </div>
+            <div class="trend-card-footer">
+                <button class="trend-start-btn">학습 시작 →</button>
             </div>
         `;
 
