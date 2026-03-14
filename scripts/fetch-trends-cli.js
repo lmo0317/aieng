@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const DB_PATH = 'D:\\work\\dev\\web\\aieng\\database.sqlite';
+const DB_PATH = path.resolve(__dirname, '..', 'db', 'database.sqlite');
 const CATEGORIES = [
     { name: 'TOP', label: '전체', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
     { name: 'TEC', label: '테크', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' },

@@ -29,7 +29,7 @@ Trend Eng is a Node.js web application that:
 
 **Frontend**: Vanilla JavaScript, Web Speech API, SSE (Server-Sent Events)
 
-**Database**: SQLite3 (database.sqlite)
+**Database**: SQLite3 (db/database.sqlite)
 
 ### Key Commands
 
@@ -71,7 +71,7 @@ npm run fetch-trends:standalone  # Standalone trend fetcher
 
 **Configuration**:
 - .env: API keys (GLM_API_KEY, GEMINI_API_KEY, GROQ_API_KEY), PORT, SESSION_SECRET
-- database.sqlite: Auto-created SQLite database
+- db/database.sqlite: Auto-created SQLite database
 - settings.html: Runtime configuration web UI
 
 ### Server Architecture
@@ -523,7 +523,7 @@ data: {"key": "value"}
 
 ### Database Location
 
-**Default**: ./database.sqlite (auto-created)
+**Default**: ./db/database.sqlite (auto-created)
 **Development**: Can be deleted to reset
 **Production**: Backup before migrations
 

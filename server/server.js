@@ -517,13 +517,32 @@ app.post('/api/trends/import-json', async (req, res) => {
             let imported = 0;
 
             data.content.forEach((article) => {
-                const sentences = article.sentences || [];
+                // Transform sentences format (Shared logic with /import)
+                const sentences = (article.sentences || []).map(sentence => {
+                    let vocaArray = [];
+                    if (sentence.vocabulary) {
+                        const pairs = sentence.vocabulary.split(/,\s*/);
+                        vocaArray = pairs.map(pair => {
+                            const match = pair.match(/(.+?)\s*\((.+)\)/);
+                            if (match) return `${match[1].trim()}: ${match[2].trim()}`;
+                            return pair.trim();
+                        });
+                    }
+
+                    return {
+                        en: sentence.english || sentence.en || '',
+                        ko: sentence.korean || sentence.ko || '',
+                        sentence_structure: sentence.analysis || sentence.sentence_structure || '',
+                        explanation: sentence.explanation || '',
+                        voca: vocaArray
+                    };
+                });
 
                 db.run(`INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type, createdAt)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                     [
                         article.news_title,
-                        article.category || '뉴스',
+                        article.category || '전체',
                         '', // summary
                         '[]', // keywords
                         JSON.stringify(sentences),
@@ -537,7 +556,7 @@ app.post('/api/trends/import-json', async (req, res) => {
                             console.error('Error inserting trend:', err.message);
                         } else {
                             imported++;
-                            console.log(`✅ [API] Imported: ${article.news_title} (category: ${article.category || '정치'})`);
+                            console.log(`✅ [API] Imported: ${article.news_title} (category: ${article.category || '전체'})`);
                         }
                     }
                 );
@@ -1035,7 +1054,7 @@ app.post('/api/trends/import', async (req, res) => {
 
                 stmt.run(
                     item.news_title,
-                    item.category || '뉴스',
+                    item.category || '전체',
                     `${title} - ${item.news_title}`,
                     '[]',
                     JSON.stringify(transformedSentences),
@@ -1047,6 +1066,7 @@ app.post('/api/trends/import', async (req, res) => {
                             errors.push({ index: index + 1, title: item.news_title, error: err.message });
                         } else {
                             successCount++;
+                            console.log(`✅ [API] Imported: ${item.news_title} (category: ${item.category || '전체'})`);
                         }
 
                         if (index === content.length - 1) {
