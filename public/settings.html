@@ -17,11 +17,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚙️ 설정</h1>
-            <div class="nav-links">
-                <a href="/data.html" class="back-btn" style="margin-right: 10px;">📊 데이터 관리</a>
-                <a href="/" class="back-btn">← 홈으로</a>
-            </div>
+            <a href="/" class="back-home-link">← 홈으로 이동</a>
         </div>
 
         <div class="settings-card">
@@ -180,19 +176,12 @@
             </form>
         </div>
 
-        <div class="info-card">
-            <h3>ℹ️ 안내</h3>
-            <ul>
-                <li>API Key와 모델은 서버 전체 설정으로 저장됩니다.</li>
-                <li>모든 사용자가 동일한 설정을 사용합니다.</li>
-                <li>API Key는 로컬 데이터베이스에 안전하게 저장됩니다.</li>
-                <li><strong>Gemini 2.5 Flash 특징:</strong>
-                    <ul>
-                        <li>가장 최신의 매우 빠르고 뛰어난 추론 성능</li>
-                        <li>언어 학습 및 문장 구조 분석에 최적화</li>
-                    </ul>
-                </li>
-            </ul>
+        <div class="settings-card management-section">
+            <h2>시스템 관리</h2>
+            <p class="description">학습 데이터 수집 및 트렌드 정보를 관리할 수 있습니다.</p>
+            <div class="button-group">
+                <a href="/data.html" class="btn-primary">📊 데이터 관리 페이지 이동</a>
+            </div>
         </div>
     </div>
 
