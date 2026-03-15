@@ -3,10 +3,10 @@ const path = require('path');
 const http = require('http');
 
 /**
- * Pop Song 전용 저장 및 서버 동기화 스크립트
+ * Pop Song ?�용 ?�??�??�버 ?�기???�크립트
  */
 
-// 프로젝트 루트 내의 output 및 tmp 폴더 경로 설정
+// ?�로?�트 루트 ?�의 output �?tmp ?�더 경로 ?�정
 const projectRoot = path.resolve(__dirname, '..', '..', '..', '..');
 const outputDir = path.join(projectRoot, 'output');
 
@@ -19,11 +19,11 @@ function saveAndUpload(data) {
     const fileName = `song_guide_${timestamp}.json`;
     const filePath = path.join(outputDir, fileName);
 
-    // 1. JSON 파일로 저장
+    // 1. JSON ?�일�??�??
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-    console.log(`✅ Saved successfully to output folder: ${filePath}`);
+    console.log(`??Saved successfully to output folder: ${filePath}`);
 
-    // 2. 서버로 POST 전송 (각 노래별로 전송)
+    // 2. ?�버�?POST ?�송 (�??�래별로 ?�송)
     data.content.forEach(item => {
         const sentences = item.sentences.map(s => {
             const rawVoca = s.voca || s.vocabulary || [];
@@ -43,7 +43,7 @@ function saveAndUpload(data) {
             };
         });
 
-        // 가사 전문이 따로 없으면 문장들을 합쳐서 보냄
+        // 가???�문???�로 ?�으�?문장?�을 ?�쳐??보냄
         const lyrics = sentences.map(s => s.en).join('\n');
 
         const postData = JSON.stringify({
@@ -65,21 +65,21 @@ function saveAndUpload(data) {
             }
         };
 
-        console.log(`🚀 Syncing "${item.news_title}" with local server...`);
+        console.log(`?? Syncing "${item.news_title}" with local server...`);
         const req = http.request(options, (res) => {
             let resBody = '';
             res.on('data', (chunk) => resBody += chunk);
             res.on('end', () => {
                 if (res.statusCode === 200) {
-                    console.log(`✨ Server sync success for: ${item.news_title}`);
+                    console.log(`??Server sync success for: ${item.news_title}`);
                 } else {
-                    console.error(`❌ Server sync failed for "${item.news_title}" (HTTP ${res.statusCode}): ${resBody}`);
+                    console.error(`??Server sync failed for "${item.news_title}" (HTTP ${res.statusCode}): ${resBody}`);
                 }
             });
         });
 
         req.on('error', (e) => {
-            console.error(`❌ Error connecting to server for "${item.news_title}": ${e.message}`);
+            console.error(`??Error connecting to server for "${item.news_title}": ${e.message}`);
         });
 
         req.write(postData);
@@ -93,9 +93,9 @@ if (process.argv[2]) {
     const filePath = path.resolve(process.argv[2]);
     if (fs.existsSync(filePath)) {
         inputData = fs.readFileSync(filePath, 'utf8');
-        console.log(`📖 Reading from file: ${filePath}`);
+        console.log(`?�� Reading from file: ${filePath}`);
     } else {
-        console.error(`❌ Error: File not found: ${filePath}`);
+        console.error(`??Error: File not found: ${filePath}`);
         process.exit(1);
     }
 } else {
@@ -105,7 +105,7 @@ if (process.argv[2]) {
 }
 
 if (!inputData.trim()) {
-    console.error('❌ Error: No input data received.');
+    console.error('??Error: No input data received.');
     process.exit(1);
 }
 
@@ -113,7 +113,9 @@ try {
     const json = JSON.parse(inputData);
     saveAndUpload(json);
 } catch (e) {
-    console.error('❌ Failed to parse input JSON. Check for unescaped double quotes or control characters.');
+    console.error('??Failed to parse input JSON. Check for unescaped double quotes or control characters.');
     console.error(`Original error: ${e.message}`);
     process.exit(1);
 }
+
+

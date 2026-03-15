@@ -1,0 +1,47 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where npm:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(\"/c/Program Files/nodejs/npm\" init:*)",
+      "Bash(\"/c/Program Files/nodejs/npm\" install:*)",
+      "Bash(taskkill:*)",
+      "Bash(sqlite3:*)",
+      "Bash(where node:*)",
+      "Bash(git rebase:*)",
+      "Bash(tasklist:*)",
+      "Bash(\"/c/Program Files/nodejs/node.exe\":*)",
+      "mcp__web-reader__webReader",
+      "mcp__web-search-prime__web_search_prime",
+      "Bash(\"/c/Program Files/nodejs/node.js\":*)",
+      "Bash(rm:*)",
+      "Bash(START:*)",
+      "Bash(/c/Users/lmo03/AppData/Local/ms-playwright-go/1.50.1/node.exe:*)",
+      "Bash(scoop info:*)",
+      "Bash(Gemini:*)",
+      "Bash(\"/c/Program Files/nodejs/npm\" update:*)",
+      "Bash(\"/c/Program Files/nodejs/npm\" list:*)",
+      "Bash(\"/c/Program Files/nodejs/npm\" view:*)",
+      "Bash(scoop bucket:*)",
+      "Bash(git restore:*)",
+      "Bash(git reset:*)",
+      "Bash(dir:*)",
+      "Bash(tr <:*)",
+      "Bash(\"/c/Program Files/nodejs/node\":*)",
+      "Bash(netstat:*)",
+      "Bash(node:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebSearch",
+      "Bash(curl:*)",
+      "Bash(git checkout:*)"
+    ]
+  },
+  "enabledPlugins": {
+    "frontend-design@Gemini-plugins-official": true
+  }
+}
+
+
