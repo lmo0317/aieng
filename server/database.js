@@ -59,10 +59,10 @@ const db = new sqlite3.Database(dbPath, (err) => {
                             migrations.push("ALTER TABLE global_settings ADD COLUMN geminiApiKey TEXT");
                         }
                         if (!columnNames.includes('geminiModel')) {
-                            migrations.push("ALTER TABLE global_settings ADD COLUMN geminiModel TEXT DEFAULT 'gemini-2.5-flash'");
+                            migrations.push("ALTER TABLE global_settings ADD COLUMN geminiModel TEXT DEFAULT 'gemini-3.1-flash-lite-preview'");
                         }
                         if (!columnNames.includes('chatModel')) {
-                            migrations.push("ALTER TABLE global_settings ADD COLUMN chatModel TEXT DEFAULT 'gemini-2.5-flash-native-audio-latest'");
+                            migrations.push("ALTER TABLE global_settings ADD COLUMN chatModel TEXT DEFAULT 'gemini-3.1-flash-lite-preview'");
                         }
                         if (!columnNames.includes('systemPrompt')) {
                             migrations.push("ALTER TABLE global_settings ADD COLUMN systemPrompt TEXT");

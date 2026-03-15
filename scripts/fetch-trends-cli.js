@@ -140,7 +140,7 @@ async function fetchTrends() {
     // Configuration
     const provider = 'gemini'; // Default to Gemini
     const apiKey = process.env.GEMINI_API_KEY;
-    const model = 'gemini-1.5-flash';
+    const model = 'gemini-3.1-flash-lite-preview';
 
     if (!apiKey) {
         console.error('❌ GEMINI_API_KEY not found in .env file');

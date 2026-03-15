@@ -20,164 +20,80 @@
             <a href="/" class="back-home-link">← 홈으로 이동</a>
         </div>
 
+        <!-- 통합된 AI 설정 카드 -->
         <div class="settings-card">
-            <h2>API Key 설정</h2>
-            <p class="description">
-                사용할 AI 서비스의 API Key를 입력하세요. API Key는 서버 전체 설정으로 저장됩니다.
-            </p>
+            <div class="settings-card-header">
+                <h2>🤖 AI 모델 및 연결 설정</h2>
+                <p class="description">Gemini API 연결과 사용할 모델을 한곳에서 관리하세요.</p>
+            </div>
 
-            <!-- GLM API Key 섹션 -->
-            <div class="api-key-section">
-                <div class="api-status" id="glm-api-status">
-                    <span class="status-indicator"></span>
-                    <span class="status-label">GLM:</span>
-                    <span class="status-text">확인 중...</span>
-                    <span class="key-preview-inline" id="glm-key-preview-inline"></span>
+            <!-- 현재 상태 요약 배지 -->
+            <div class="settings-status-summary">
+                <div class="status-item">
+                    <span class="status-label">API 연결:</span>
+                    <span id="api-status-badge" class="status-badge inactive">확인 중...</span>
                 </div>
-
-                <div class="form-group">
-                    <label for="glm-api-key">GLM API Key (Z.ai)</label>
-                    <input
-                        type="password"
-                        id="glm-api-key"
-                        placeholder="GLM API Key를 입력하세요"
-                        autocomplete="off"
-                    >
-                    <small class="help-text">
-                        <a href="https://open.bigmodel.cn/usercenter/apikeys" target="_blank">Z.ai API Key 페이지</a>에서 발급 가능합니다. 영어 학습에 사용됩니다.
-                    </small>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" id="save-glm-btn" class="btn-primary">GLM Key 저장</button>
-                    <button type="button" id="delete-glm-btn" class="btn-danger hidden">GLM Key 삭제</button>
+                <div class="status-item">
+                    <span class="status-label">선택된 모델:</span>
+                    <span id="model-status-badge" class="status-badge model-badge">확인 중...</span>
                 </div>
             </div>
 
             <hr class="section-divider">
 
-            <!-- Groq API Key 섹션 -->
-            <div class="api-key-section">
-                <div class="api-status" id="groq-api-status">
-                    <span class="status-indicator"></span>
-                    <span class="status-label">Groq:</span>
-                    <span class="status-text">확인 중...</span>
-                    <span class="key-preview-inline" id="groq-key-preview-inline"></span>
-                </div>
-
+            <!-- API Key 설정 영역 -->
+            <div class="setting-group-inline">
                 <div class="form-group">
-                    <label for="groq-api-key">Groq API Key</label>
-                    <input
-                        type="password"
-                        id="groq-api-key"
-                        placeholder="gsk_..."
-                        autocomplete="off"
-                    >
+                    <label for="api-key">Gemini API Key</label>
+                    <div class="input-with-btn">
+                        <input type="password" id="api-key" placeholder="AIza..." autocomplete="off">
+                        <button type="button" id="save-gemini-btn" class="btn-primary">저장</button>
+                        <button type="button" id="delete-gemini-btn" class="btn-danger hidden">삭제</button>
+                    </div>
                     <small class="help-text">
-                        <a href="https://console.groq.com/keys" target="_blank">Groq Console</a>에서 발급 가능합니다. 초고속 영어 학습에 사용됩니다.
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>에서 발급받은 키를 입력하세요.
                     </small>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" id="save-groq-btn" class="btn-primary">Groq Key 저장</button>
-                    <button type="button" id="delete-groq-btn" class="btn-danger hidden">Groq Key 삭제</button>
                 </div>
             </div>
 
-            <hr class="section-divider">
-
-            <!-- Gemini API Key 섹션 -->
-            <div class="api-key-section">
-                <div class="api-status" id="api-status">
-                    <span class="status-indicator"></span>
-                    <span class="status-label">Gemini:</span>
-                    <span class="status-text">확인 중...</span>
-                    <span class="key-preview-inline" id="gemini-key-preview-inline"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="api-key">Gemini API Key (Google)</label>
-                    <input
-                        type="password"
-                        id="api-key"
-                        placeholder="AIza..."
-                        autocomplete="off"
-                    >
-                    <small class="help-text">
-                        <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>에서 발급 가능합니다. AI 음성 대화에 사용됩니다.
-                    </small>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" id="save-gemini-btn" class="btn-primary">Gemini Key 저장</button>
-                    <button type="button" id="delete-gemini-btn" class="btn-danger hidden">Gemini Key 삭제</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="settings-card">
-            <h2>모델 설정</h2>
-            <p class="description">
-                각 기능에서 사용할 AI 모델을 선택하세요.
-            </p>
-
+            <!-- 모델 선택 영역 -->
             <form id="models-form" class="settings-form">
                 <div class="form-group">
-                    <label for="model-select">영어 학습 모델</label>
+                    <label for="model-select">학습 및 대화 모델 선택</label>
                     <div class="model-select-wrapper">
                         <select id="model-select" class="model-select">
+                            <!-- JS에서 목록 추가 -->
                         </select>
-                        <span id="current-model-badge" class="model-badge"></span>
+                        <button type="submit" class="btn-secondary">모델 변경 적용</button>
                     </div>
-                    <small class="help-text">
-                        주제에 따른 학습 문장 생성과 문단 분석에 사용됩니다. (권장: GLM 4.7 한국어 특화)
-                    </small>
-                </div>
-
-                <div class="form-group">
-                    <label for="chat-model-select">AI 음성 대화 모델</label>
-                    <div class="model-select-wrapper">
-                        <select id="chat-model-select" class="model-select">
-                        </select>
-                        <span id="current-chat-model-badge" class="model-badge"></span>
-                    </div>
-                    <small class="help-text">
-                        실시간 음성 대화 및 채팅에 사용됩니다. (권장: Gemini 2.5 Flash Native Audio)
-                    </small>
-                </div>
-
-                <div class="button-group">
-                    <button type="submit" class="btn-primary">모델 저장</button>
+                    <small class="help-text">학습 문장 생성과 AI 튜터 대화에 공통으로 사용됩니다.</small>
                 </div>
             </form>
-
-            <div class="current-model-info" id="current-model-info">
-                <p><strong>현재 선택된 모델:</strong> <span id="model-preview"></span></p>
-            </div>
         </div>
 
+        <!-- 프롬프트 설정 카드 -->
         <div class="settings-card">
-            <h2>AI 프롬프트 설정 (고급 튜닝)</h2>
+            <h2>✍️ AI 프롬프트 설정 (고급)</h2>
             <p class="description">
-                AI에게 전달되는 지시문(프롬프트)을 직접 수정할 수 있습니다.<br>
-                <code>{topic}</code>과 <code>{difficulty}</code>는 실제 생성 시 입력된 값으로 자동 치환됩니다.
+                AI에게 전달되는 지시문을 직접 수정할 수 있습니다.<br>
+                <code>{topic}</code>과 <code>{difficulty}</code>는 자동으로 치환됩니다.
             </p>
 
             <form id="prompt-form" class="settings-form">
                 <div class="form-group">
                     <label for="system-prompt">시스템 프롬프트</label>
-                    <textarea id="system-prompt" rows="15" class="prompt-textarea" placeholder="로딩 중..."></textarea>
+                    <textarea id="system-prompt" rows="12" class="prompt-textarea" placeholder="로딩 중..."></textarea>
                 </div>
 
                 <div class="button-group">
                     <button type="submit" class="btn-primary">프롬프트 저장</button>
-                    <button type="button" id="reset-prompt-btn" class="btn-danger">기본값으로 초기화</button>
+                    <button type="button" id="reset-prompt-btn" class="btn-danger">기본값 초기화</button>
                 </div>
             </form>
         </div>
 
         <div class="settings-card management-section">
-            <h2>시스템 관리</h2>
+            <h2>⚙️ 시스템 관리</h2>
             <p class="description">학습 데이터 수집 및 트렌드 정보를 관리할 수 있습니다.</p>
             <div class="button-group">
                 <a href="/data.html" class="btn-primary">📊 데이터 관리 페이지 이동</a>

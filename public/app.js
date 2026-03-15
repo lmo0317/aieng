@@ -118,8 +118,8 @@ function resetChatConversation() {
         welcomeDiv.className = 'chat-welcome-message';
         welcomeDiv.innerHTML = `
             안녕하세요! Trend Eng AI 튜터입니다.<br>
-            실시간 음성 및 화상 대화로 영어 실력을 키워보세요!<br>
-            하단의 마이크나 상단의 비디오 버튼을 눌러 시작하세요.
+            궁금한 점이나 학습 중 어려운 부분이 있다면<br>
+            언제든지 텍스트로 물어보세요!
         `;
         chatMessages.appendChild(welcomeDiv);
     }
@@ -512,7 +512,11 @@ function showSentence() {
     }
 
     if (current.voca && Array.isArray(current.voca) && current.voca.length > 0) {
-        vocaDiv.innerHTML = `<strong>📖 주요 어휘 및 표현:</strong><br/>` + current.voca.join('<br/>');
+        const vocaHtml = current.voca.map(v => {
+            if (typeof v === 'string') return v;
+            return `${v.word}: ${v.mean}`;
+        }).join('<br/>');
+        vocaDiv.innerHTML = `<strong>📖 주요 어휘 및 표현:</strong><br/>` + vocaHtml;
     } else {
         vocaDiv.innerHTML = '';
     }
