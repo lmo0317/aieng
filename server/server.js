@@ -70,9 +70,9 @@ async function getGlobalSettings() {
         db.get("SELECT geminiApiKey, geminiModel, systemPrompt FROM global_settings WHERE id = 1", (err, row) => {
             if (err) reject(err);
             else resolve({
-                geminiApiKey: row?.geminiApiKey || process.env.GEMINI_API_KEY,
-                geminiModel: row?.geminiModel || 'gemini-3.1-flash-lite-preview',
-                systemPrompt: row?.systemPrompt || DEFAULT_PROMPT
+                geminiApiKey: (row && row.geminiApiKey) || process.env.GEMINI_API_KEY,
+                geminiModel: (row && row.geminiModel) || 'gemini-3.1-flash-lite-preview',
+                systemPrompt: (row && row.systemPrompt) || DEFAULT_PROMPT
             });
         });
     });
@@ -434,8 +434,9 @@ app.delete('/api/trends/:id', (req, res) => {
 });
 
 // Start Express Server
-const server = app.listen(PORT, async () => {
-    console.log(`Express Server running on port ${PORT} (Dynamic Gemini Mode)`);
+const server = app.listen(PORT, '0.0.0.0', async () => {
+    console.log(`Express Server running on http://0.0.0.0:${PORT} (Dynamic Gemini Mode)`);
+    console.log(`Service URL: http://aieng.cafe24app.com`);
     
     // WebSocket for AI Tutor Chat
     const wss = new WebSocket.Server({ server, path: '/ws/chat' });

@@ -1,12 +1,10 @@
 {
   "name": "trend-eng",
   "version": "1.0.0",
-  "description": "",
+  "description": "English Learning App optimized for Node v14",
   "main": "web.js",
   "scripts": {
     "start": "node web.js",
-    "fetch-trends": "node server/cli-fetch-trends.js",
-    "test-import": "node scripts/test-import-cli.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,16 +12,15 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "axios": "^1.13.6",
-    "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "express-session": "^1.19.0",
-    "passport": "^0.7.0",
+    "@google/generative-ai": "^0.1.0",
+    "axios": "^0.27.2",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "passport": "^0.5.0",
     "passport-google-oauth20": "^2.0.0",
-    "sqlite3": "^5.1.7",
-    "ws": "^8.19.0",
-    "zhipuai": "^2.0.0"
+    "sqlite3": "^5.0.2",
+    "ws": "^7.5.0"
   }
 }
