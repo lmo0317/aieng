@@ -30,7 +30,16 @@
       "Bash(tr <:*)",
       "Bash(\"/c/Program Files/nodejs/node\":*)",
       "Bash(netstat:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebSearch",
+      "Bash(curl:*)",
+      "Bash(git checkout:*)"
     ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
   }
 }
