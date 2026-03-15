@@ -186,7 +186,7 @@ function sleep(ms) {
 }
 
 // Main Function
-async function fetchTrends() {
+async function fetchTrends(limit = 3) {
     // Configuration
     const provider = 'gemini'; // Default to Gemini
     const apiKey = process.env.GEMINI_API_KEY;
@@ -197,7 +197,7 @@ async function fetchTrends() {
         process.exit(1);
     }
 
-    console.log('🔍 Fetching trends from Google News...');
+    console.log(`🔍 Fetching trends from Google News (Limit: ${limit})...`);
 
     // Stage 1: Fetch RSS Feeds
     const httpsAgent = new https.Agent({
@@ -227,7 +227,7 @@ async function fetchTrends() {
             let match;
             let count = 0;
 
-            while ((match = itemRegex.exec(xml)) !== null && count < 10) {
+            while ((match = itemRegex.exec(xml)) !== null && count < 20) {
                 const itemContent = match[1];
                 const titleMatch = itemContent.match(/<title>(.*?)<\/title>/);
                 const dateMatch = itemContent.match(/<pubDate>(.*?)<\/pubDate>/);
@@ -257,11 +257,11 @@ async function fetchTrends() {
         process.exit(1);
     }
 
-    // Remove duplicates and select top 3 for speed
+    // Remove duplicates and select top N
     const uniqueTrends = Array.from(new Set(allTrends.map(t => t.title)))
         .map(title => allTrends.find(t => t.title === title))
         .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
+        .slice(0, limit);
 
     console.log(`📊 Found ${uniqueTrends.length} trends`);
     console.log('🤖 Analyzing trends...');
@@ -388,7 +388,10 @@ async function fetchTrends() {
 
 // Run if called directly
 if (require.main === module) {
-    fetchTrends()
+    const args = process.argv.slice(2);
+    const limit = args[0] ? parseInt(args[0], 10) : 3;
+    
+    fetchTrends(limit)
         .then(() => process.exit(0))
         .catch(err => {
             console.error('❌ Error:', err.message);

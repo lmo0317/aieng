@@ -46,4 +46,5 @@ description: >
 ## 📂 실행 환경
 - **삭제**: `node .gemini/skills/news/scripts/delete-today.js`
 - **생성**: `node .gemini/skills/news/scripts/fetch-trends-cli.js`
+- **[Clean Up]**: 작업 중 생성된 모든 임시 파일(`.json`) 및 로그는 완료 즉시 **반드시 삭제**하여 환경을 깨끗하게 유지해야 합니다.
 - **인코딩**: Windows 환경 실행 시 `chcp 65001` 권장.

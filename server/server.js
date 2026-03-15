@@ -386,6 +386,25 @@ app.get('/api/songs/saved', (req, res) => {
     });
 });
 
+app.post('/api/songs/save', (req, res) => {
+    const { title, lyrics, difficulty, sentences, quiz, image } = req.body;
+    if (!title || !sentences) {
+        return res.status(400).json({ error: 'title과 sentences가 필요합니다.' });
+    }
+
+    const sentencesStr = typeof sentences === 'string' ? sentences : JSON.stringify(sentences);
+    const quizStr = quiz ? (typeof quiz === 'string' ? quiz : JSON.stringify(quiz)) : '[]';
+
+    db.run(
+        "INSERT INTO trends (title, summary, difficulty, sentences, quiz, image, type) VALUES (?, ?, ?, ?, ?, ?, 'song')",
+        [title, lyrics.substring(0, 200), difficulty || 'level3', sentencesStr, quizStr, image],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ success: true, id: this.lastID });
+        }
+    );
+});
+
 // Clear Today's Data API
 app.post('/api/trends/clear-today', (req, res) => {
     const { date } = req.body;
