@@ -359,8 +359,9 @@ function addCorrectionsToggle(parentMessage, corrections, actionsDiv) {
 
 // 초기화
 document.addEventListener('DOMContentLoaded', () => {
-    const chatBtn = document.getElementById('ai-chat-btn');
-    if (chatBtn) chatBtn.addEventListener('click', (e) => { 
+    const chatNavBtn = document.getElementById('nav-chat');
+    if (chatNavBtn) chatNavBtn.addEventListener('click', (e) => { 
+        e.preventDefault();
         e.stopPropagation(); 
         openChatModal(); 
     });
