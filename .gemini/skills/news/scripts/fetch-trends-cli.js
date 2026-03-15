@@ -58,7 +58,7 @@ Format:
     {
       "type": "fill_in_blank",
       "word": "banana",
-      "question": "다음 뜻에 해당하는 영어 단어를 적어주세요: '바나나'",
+      "question": "다음 뜻에 해당하는 영어 단어를 완성하세요: '바나나' (힌트: b_n_n_)",
       "answer": "banana"
     }
   ]

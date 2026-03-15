@@ -1,0 +1,109 @@
+{
+  "news_title": "방탄소년단 넷플릭스 전 세계 컴백 생중계",
+  "category": "ENTERTAINMENT",
+  "sentences": [
+    {
+      "english": "Global superstar group BTS is set to broadcast their comeback live on Netflix.",
+      "korean": "글로벌 슈퍼스타 그룹 방탄소년단이 넷플릭스를 통해 컴백을 생중계할 예정입니다.",
+      "voca": [
+        "broadcast : 방송하다",
+        "set to : ~할 예정이다",
+        "comeback : 컴백"
+      ]
+    },
+    {
+      "english": "Fans around the world are eagerly waiting for this historic streaming event.",
+      "korean": "전 세계 팬들이 이 역사적인 스트리밍 이벤트를 간절히 기다리고 있습니다.",
+      "voca": [
+        "eagerly : 간절히",
+        "historic : 역사적인",
+        "streaming : 스트리밍"
+      ]
+    },
+    {
+      "english": "The performance will be available in over 190 countries simultaneously.",
+      "korean": "이번 공연은 190개국 이상의 국가에서 동시에 관람할 수 있습니다.",
+      "voca": [
+        "available : 이용 가능한",
+        "simultaneously : 동시에",
+        "country : 국가"
+      ]
+    },
+    {
+      "english": "Netflix has prepared a special high-definition channel for the massive traffic.",
+      "korean": "넷플릭스는 엄청난 트래픽에 대비해 특별 고화질 채널을 준비했습니다.",
+      "voca": [
+        "prepare : 준비하다",
+        "high-definition : 고화질",
+        "massive : 엄청난"
+      ]
+    },
+    {
+      "english": "This collaboration marks a new milestone for the K-pop industry.",
+      "korean": "이번 협업은 케이팝 산업의 새로운 이정표가 될 것입니다.",
+      "voca": [
+        "collaboration : 협업",
+        "milestone : 이정표",
+        "industry : 산업"
+      ]
+    },
+    {
+      "english": "Advanced technology will be used to provide an immersive concert experience.",
+      "korean": "몰입감 넘치는 콘서트 경험을 제공하기 위해 첨단 기술이 사용될 것입니다.",
+      "voca": [
+        "advanced : 첨단",
+        "immersive : 몰입감 있는",
+        "experience : 경험"
+      ]
+    },
+    {
+      "english": "Security measures have been tightened to prevent illegal recording and distribution.",
+      "korean": "불법 녹화 및 유포를 방지하기 위해 보안 조치가 강화되었습니다.",
+      "voca": [
+        "security measures : 보안 조치",
+        "tighten : 강화하다",
+        "distribution : 유포"
+      ]
+    },
+    {
+      "english": "The group will perform their new title track for the first time.",
+      "korean": "그룹은 새로운 타이틀곡을 처음으로 선보일 예정입니다.",
+      "voca": [
+        "perform : 공연하다",
+        "title track : 타이틀곡",
+        "for the first time : 처음으로"
+      ]
+    },
+    {
+      "english": "Subtitles in multiple languages will be provided for global accessibility.",
+      "korean": "글로벌 접근성을 위해 여러 언어의 자막이 제공될 예정입니다.",
+      "voca": [
+        "subtitle : 자막",
+        "multiple : 다수의",
+        "accessibility : 접근성"
+      ]
+    },
+    {
+      "english": "Industry experts predict record-breaking viewership for this live broadcast.",
+      "korean": "업계 전문가들은 이번 생중계가 역대 최고 시청자 수를 기록할 것으로 예측합니다.",
+      "voca": [
+        "expert : 전문가",
+        "predict : 예측하다",
+        "viewership : 시청자 수"
+      ]
+    }
+  ],
+  "tutor": {
+    "grammar": "BTS(주어) + is set(동사) + to broadcast(목적어적 성격의 보어). 'is set to'는 확정된 미래의 일정을 나타낼 때 자주 쓰이는 표현입니다.",
+    "usage": "원어민들은 뉴스나 공식 발표에서 'is set to'라는 표현을 정말 많이 사용합니다. 'be going to'보다 조금 더 정중하고 공식적인 느낌을 줍니다. 콘서트나 스트리밍 상황에서는 'broadcast' 대신 'stream'을 써도 아주 자연스럽습니다. 실생활에서는 'I'm set to start my new job tomorrow'처럼 본인의 일정을 말할 때도 유용하게 쓸 수 있는 구문입니다."
+  },
+  "qa": {
+    "hashtags": [
+      "#방탄소년단",
+      "#넷플릭스",
+      "#컴백생중계",
+      "#케이팝",
+      "#글로벌아티스트"
+    ]
+  }
+}

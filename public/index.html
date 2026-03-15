@@ -96,7 +96,10 @@
                 <button id="reveal-btn">정답 및 설명 보기</button>
                 <button id="next-btn" class="hidden">다음 문장</button>
                 <button id="finish-btn" class="hidden">오늘의 학습 완료!</button>
-                <button id="start-quiz-btn" class="hidden">🎮 어휘 퀴즈 시작</button>
+                <div class="quiz-start-controls">
+                    <button id="start-quiz-btn" class="hidden">🎮 어휘 퀴즈 시작</button>
+                    <button id="skip-to-quiz-btn" class="btn-text hidden">연습 없이 퀴즈 바로가기 ⚡</button>
+                </div>
             </div>
         </div>
 
@@ -121,8 +124,10 @@
                 </div>
                 
                 <div id="quiz-input-container" class="quiz-input-container hidden">
-                    <input type="text" id="quiz-input" placeholder="정답 단어를 입력하세요" autocomplete="off" spellcheck="false" />
-                    <button id="quiz-submit-btn" class="btn-primary">제출</button>
+                    <div id="quiz-char-boxes" class="quiz-char-boxes">
+                        <!-- 철자별 네모 칸이 동적으로 생성됨 -->
+                    </div>
+                    <button id="quiz-submit-btn" class="btn-primary">정답 확인</button>
                 </div>
                 
                 <div id="quiz-feedback" class="quiz-feedback hidden"></div>

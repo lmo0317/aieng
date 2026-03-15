@@ -1928,26 +1928,69 @@ body.chat-active .ai-chat-btn {
 
 .quiz-input-container {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
     margin-bottom: 20px;
 }
 
-#quiz-input {
-    flex: 1;
-    padding: 16px 20px;
-    font-size: 1.2rem;
-    border: 2px solid var(--border-color);
-    border-radius: 14px;
-    outline: none;
-    transition: all 0.2s;
+.quiz-char-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
-#quiz-input:focus {
+.char-box {
+    width: 45px;
+    height: 50px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    background-color: #f8fafc;
+    color: var(--text-main);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.char-box.empty {
+    background-color: white;
+    border-color: #cbd5e1;
+}
+
+.char-box.focused {
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    background-color: white;
+    transform: translateY(-2px);
+}
+
+.char-box.hint {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    cursor: default;
+}
+
+.char-box.correct {
+    background-color: #dcfce7;
+    border-color: #22c55e;
+    color: #166534;
+}
+
+.char-box.wrong {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+    color: #991b1b;
 }
 
 #quiz-submit-btn {
+
     padding: 0 30px;
     font-size: 1.1rem;
     border-radius: 14px;

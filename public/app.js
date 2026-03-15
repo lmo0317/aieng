@@ -13,6 +13,7 @@ const revealBtn = document.getElementById('reveal-btn');
 const nextBtn = document.getElementById('next-btn');
 const finishBtn = document.getElementById('finish-btn');
 const startQuizBtn = document.getElementById('start-quiz-btn');
+const skipToQuizBtn = document.getElementById('skip-to-quiz-btn');
 const currentCountSpan = document.getElementById('current-count');
 
 // 퀴즈 관련 DOM 요소
@@ -70,6 +71,7 @@ function resetLearningState() {
     nextBtn.classList.add('hidden');
     finishBtn.classList.add('hidden');
     if(startQuizBtn) startQuizBtn.classList.add('hidden');
+    if(skipToQuizBtn) skipToQuizBtn.classList.add('hidden');
     ttsBtn.classList.add('hidden');
     
     currentCountSpan.textContent = '0';
@@ -360,6 +362,14 @@ async function startLearningFromTrend(topic, id) {
                         currentCount = 0;
                         showSentence();
                         sendTopicToChat(topic);
+
+                        // 테스트용 바로가기 버튼 활성화
+                        if (quizData.length > 0 && skipToQuizBtn) {
+                            skipToQuizBtn.classList.remove('hidden');
+                            skipToQuizBtn.onclick = () => {
+                                startQuizBtn.click();
+                            };
+                        }
                         return;
                     }
                 } catch (parseError) {
@@ -748,43 +758,125 @@ function showQuiz() {
         quizTypeLabel.textContent = '빈칸 채우기';
         quizOptions.classList.add('hidden');
         quizInputContainer.classList.remove('hidden');
-        quizInput.value = '';
+        quizSubmitBtn.disabled = false;
         
-        // Remove previous listeners
-        const newSubmitBtn = quizSubmitBtn.cloneNode(true);
-        quizSubmitBtn.parentNode.replaceChild(newSubmitBtn, quizSubmitBtn);
-        newSubmitBtn.addEventListener('click', () => {
-            handleQuizAnswer(quizInput.value.trim(), q.answer, newSubmitBtn);
-        });
+        const word = q.word.trim();
+        const hint = q.question.match(/\(힌트: (.*?)\)/);
+        const hintPattern = hint ? hint[1] : '_'.repeat(word.length);
         
-        // Enter key support
-        quizInput.onkeypress = (e) => {
-            if (e.key === 'Enter') {
-                newSubmitBtn.click();
+        quizQuestion.innerHTML = q.question.split(' (힌트:')[0];
+        
+        const boxesContainer = document.getElementById('quiz-char-boxes');
+        boxesContainer.innerHTML = '';
+        
+        // 박스 생성 및 힌트 적용
+        for (let i = 0; i < word.length; i++) {
+            const char = word[i];
+            const hintChar = hintPattern[i] || '_';
+            
+            const box = document.createElement('div');
+            box.className = 'char-box';
+            box.dataset.index = i;
+            
+            if (hintChar !== '_') {
+                box.textContent = hintChar;
+                box.classList.add('hint');
+            } else {
+                box.classList.add('empty');
+                box.onclick = () => focusBox(i);
+            }
+            boxesContainer.appendChild(box);
+        }
+        
+        // 첫 번째 빈칸에 포커스
+        focusBox(hintPattern.indexOf('_'));
+        
+        // 키보드 입력 이벤트 (한 번만 등록되도록 처리)
+        window.onkeydown = (e) => {
+            const focused = document.querySelector('.char-box.focused');
+            if (!focused) return;
+            
+            const index = parseInt(focused.dataset.index);
+            
+            if (e.key === 'Backspace') {
+                focused.textContent = '';
+                findPrevEmpty(index);
+            } else if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+                focused.textContent = e.key;
+                findNextEmpty(index);
+            } else if (e.key === 'Enter') {
+                quizSubmitBtn.click();
             }
         };
-        quizInput.focus();
+
+        quizSubmitBtn.onclick = () => {
+            const boxes = document.querySelectorAll('.char-box');
+            let userAnswer = '';
+            boxes.forEach(b => userAnswer += b.textContent || '');
+            handleQuizAnswer(userAnswer, q.answer, quizSubmitBtn);
+            window.onkeydown = null; // 정답 확인 후 키 입력 해제
+        };
+    }
+}
+
+function focusBox(index) {
+    if (index === -1) return;
+    document.querySelectorAll('.char-box').forEach(b => b.classList.remove('focused'));
+    const target = document.querySelector(`.char-box[data-index="${index}"]`);
+    if (target && !target.classList.contains('hint')) {
+        target.classList.add('focused');
+    }
+}
+
+function findNextEmpty(currentIndex) {
+    const boxes = document.querySelectorAll('.char-box');
+    for (let i = currentIndex + 1; i < boxes.length; i++) {
+        if (boxes[i].classList.contains('empty')) {
+            focusBox(i);
+            return;
+        }
+    }
+}
+
+function findPrevEmpty(currentIndex) {
+    const boxes = document.querySelectorAll('.char-box');
+    for (let i = currentIndex - 1; i >= 0; i--) {
+        if (boxes[i].classList.contains('empty')) {
+            focusBox(i);
+            return;
+        }
     }
 }
 
 function handleQuizAnswer(userAnswer, correctAnswer, btnElement) {
     const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+    const currentQuestion = quizData[currentQuizIndex];
     
-    // Disable inputs
-    if (quizData[currentQuizIndex].type === 'multiple_choice') {
+    // UI 비활성화 및 피드백 처리
+    if (currentQuestion.type === 'multiple_choice') {
         document.querySelectorAll('.quiz-option-btn').forEach(b => b.disabled = true);
         if (isCorrect) {
             btnElement.classList.add('correct');
         } else {
             btnElement.classList.add('wrong');
-            // Show correct answer
             document.querySelectorAll('.quiz-option-btn').forEach(b => {
                 if (b.textContent === correctAnswer) b.classList.add('correct');
             });
         }
     } else {
+        // 빈칸 채우기형 피드백
         btnElement.disabled = true;
-        quizInput.disabled = true;
+        const boxes = document.querySelectorAll('.char-box');
+        boxes.forEach((box, i) => {
+            box.classList.remove('focused');
+            if (isCorrect) {
+                box.classList.add('correct');
+            } else {
+                box.classList.add('wrong');
+                // 틀렸을 경우 정답을 살짝 보여줌 (선택사항)
+                box.textContent = correctAnswer[i];
+            }
+        });
     }
     
     quizFeedback.classList.remove('hidden');
@@ -808,9 +900,12 @@ function handleQuizAnswer(userAnswer, correctAnswer, btnElement) {
 if(quizNextBtn) {
     quizNextBtn.addEventListener('click', () => {
         currentQuizIndex++;
-        if (quizData[currentQuizIndex].type === 'fill_in_blank') {
-            quizInput.disabled = false;
-        }
+        
+        // 이전 문제의 잔재 청소
+        quizFeedback.classList.add('hidden');
+        quizNextBtn.classList.add('hidden');
+        window.onkeydown = null; 
+        
         showQuiz();
     });
 }
