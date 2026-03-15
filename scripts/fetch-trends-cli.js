@@ -30,8 +30,10 @@ Each object must have:
   "ko": "Korean translation here",
   "sentence_structure": "Grammar analysis explaining structure",
   "explanation": "Learning tips and context",
-  "voca": ["word1: meaning1", "word2: meaning2"]
-}`;
+  "voca": ["word : meaning", "word : meaning"]
+}
+
+[IMPORTANT: Each item in the "voca" array must be a string containing both the English word and its Korean meaning, separated by a colon (e.g., "apple : 사과").]`;
 
 // Helper Functions
 function getModelProvider(model) {
@@ -167,18 +169,34 @@ async function fetchTrends() {
     );
 
     let allTrends = [];
+    const now = new Date();
     results.forEach((result, index) => {
         if (result.status === 'fulfilled') {
             const xml = result.value.data;
-            const matches = xml.match(/<title>(.*?)<\/title>/g) || [];
-            matches.slice(1, 8).forEach(m => {
-                let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
-                title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-                const cleanTitle = title.trim();
-                if (cleanTitle.length > 10) {
-                    allTrends.push({ category: CATEGORIES[index].label, title: cleanTitle });
+            const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+            let match;
+            let count = 0;
+
+            while ((match = itemRegex.exec(xml)) !== null && count < 10) {
+                const itemContent = match[1];
+                const titleMatch = itemContent.match(/<title>(.*?)<\/title>/);
+                const dateMatch = itemContent.match(/<pubDate>(.*?)<\/pubDate>/);
+
+                if (titleMatch && dateMatch) {
+                    const pubDate = new Date(dateMatch[1]);
+                    const diffHours = (now - pubDate) / (1000 * 60 * 60);
+
+                    if (diffHours <= 24) {
+                        let title = titleMatch[1].replace(/<!\[CDATA\[|\]\]>/g, '').split(' - ')[0];
+                        title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                        const cleanTitle = title.trim();
+                        if (cleanTitle.length > 10) {
+                            allTrends.push({ category: CATEGORIES[index].label, title: cleanTitle });
+                            count++;
+                        }
+                    }
                 }
-            });
+            }
         } else {
             console.warn(`⚠️  RSS fetch failed for ${CATEGORIES[index].label}`);
         }

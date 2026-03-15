@@ -12,18 +12,30 @@ async function fetchRSS() {
         const itemRegex = /<item>([\s\S]*?)<\/item>/g;
         let match;
 
-        while ((match = itemRegex.exec(rssContent)) !== null && items.length < 10) {
+        const now = new Date();
+        while ((match = itemRegex.exec(rssContent)) !== null && items.length < 15) {
             const itemContent = match[1];
             const titleMatch = itemContent.match(/<title>(.*?)<\/title>/);
             const linkMatch = itemContent.match(/<link>(.*?)<\/link>/);
-            if (titleMatch && linkMatch) {
-                items.push({
-                    title: titleMatch[1].replace(/<!\[CDATA\[|\]\]>/g, ''),
-                    link: linkMatch[1]
-                });
+            const dateMatch = itemContent.match(/<pubDate>(.*?)<\/pubDate>/);
+            
+            if (titleMatch && linkMatch && dateMatch) {
+                const pubDate = new Date(dateMatch[1]);
+                const diffHours = (now - pubDate) / (1000 * 60 * 60);
+                
+                // 최근 24시간 이내의 뉴스만 선택
+                if (diffHours <= 24) {
+                    items.push({
+                        title: titleMatch[1].replace(/<!\[CDATA\[|\]\]>/g, ''),
+                        link: linkMatch[1],
+                        pubDate: dateMatch[1]
+                    });
+                }
             }
         }
-        console.log(JSON.stringify(items, null, 2));
+        // 최대 10개까지만 반환
+        const finalItems = items.slice(0, 10);
+        console.log(JSON.stringify(finalItems, null, 2));
     } catch (error) {
         console.error(error.message);
         process.exit(1);
