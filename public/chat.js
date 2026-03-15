@@ -234,18 +234,33 @@ function connectWebSocket() {
                     const aiParentMessage = ChatState.currentAiMessageTextDiv.closest('.chat-message');
                     const translation = aiParentMessage.getAttribute('data-translation');
                     const corrections = aiParentMessage.getAttribute('data-corrections');
-                    
-                    if (translation || corrections) {
-                        const aiActionsDiv = document.createElement('div');
-                        aiActionsDiv.className = 'message-actions';
-                        aiParentMessage.querySelector('.chat-message-content').appendChild(aiActionsDiv);
-                        if (translation) addTranslationToggle(aiParentMessage, translation, aiActionsDiv);
-                        if (corrections) addCorrectionsToggle(aiParentMessage, corrections, aiActionsDiv);
+
+                    if (translation) {
+                        let aiActionsDiv = aiParentMessage.querySelector('.message-actions');
+                        if (!aiActionsDiv) {
+                            aiActionsDiv = document.createElement('div');
+                            aiActionsDiv.className = 'message-actions';
+                            aiParentMessage.querySelector('.chat-message-content').appendChild(aiActionsDiv);
+                        }
+                        addTranslationToggle(aiParentMessage, translation, aiActionsDiv);
+                    }
+
+                    if (corrections) {
+                        const userMessages = document.querySelectorAll('.chat-message-user');
+                        if (userMessages.length > 0) {
+                            const lastUserMessage = userMessages[userMessages.length - 1];
+                            let userActionsDiv = lastUserMessage.querySelector('.message-actions');
+                            if (!userActionsDiv) {
+                                userActionsDiv = document.createElement('div');
+                                userActionsDiv.className = 'message-actions';
+                                lastUserMessage.querySelector('.chat-message-content').appendChild(userActionsDiv);
+                            }
+                            addCorrectionsToggle(lastUserMessage, corrections, userActionsDiv);
+                        }
                     }
                 }
                 ChatState.currentAiMessageTextDiv = null;
-                ChatState.aiTextBuffer = '';
-            } else if (data.type === 'error') {
+                ChatState.aiTextBuffer = '';            } else if (data.type === 'error') {
                 alert('서버 오류: ' + data.message);
             }
         } catch (e) {

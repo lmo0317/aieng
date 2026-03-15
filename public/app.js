@@ -12,7 +12,28 @@ const startBtn = document.getElementById('start-btn');
 const revealBtn = document.getElementById('reveal-btn');
 const nextBtn = document.getElementById('next-btn');
 const finishBtn = document.getElementById('finish-btn');
+const startQuizBtn = document.getElementById('start-quiz-btn');
 const currentCountSpan = document.getElementById('current-count');
+
+// 퀴즈 관련 DOM 요소
+const quizSection = document.getElementById('quiz-section');
+const quizCurrentCount = document.getElementById('quiz-current-count');
+const quizScoreDisplay = document.getElementById('quiz-score');
+const quizLoading = document.getElementById('quiz-loading');
+const quizContent = document.getElementById('quiz-content');
+const quizTypeLabel = document.getElementById('quiz-type-label');
+const quizQuestion = document.getElementById('quiz-question');
+const quizOptions = document.getElementById('quiz-options');
+const quizInputContainer = document.getElementById('quiz-input-container');
+const quizInput = document.getElementById('quiz-input');
+const quizSubmitBtn = document.getElementById('quiz-submit-btn');
+const quizFeedback = document.getElementById('quiz-feedback');
+const quizNextBtn = document.getElementById('quiz-next-btn');
+const quizFinishBtn = document.getElementById('quiz-finish-btn');
+
+let quizData = [];
+let currentQuizIndex = 0;
+let quizScore = 0;
 
 const sentenceEn = document.getElementById('sentence-en');
 const sentenceKo = document.getElementById('sentence-ko');
@@ -48,6 +69,7 @@ function resetLearningState() {
     revealBtn.classList.remove('hidden');
     nextBtn.classList.add('hidden');
     finishBtn.classList.add('hidden');
+    if(startQuizBtn) startQuizBtn.classList.add('hidden');
     ttsBtn.classList.add('hidden');
     
     currentCountSpan.textContent = '0';
@@ -318,27 +340,32 @@ async function startLearningFromTrend(topic, id) {
         const data = await response.json();
         console.log('📦 Data from server:', data);
 
-        if (response.ok && data.trend && data.trend.sentences) {
-            try {
-                // sentences가 이미 객체(Array)일 수도 있고 JSON 문자열일 수도 있음
-                let savedSentences = data.trend.sentences;
-                if (typeof savedSentences === 'string') {
-                    savedSentences = JSON.parse(savedSentences);
-                }
-                
-                console.log('✅ Loaded sentences:', savedSentences);
+            if (response.ok && data.trend && data.trend.sentences) {
+                try {
+                    let savedSentences = data.trend.sentences;
+                    if (typeof savedSentences === 'string') {
+                        savedSentences = JSON.parse(savedSentences);
+                    }
+                    
+                    let savedQuiz = data.trend.quiz;
+                    if (typeof savedQuiz === 'string') {
+                        savedQuiz = JSON.parse(savedQuiz);
+                    }
+                    
+                    console.log('✅ Loaded sentences:', savedSentences);
 
-                if (Array.isArray(savedSentences) && savedSentences.length > 0) {
-                    sentences = savedSentences;
-                    currentCount = 0;
-                    showSentence();
-                    sendTopicToChat(topic);
-                    return;
+                    if (Array.isArray(savedSentences) && savedSentences.length > 0) {
+                        sentences = savedSentences;
+                        quizData = Array.isArray(savedQuiz) ? savedQuiz : [];
+                        currentCount = 0;
+                        showSentence();
+                        sendTopicToChat(topic);
+                        return;
+                    }
+                } catch (parseError) {
+                    console.error('❌ Data processing error:', parseError);
                 }
-            } catch (parseError) {
-                console.error('❌ Data processing error:', parseError);
-            }
-        }        
+            }        
         alert('해당 트렌드의 학습 데이터가 존재하지 않거나 형식이 올바르지 않습니다.');
         showSection('trends-section');
     } catch (error) {
@@ -647,6 +674,7 @@ revealBtn.addEventListener('click', () => {
         nextBtn.classList.remove('hidden');
     } else {
         finishBtn.classList.remove('hidden');
+        if(startQuizBtn) startQuizBtn.classList.remove('hidden');
     }
 });
 
@@ -668,4 +696,128 @@ function finishLearning() {
     vocaDiv.classList.add('hidden');
     nextBtn.classList.add('hidden');
     finishBtn.classList.remove('hidden');
+    if(startQuizBtn) startQuizBtn.classList.remove('hidden');
+}
+
+// 퀴즈 관련 로직
+if(startQuizBtn) {
+    startQuizBtn.addEventListener('click', () => {
+        if (!quizData || quizData.length === 0) {
+            alert('이 학습 세션에는 등록된 퀴즈가 없습니다.');
+            return;
+        }
+
+        // 퀴즈 화면 전환
+        learningSection.classList.add('hidden');
+        quizSection.classList.remove('hidden');
+        quizLoading.classList.add('hidden');
+        quizContent.classList.remove('hidden');
+        quizNextBtn.classList.add('hidden');
+        quizFinishBtn.classList.add('hidden');
+        quizFeedback.classList.add('hidden');
+
+        currentQuizIndex = 0;
+        quizScore = 0;
+        showQuiz();
+    });
+}
+
+function showQuiz() {
+    const q = quizData[currentQuizIndex];
+    quizCurrentCount.textContent = `${currentQuizIndex + 1} / ${quizData.length}`;
+    quizScoreDisplay.textContent = quizScore;
+    quizFeedback.classList.add('hidden');
+    quizNextBtn.classList.add('hidden');
+    
+    quizQuestion.textContent = q.question;
+    
+    if (q.type === 'multiple_choice') {
+        quizTypeLabel.textContent = '4지 선다형';
+        quizOptions.classList.remove('hidden');
+        quizInputContainer.classList.add('hidden');
+        
+        quizOptions.innerHTML = '';
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => handleQuizAnswer(opt, q.answer, btn);
+            quizOptions.appendChild(btn);
+        });
+    } else {
+        quizTypeLabel.textContent = '빈칸 채우기';
+        quizOptions.classList.add('hidden');
+        quizInputContainer.classList.remove('hidden');
+        quizInput.value = '';
+        
+        // Remove previous listeners
+        const newSubmitBtn = quizSubmitBtn.cloneNode(true);
+        quizSubmitBtn.parentNode.replaceChild(newSubmitBtn, quizSubmitBtn);
+        newSubmitBtn.addEventListener('click', () => {
+            handleQuizAnswer(quizInput.value.trim(), q.answer, newSubmitBtn);
+        });
+        
+        // Enter key support
+        quizInput.onkeypress = (e) => {
+            if (e.key === 'Enter') {
+                newSubmitBtn.click();
+            }
+        };
+        quizInput.focus();
+    }
+}
+
+function handleQuizAnswer(userAnswer, correctAnswer, btnElement) {
+    const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+    
+    // Disable inputs
+    if (quizData[currentQuizIndex].type === 'multiple_choice') {
+        document.querySelectorAll('.quiz-option-btn').forEach(b => b.disabled = true);
+        if (isCorrect) {
+            btnElement.classList.add('correct');
+        } else {
+            btnElement.classList.add('wrong');
+            // Show correct answer
+            document.querySelectorAll('.quiz-option-btn').forEach(b => {
+                if (b.textContent === correctAnswer) b.classList.add('correct');
+            });
+        }
+    } else {
+        btnElement.disabled = true;
+        quizInput.disabled = true;
+    }
+    
+    quizFeedback.classList.remove('hidden');
+    quizFeedback.className = 'quiz-feedback ' + (isCorrect ? 'success' : 'error');
+    
+    if (isCorrect) {
+        quizScore += 10;
+        quizScoreDisplay.textContent = quizScore;
+        quizFeedback.textContent = '🎉 정답입니다!';
+    } else {
+        quizFeedback.textContent = `❌ 오답입니다. 정답: ${correctAnswer}`;
+    }
+    
+    if (currentQuizIndex + 1 < quizData.length) {
+        quizNextBtn.classList.remove('hidden');
+    } else {
+        quizFinishBtn.classList.remove('hidden');
+    }
+}
+
+if(quizNextBtn) {
+    quizNextBtn.addEventListener('click', () => {
+        currentQuizIndex++;
+        if (quizData[currentQuizIndex].type === 'fill_in_blank') {
+            quizInput.disabled = false;
+        }
+        showQuiz();
+    });
+}
+
+if(quizFinishBtn) {
+    quizFinishBtn.addEventListener('click', () => {
+        alert(`퀴즈 완료! 최종 점수: ${quizScore} / ${quizData.length * 10}점`);
+        location.reload();
+    });
 }

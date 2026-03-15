@@ -136,8 +136,20 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 topic TEXT,
                 difficulty TEXT,
                 sentences TEXT,
+                quiz TEXT,
                 createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-            )`);
+            )`, (err) => {
+                if(!err) {
+                    db.all("PRAGMA table_info(learning_history)", (err, columns) => {
+                        if (!err) {
+                            const columnNames = columns.map(c => c.name);
+                            if (!columnNames.includes('quiz')) {
+                                db.run("ALTER TABLE learning_history ADD COLUMN quiz TEXT");
+                            }
+                        }
+                    });
+                }
+            });
 
             // Create Real-time Trends table
             db.run(`CREATE TABLE IF NOT EXISTS trends (

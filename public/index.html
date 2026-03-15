@@ -96,6 +96,41 @@
                 <button id="reveal-btn">정답 및 설명 보기</button>
                 <button id="next-btn" class="hidden">다음 문장</button>
                 <button id="finish-btn" class="hidden">오늘의 학습 완료!</button>
+                <button id="start-quiz-btn" class="hidden">🎮 어휘 퀴즈 시작</button>
+            </div>
+        </div>
+
+        <!-- 퀴즈 섹션 -->
+        <div id="quiz-section" class="hidden">
+            <div class="quiz-header">
+                <h2>🎮 어휘 복습 퀴즈</h2>
+                <div class="quiz-progress">문제: <span id="quiz-current-count">0 / 0</span> | 점수: <span id="quiz-score">0</span></div>
+            </div>
+            
+            <div id="quiz-loading" class="quiz-loading hidden">
+                <div class="spinner"></div>
+                <p>AI가 맞춤형 퀴즈를 생성하고 있습니다...</p>
+            </div>
+
+            <div id="quiz-content" class="card hidden">
+                <div class="quiz-question-type" id="quiz-type-label">유형</div>
+                <div class="quiz-question" id="quiz-question">문제가 여기에 표시됩니다.</div>
+                
+                <div id="quiz-options" class="quiz-options hidden">
+                    <!-- 4지선다 옵션 동적 추가 -->
+                </div>
+                
+                <div id="quiz-input-container" class="quiz-input-container hidden">
+                    <input type="text" id="quiz-input" placeholder="정답 단어를 입력하세요" autocomplete="off" spellcheck="false" />
+                    <button id="quiz-submit-btn" class="btn-primary">제출</button>
+                </div>
+                
+                <div id="quiz-feedback" class="quiz-feedback hidden"></div>
+            </div>
+            
+            <div class="controls quiz-controls">
+                <button id="quiz-next-btn" class="hidden">다음 문제</button>
+                <button id="quiz-finish-btn" class="hidden">퀴즈 완료</button>
             </div>
         </div>
     </div>

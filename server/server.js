@@ -29,27 +29,40 @@ const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'T
 2. 실제 튜터와 대화하듯이 친절하고 자연스러운 문장으로 응답하세요.
 3. 제공된 주제에 대해 먼저 한국어로 핵심 내용을 아주 짧게(1~2문장) 요약해 준 뒤, 곧바로 영어 학습을 도와주세요.
 
-**문장 생성 규칙 (Generate API 호출 시)**:
-위 주제와 난이도에 맞는 영어 문장 10개를 생성하여 반드시 아래의 순수한 JSON 배열 형식으로만 응답하세요. 
+**콘텐츠 생성 규칙 (Generate API 호출 시)**:
+위 주제와 난이도에 맞는 영어 문장 10개와 복습용 퀴즈 10개를 생성하여, 반드시 아래의 순수한 JSON 객체 형식으로만 응답하세요. 
 [중요] JSON 문자열 값 내에 실제 줄바꿈(Enter)을 포함하지 마세요. 줄바꿈이 필요한 경우 반드시 \\n으로 이스케이프 처리하세요.
 설명이나 다른 텍스트를 붙이지 마세요.
 
-1. "en": 영어 문장
-2. "ko": 한국어 해석
-3. "sentence_structure": 문장 구조 분석
-4. "explanation": 학습 팁 및 문법 설명
-5. "voca": 핵심 단어 및 숙어 ["단어: 뜻"]
+- "sentence_structure" 작성 시 언어학적 태그와 함께 반드시 한글 명칭(주어, 동사, 목적어, 수식어구 등)을 포함하여 직관적으로 분석하세요. (예: S(주어: 단어) + V(동사: 단어) + O(목적어: 단어))
+- "explanation" (학습 팁 및 문법 설명) 작성 시, 명확하고 직관적인 1타 강사 스타일로 아주 상세하게 설명하세요.
 
-JSON 형식 예시:
-[
-  {
-    "en": "Example sentence",
-    "ko": "예시 문장",
-    "sentence_structure": "구조 분석",
-    "explanation": "설명",
-    "voca": ["word: 뜻"]
-  }
-]`;
+{
+  "sentences": [
+    {
+      "en": "English sentence",
+      "ko": "한국어 해석",
+      "sentence_structure": "S(주어: Apple) + V(동사: is) + SC(주격보어: delicious) 형식의 명확한 문장 구조 분석",
+      "explanation": "1타 강사 스타일의 깊이 있는 문법 및 뉘앙스 설명",
+      "voca": ["word: 뜻"]
+    }
+  ],
+  "quiz": [
+    {
+      "type": "multiple_choice",
+      "word": "apple",
+      "question": "'apple'의 올바른 뜻을 고르세요.",
+      "options": ["사과", "바나나", "포도", "오렌지"],
+      "answer": "사과"
+    },
+    {
+      "type": "fill_in_blank",
+      "word": "banana",
+      "question": "다음 뜻에 해당하는 영어 단어를 적어주세요: '바나나'",
+      "answer": "banana"
+    }
+  ]
+}`;
 
 // Helper function to get global settings
 async function getGlobalSettings() {
@@ -183,17 +196,20 @@ app.post('/api/generate', async (req, res) => {
     }
 
     try {
-        const userPrompt = `주제: ${topic}\n난이도: ${difficulty}\n\n[CRITICAL: Output ONLY a valid JSON array of exactly 10 objects. No markdown.]`;
+        const userPrompt = `주제: ${topic}\n난이도: ${difficulty}\n\n[CRITICAL: Output ONLY a valid JSON object containing "sentences" and "quiz". No markdown.]`;
         const content = await callGeminiAPI(s.geminiApiKey, s.geminiModel, s.systemPrompt, userPrompt);
-        const sentences = cleanAndParseJSON(content);
+        const parsedData = cleanAndParseJSON(content);
         
-        db.run("INSERT INTO learning_history (topic, difficulty, sentences) VALUES (?, ?, ?)",
-            [topic, difficulty, JSON.stringify(sentences)]);
+        let sentences = parsedData.sentences || parsedData;
+        let quiz = parsedData.quiz || [];
+        
+        db.run("INSERT INTO learning_history (topic, difficulty, sentences, quiz) VALUES (?, ?, ?, ?)",
+            [topic, difficulty, JSON.stringify(sentences), JSON.stringify(quiz)]);
 
-        res.json({ sentences });
+        res.json({ sentences, quiz });
     } catch (error) {
         console.error('Generate Error:', error.message);
-        res.status(500).json({ error: 'Failed to generate sentences' });
+        res.status(500).json({ error: 'Failed to generate sentences and quiz' });
     }
 });
 
@@ -287,19 +303,22 @@ app.post('/api/trends/fetch', async (req, res) => {
             const analysis = await callGeminiAPI(s.geminiApiKey, s.geminiModel, null, prompt);
             const analyzed = cleanAndParseJSON(analysis);
 
-            const userPrompt = `주제: ${trend.title}\n난이도: level3\n\n[Output ONLY JSON array of 10 objects]`;
+            const userPrompt = `주제: ${trend.title}\n난이도: level3\n\n[Output ONLY a valid JSON object containing "sentences" and "quiz"]`;
             const content = await callGeminiAPI(s.geminiApiKey, s.geminiModel, s.systemPrompt, userPrompt);
-            const sentences = cleanAndParseJSON(content);
+            const parsedData = cleanAndParseJSON(content);
+            
+            let sentences = parsedData.sentences || parsedData;
+            let quiz = parsedData.quiz || [];
 
-            processed.push({ ...trend, summary: analyzed.summary, keywords: analyzed.keywords, sentences });
+            processed.push({ ...trend, summary: analyzed.summary, keywords: analyzed.keywords, sentences, quiz });
             await new Promise(r => setTimeout(r, 2000));
         }
 
         const today = new Date().toISOString().split('T')[0];
         db.serialize(() => {
             db.run("DELETE FROM trends WHERE date = ? AND type = 'news'", [today]);
-            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, 'news')");
-            processed.forEach(t => stmt.run(t.title, t.category, t.summary, JSON.stringify(t.keywords), JSON.stringify(t.sentences), 'level3', today));
+            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, quiz, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'news')");
+            processed.forEach(t => stmt.run(t.title, t.category, t.summary, JSON.stringify(t.keywords), JSON.stringify(t.sentences), JSON.stringify(t.quiz), 'level3', today));
             stmt.finalize();
         });
 
@@ -311,12 +330,80 @@ app.post('/api/trends/fetch', async (req, res) => {
     }
 });
 
+// Save Pre-Analyzed Trends API (for CLI script)
+app.post('/api/trends/save', async (req, res) => {
+    try {
+        const { trends } = req.body;
+        if (!Array.isArray(trends) || trends.length === 0) {
+            return res.status(400).json({ error: '트렌드 배열이 필요합니다.' });
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+
+        db.serialize(() => {
+            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, quiz, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            trends.forEach(t => {
+                const keywords = t.keywords ? JSON.stringify(t.keywords) : '[]';
+                const sentences = typeof t.sentences === 'object' ? JSON.stringify(t.sentences) : t.sentences;
+                const quiz = t.quiz ? (typeof t.quiz === 'object' ? JSON.stringify(t.quiz) : t.quiz) : '[]';
+                const cleanTitle = String(t.title || '').trim();
+
+                stmt.run(cleanTitle, t.category, t.summary || '', keywords, sentences, quiz, t.difficulty || 'level3', today, 'news');
+            });
+            stmt.finalize();
+        });
+
+        res.json({ success: true, message: `${trends.length} trends saved successfully.` });
+    } catch (error) {
+        console.error('Trends save error:', error.message);
+        res.status(500).json({ error: `실패: ${error.message}` });
+    }
+});
+
+app.get('/api/trends/by-id/:id', (req, res) => {
+    const { id } = req.params;
+    db.get("SELECT * FROM trends WHERE id = ?", [id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: 'Not found' });
+        res.json({ trend: row });
+    });
+});
+
+app.get('/api/trends/by-title', (req, res) => {
+    const { title } = req.query;
+    db.get("SELECT * FROM trends WHERE title = ?", [title], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: 'Not found' });
+        res.json({ trend: row });
+    });
+});
+
 // Saved Songs API
 app.get('/api/songs/saved', (req, res) => {
     db.all("SELECT * FROM trends WHERE type = 'song' ORDER BY createdAt DESC", (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ songs: rows || [] });
     });
+});
+
+// Clear Today's Data API
+app.post('/api/trends/clear-today', (req, res) => {
+    const { date } = req.body;
+    if (!date) {
+        return res.status(400).json({ error: 'date 파라미터가 필요합니다.' });
+    }
+
+    if (date === '날짜 미지정') {
+        db.run("DELETE FROM trends WHERE (date IS NULL OR date = '') AND type = 'news'", function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ success: true, deleted: this.changes });
+        });
+    } else {
+        db.run("DELETE FROM trends WHERE date = ? AND type = 'news'", [date], function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ success: true, deleted: this.changes });
+        });
+    }
 });
 
 // Delete Trend or Song
