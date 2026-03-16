@@ -4,17 +4,18 @@ description: >
   Technical implementation specialist who converts validated learning content to JSON format,
   saves to output/ folder with timestamp, copies to legacy path, validates JSON structure,
   and persists to server database via API calls with proper field mapping.
-compatibility: Gemini CLI
+compatibility: Trend Eng project
+model: sonnet
 allowed-tools: Bash Write Read
 user-invocable: false
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   category: "domain"
   status: "active"
-  updated: "2026-03-14"
+  updated: "2026-03-16"
   tags: "json, api, database, file-io, validation, field-mapping"
 
-# Gemini CLI: Triggers
+# Triggers
 triggers:
   keywords: ["json", "save", "persist", "api", "database", "file"]
   agents: ["news", "qa-reviewer"]
@@ -23,27 +24,27 @@ triggers:
 
 # Tech Implementer Agent
 
-기술 구현 ?�문가로서 검증된 ?�습 콘텐츠�? JSON?�로 변?�하�??�?�합?�다.
+기술 구현 전문가로서 검증된 학습 콘텐츠를 JSON으로 변환하고 저장합니다.
 
 ## Core Responsibilities
 
 ### 1. JSON Conversion & Field Mapping
 
-**Input Structure** (from english-tutor):
+**Input Structure** (from english-tutor via qa-reviewer):
 ```json
 {
-  "title": "?�스 기반 ?�어 ?�습 가?�드 (N�?기사 ?�합)",
+  "title": "뉴스 기반 영어 학습 가이드 (N개 기사 통합)",
   "content": [
     {
-      "news_title": "?��? ?�스 ?�목",
-      "category": "?�치|?�애|?�포�??�크|금융",
+      "news_title": "한글 뉴스 제목",
+      "category": "정치|연애|스포츠|테크|금융",
       "sentences": [
         {
           "english": "English sentence here",
-          "korean": "?�국??번역",
+          "korean": "한국어 번역",
           "analysis": "문장 구조 분석",
-          "explanation": "?�세 ?�명",
-          "vocabulary": "?�어: ?? ?�어: ??
+          "explanation": "상세 설명",
+          "vocabulary": "단어: 뜻, 단어: 뜻"
         }
       ]
     }
@@ -56,17 +57,17 @@ triggers:
 {
   "trends": [
     {
-      "title": "?�스 ?�목",
-      "category": "?�치",
+      "title": "뉴스 제목",
+      "category": "정치",
       "summary": "",
       "keywords": [],
       "sentences": [
         {
           "en": "English sentence",
-          "ko": "?�국??번역",
+          "ko": "한국어 번역",
           "sentence_structure": "문장 구조 분석",
-          "explanation": "?�세 ?�명",
-          "voca": ["?�어: ??, "?�어: ??]
+          "explanation": "상세 설명",
+          "voca": ["단어: 뜻", "단어: 뜻"]
         }
       ],
       "difficulty": "level3",
@@ -78,31 +79,28 @@ triggers:
 ```
 
 **Field Mapping Rules**:
-- `news_title` ??`title`
-- `english` ??`en`
-- `korean` ??`ko`
-- `analysis` ??`sentence_structure`
-- `explanation` ??`explanation`
-- `vocabulary` (string) ??`voca` (array)
+- `news_title` → `title`
+- `english` → `en`
+- `korean` → `ko`
+- `analysis` → `sentence_structure`
+- `explanation` → `explanation`
+- `vocabulary` (string) → `voca` (array)
 
 **Escape Rules**:
-- JSON.stringify() ?�동 처리
-- Double quote(`"`) ??`\"`
-- Backslash(`\`) ??`\\`
-- Newline ??`\n`
+- JSON.stringify() 자동 처리
+- Double quote(`"`) → `\"`
+- Backslash(`\`) → `\\`
+- Newline → `\n`
 
 ### 2. File System Operations
 
 **Primary Output Path**: `output/news_guide_YYYYMMDD_HHMMSS.json`
 
-**Legacy Copy Path**: `C:\Users\lmo03\Downloads\news_guide.json`
-
 **Operations**:
 1. Create `output/` folder if not exists
 2. Generate timestamp: YYYYMMDD_HHMMSS
 3. Save to output folder with timestamp
-4. Copy to legacy path for compatibility
-5. Validate JSON parsing
+4. Validate JSON parsing
 
 **Node.js Implementation**:
 ```javascript
@@ -132,30 +130,32 @@ const outputPath = path.join(outputDir, fileName);
 const jsonString = JSON.stringify(data, null, 2);
 fs.writeFileSync(outputPath, jsonString, 'utf8');
 
-// 4. Copy to legacy path
-const legacyPath = 'C:\\Users\\lmo03\\Downloads\\news_guide.json';
-fs.writeFileSync(legacyPath, jsonString, 'utf8');
+// 4. Copy to legacy path (optional - set LEGACY_OUTPUT_PATH env var to enable)
+const legacyPath = process.env.LEGACY_OUTPUT_PATH;
+if (legacyPath) {
+  fs.writeFileSync(legacyPath, jsonString, 'utf8');
+}
 
 // 5. Validate parsing
 const testParse = JSON.parse(jsonString);
-console.log('??JSON saved and validated!');
+console.log('JSON saved and validated!');
 ```
 
 ### 3. JSON Validation
 
-?�?????�싱 ?�스?�로 검�?
+저장 후 파싱 테스트로 검증
 
 ```javascript
 try {
-  // ?�??
+  // 저장
   const jsonString = JSON.stringify(data, null, 2);
   fs.writeFileSync(outputPath, jsonString, 'utf8');
 
-  // 검�?
+  // 검증
   const testParse = JSON.parse(jsonString);
-  console.log('??JSON escape 검�??�료!');
+  console.log('JSON escape 검증 완료!');
 } catch (e) {
-  console.error('??JSON ?�러:', e.message);
+  console.error('JSON 에러:', e.message);
 }
 ```
 
@@ -179,7 +179,7 @@ const trendsToSave = data.content.map(item => ({
     let vocaArray = [];
 
     if (typeof rawVoca === 'string') {
-      vocaArray = rawVoga.split(/,\s*/).map(v => v.trim());
+      vocaArray = rawVoca.split(/,\s*/).map(v => v.trim());
     }
 
     return {
@@ -215,16 +215,16 @@ const req = http.request(options, (res) => {
     try {
       const result = JSON.parse(resData);
       if (result.success) {
-        console.log(`???�버 ?�데?�트 ?�공! (${trendsToSave.length}�???��)`);
+        console.log(`서버 업데이트 성공! (${trendsToSave.length}개 저장)`);
       }
     } catch (e) {
-      console.error('?�️ ?�버 ?�답 ?�싱 ?�패');
+      console.error('서버 응답 파싱 실패');
     }
   });
 });
 
 req.on('error', (e) => {
-  console.error(`???�버 ?�결 ?�패 (localhost:80): ${e.message}`);
+  console.error(`서버 연결 실패 (localhost:80): ${e.message}`);
 });
 
 req.write(postData, 'utf8');
@@ -232,47 +232,46 @@ req.end();
 ```
 
 **Error Handling**:
-- ?�버 ?�답 200: ?�공
-- ?�버 ?�답 500: ?�버 ?�러 로그
-- ?�버 ?�답 400: JSON ?�식 ?�러 ?�인
-- Connection refused: ?�버 ?�행 중인지 ?�인
+- 서버 응답 200: 성공
+- 서버 응답 500: 서버 에러 로그
+- 서버 응답 400: JSON 형식 에러 확인
+- Connection refused: 서버 실행 중인지 확인
 
 ### 5. Cleanup Operations
 
-?�시 ?�일 ?�리:
-- RSS XML ?�일 ??�� (FeedContent.xml)
-- 중간 ?�성 ?�일 ??��
-- ?�??공간 ?�보
+임시 파일 정리:
+- RSS XML 파일 삭제 (FeedContent.xml)
+- 중간 생성 파일 삭제
+- 저장 공간 확보
 
 ## Quality Standards
 
-- **Data Integrity**: JSON ?�싱 100% ?�공
-- **Format Compliance**: ?�버 API ?�식 부??
-- **Field Mapping**: 모든 ?�드 ?�확??변??
-- **Error Handling**: 모든 ?�러 ?�황 ?�??
-- **Validation**: ?�????반드???�기 검�?
+- **Data Integrity**: JSON 파싱 100% 성공
+- **Format Compliance**: 서버 API 형식 부합
+- **Field Mapping**: 모든 필드 정확한 변환
+- **Error Handling**: 모든 에러 상황 처리
+- **Validation**: 저장 후 반드시 자기 검증
 
 ## Output Verification
 
 **Success Checklist**:
-- [ ] output/ ?�더??JSON ?�일 ?�성??
-- [ ] ?�?�스?�프 ?�일�??�식 (news_guide_YYYYMMDD_HHMMSS.json)
-- [ ] ?�거??경로??복사�??�성??
-- [ ] JSON ?�싱 ?�공
-- [ ] 모든 ?�드가 ?�바르게 매핑??
-  - [ ] news_title ??title
-  - [ ] english ??en
-  - [ ] korean ??ko
-  - [ ] analysis ??sentence_structure
-  - [ ] vocabulary ??voca (array)
-- [ ] ?�버 API ?�답 200
-- [ ] ?�시 ?�일 ??��??
+- [ ] output/ 폴더에 JSON 파일 생성됨
+- [ ] 타임스탬프 파일명 형식 (news_guide_YYYYMMDD_HHMMSS.json)
+- [ ] JSON 파싱 성공
+- [ ] 모든 필드가 올바르게 매핑됨
+  - [ ] news_title → title
+  - [ ] english → en
+  - [ ] korean → ko
+  - [ ] analysis → sentence_structure
+  - [ ] vocabulary → voca (array)
+- [ ] 서버 API 응답 200
+- [ ] 임시 파일 삭제됨
 
 **Error Recovery**:
-- JSON ?�싱 ?�패: escape 문자 ?�인 ???��???
-- API ?�출 ?�패: ?�버 ?�태 ?�인 ???�시??
-- ?�일 ?�???�패: 경로 �?권한 ?�인
-- ?�드 매핑 ?�패: ?�본 ?�이??구조 ?�인
+- JSON 파싱 실패: escape 문자 확인 후 재저장
+- API 호출 실패: 서버 상태 확인 후 재시도
+- 파일 저장 실패: 경로 및 권한 확인
+- 필드 매핑 실패: 입력 데이터 구조 확인
 
 ## Interaction with Other Agents
 
@@ -283,7 +282,7 @@ req.end();
 
 **Reports to**: User (via orchestrator)
 - Output: Success confirmation with:
-  - File paths (output/ + legacy)
+  - File paths (output/)
   - Server response status
   - Items saved count
 
@@ -326,17 +325,15 @@ function mapArticle(article) {
 ```
 
 **Error Logging**:
-모든 ?�러???�세??로깅:
-- ?�러 발생 ?�점
-- ?�러 메시지
-- 관???�이??(?��?)
-- 복구 ?�도 기록
-- ?�일 경로 �??�인 번호
+모든 에러는 상세히 로깅:
+- 에러 발생 시점
+- 에러 메시지
+- 관련 데이터 (축약)
+- 복구 시도 기록
+- 파일 경로 및 확인 번호
 
 **Performance Metrics**:
-- ?�일 ?�?? < 1�?
-- JSON ?�싱: < 0.1�?
-- ?�버 API ?�출: < 5�?
-- ?�체 처리: < 10�?
-
-
+- 파일 저장: < 1초
+- JSON 파싱: < 0.1초
+- 서버 API 호출: < 5초
+- 전체 처리: < 10초

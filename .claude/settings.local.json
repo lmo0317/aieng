@@ -41,7 +41,12 @@
       "Bash(mv:*)",
       "Bash(cat:*)",
       "Bash(echo:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//c/work/git/web/aieng/**)",
+      "Bash(done)"
     ]
   },
   "enabledPlugins": {

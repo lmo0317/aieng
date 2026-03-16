@@ -4,6 +4,7 @@ description: >
   팝송 가사 분석 전문가. 가사 텍스트를 분석하여 핵심 주제, 키워드, 문화적 배경을 추출하고
   학습에 적합한 문장을 선정합니다. 슬랭, 관용구, 문학적 표현을 식별합니다.
 compatibility: Trend Eng project
+model: sonnet
 allowed-tools: Read Write Grep
 user-invocable: false
 metadata:
