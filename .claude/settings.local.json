@@ -46,7 +46,8 @@
       "Bash(for f:*)",
       "Bash(do echo:*)",
       "Read(//c/work/git/web/aieng/**)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(ls:*)"
     ]
   },
   "enabledPlugins": {
