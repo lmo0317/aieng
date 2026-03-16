@@ -36,7 +36,12 @@
       "Bash(git push:*)",
       "WebSearch",
       "Bash(curl:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(find:*)"
     ]
   },
   "enabledPlugins": {
