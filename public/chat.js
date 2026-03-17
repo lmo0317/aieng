@@ -109,6 +109,8 @@ function selectTeacher(teacherType) {
 
     const modalTitle = document.getElementById('chat-modal-title');
     if (modalTitle) modalTitle.textContent = ChatState.teacherPersona.name;
+    const headerAvatar = document.getElementById('chat-header-avatar');
+    if (headerAvatar) headerAvatar.textContent = ChatState.teacherPersona.emoji;
 
     const teacherSelection = document.getElementById('teacher-selection');
     const chatMessages = document.getElementById('chat-messages');
@@ -209,9 +211,10 @@ function connectWebSocket() {
                 if (cleanText.length === 0) return;
 
                 if (!ChatState.currentAiMessageTextDiv) {
+                    const emoji = ChatState.teacherPersona?.emoji || '🤖';
                     const messageDiv = document.createElement('div');
                     messageDiv.className = `chat-message chat-message-ai`;
-                    messageDiv.innerHTML = `<div class="chat-message-content"><div class="chat-message-text"></div></div>`;
+                    messageDiv.innerHTML = `<div class="chat-ai-avatar">${emoji}</div><div class="chat-message-bubble"><div class="chat-message-text"></div></div>`;
                     chatMessages.appendChild(messageDiv);
                     ChatState.currentAiMessageTextDiv = messageDiv.querySelector('.chat-message-text');
 
@@ -227,6 +230,7 @@ function connectWebSocket() {
                     if (correctionsText) parentMessage.setAttribute('data-corrections', correctionsText);
                 }
 
+
                 chatMessages.scrollTop = chatMessages.scrollHeight;
 
             } else if (data.type === 'turn_complete') {
@@ -240,7 +244,7 @@ function connectWebSocket() {
                         if (!aiActionsDiv) {
                             aiActionsDiv = document.createElement('div');
                             aiActionsDiv.className = 'message-actions';
-                            aiParentMessage.querySelector('.chat-message-content').appendChild(aiActionsDiv);
+                            aiParentMessage.querySelector('.chat-message-bubble').appendChild(aiActionsDiv);
                         }
                         addTranslationToggle(aiParentMessage, translation, aiActionsDiv);
                     }
@@ -253,7 +257,7 @@ function connectWebSocket() {
                             if (!userActionsDiv) {
                                 userActionsDiv = document.createElement('div');
                                 userActionsDiv.className = 'message-actions';
-                                lastUserMessage.querySelector('.chat-message-content').appendChild(userActionsDiv);
+                                lastUserMessage.querySelector('.chat-message-bubble').appendChild(userActionsDiv);
                             }
                             addCorrectionsToggle(lastUserMessage, corrections, userActionsDiv);
                         }
@@ -291,7 +295,12 @@ function sendMessage() {
 function addMessage(type, text) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message chat-message-${type}`;
-    messageDiv.innerHTML = `<div class="chat-message-content"><div class="chat-message-text">${text}</div></div>`;
+    if (type === 'ai') {
+        const emoji = ChatState.teacherPersona?.emoji || '🤖';
+        messageDiv.innerHTML = `<div class="chat-ai-avatar">${emoji}</div><div class="chat-message-bubble"><div class="chat-message-text">${text}</div></div>`;
+    } else {
+        messageDiv.innerHTML = `<div class="chat-message-bubble"><div class="chat-message-text">${text}</div></div>`;
+    }
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
@@ -305,19 +314,20 @@ function updateStatus(text, type) {
 }
 
 function showTypingIndicator() {
-    const existing = document.querySelector('.typing-indicator');
+    const existing = document.querySelector('.typing-indicator-wrap');
     if (existing) existing.remove();
 
-    const typingDiv = document.createElement('div');
-    typingDiv.className = 'typing-indicator';
-    typingDiv.innerHTML = '<span></span><span></span><span></span>';
-    chatMessages.appendChild(typingDiv);
+    const emoji = ChatState.teacherPersona?.emoji || '🤖';
+    const wrapDiv = document.createElement('div');
+    wrapDiv.className = 'chat-message chat-message-ai typing-indicator-wrap';
+    wrapDiv.innerHTML = `<div class="chat-ai-avatar">${emoji}</div><div class="typing-indicator"><span></span><span></span><span></span></div>`;
+    chatMessages.appendChild(wrapDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function hideTypingIndicator() {
-    const typingDiv = document.querySelector('.typing-indicator');
-    if (typingDiv) typingDiv.remove();
+    const wrapDiv = document.querySelector('.typing-indicator-wrap');
+    if (wrapDiv) wrapDiv.remove();
 }
 
 function addTranslationToggle(parentMessage, translation, actionsDiv) {
@@ -336,7 +346,7 @@ function addTranslationToggle(parentMessage, translation, actionsDiv) {
     });
     
     actionsDiv.appendChild(translateBtn);
-    parentMessage.querySelector('.chat-message-content').appendChild(translationDiv);
+    parentMessage.querySelector('.chat-message-bubble').appendChild(translationDiv);
 }
 
 function addCorrectionsToggle(parentMessage, corrections, actionsDiv) {
@@ -354,7 +364,7 @@ function addCorrectionsToggle(parentMessage, corrections, actionsDiv) {
     });
     
     actionsDiv.appendChild(correctionsBtn);
-    parentMessage.querySelector('.chat-message-content').appendChild(correctionsDiv);
+    parentMessage.querySelector('.chat-message-bubble').appendChild(correctionsDiv);
 }
 
 // 초기화

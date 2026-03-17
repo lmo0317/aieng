@@ -150,10 +150,13 @@
         <div class="chat-modal-container">
             <div class="chat-modal-header">
                 <div class="chat-header-left">
-                    <h2 id="chat-modal-title">AI Tutor</h2>
-                    <div class="chat-status-indicator hidden" id="chat-status-indicator">
-                        <span class="status-dot"></span>
-                        <span class="status-text" id="chat-status-text">연결 중...</span>
+                    <div class="chat-header-avatar" id="chat-header-avatar">🤖</div>
+                    <div class="chat-header-info">
+                        <h2 id="chat-modal-title">AI Tutor</h2>
+                        <div class="chat-status-indicator hidden" id="chat-status-indicator">
+                            <span class="status-dot"></span>
+                            <span class="status-text" id="chat-status-text">연결 중...</span>
+                        </div>
                     </div>
                 </div>
                 <div class="chat-header-actions">
@@ -177,11 +180,12 @@
             <!-- 선생님 선택 화면 -->
             <div id="teacher-selection" class="teacher-selection">
                 <div class="teacher-selection-content">
-                    <h3>👨‍🏫 선생님을 선택해주세요</h3>
+                    <div class="teacher-selection-logo">🎓</div>
+                    <h3>선생님을 선택해주세요</h3>
                     <p class="teacher-selection-subtitle">학습 스타일에 맞는 선생님을 선택하세요</p>
                     <div class="teacher-cards">
                         <div class="teacher-card" data-teacher="korean">
-                            <div class="teacher-emoji">👩‍🏫</div>
+                            <div class="teacher-avatar">👩‍🏫</div>
                             <h4>친절한 한국어 선생님</h4>
                             <p>한국어로 친절하게 설명해드려요<br>초보자에게 추천</p>
                             <div class="teacher-features">
@@ -192,7 +196,7 @@
                             <button class="teacher-select-btn">이 선생님 선택</button>
                         </div>
                         <div class="teacher-card" data-teacher="native">
-                            <div class="teacher-emoji">🧑‍🏫</div>
+                            <div class="teacher-avatar">🧑‍🏫</div>
                             <h4>원어민 강사</h4>
                             <p>영어로 자연스럽게 대화해요<br>실력 향상에 추천</p>
                             <div class="teacher-features">
