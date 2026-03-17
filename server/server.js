@@ -125,7 +125,7 @@ async function getGlobalSettings() {
             if (err) reject(err);
             else resolve({
                 geminiApiKey: (row && row.geminiApiKey) || process.env.GEMINI_API_KEY,
-                geminiModel: (row && row.geminiModel) || 'gemini-3.1-flash-lite-preview',
+                geminiModel: (row && row.geminiModel) || 'gemini-2.0-flash',
                 systemPrompt: (row && row.systemPrompt) || DEFAULT_PROMPT
             });
         });
@@ -262,8 +262,10 @@ app.post('/api/generate', async (req, res) => {
 
         res.json({ sentences, quiz });
     } catch (error) {
-        console.error('Generate Error:', error.message);
-        res.status(500).json({ error: 'Failed to generate sentences and quiz' });
+        const status = error.response?.status;
+        const detail = error.response?.data ? JSON.stringify(error.response.data) : error.message;
+        console.error(`Generate Error [${status}]:`, detail);
+        res.status(500).json({ error: `Generate Error [${status}]: ${detail}` });
     }
 });
 
