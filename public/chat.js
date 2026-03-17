@@ -18,7 +18,7 @@ const TEACHER_PERSONAS = {
     korean: {
         name: 'Sophie 선생님',
         emoji: '👩‍🏫',
-        avatarText: '가',
+        avatarText: '🇰🇷',
         avatarClass: 'tc-avatar-kor',
         systemPrompt: `당신은 'Trend Eng'의 친절한 한국어 영어 선생님 "Sophie 선생님"입니다.
 
@@ -42,7 +42,7 @@ const TEACHER_PERSONAS = {
     native: {
         name: 'Alex 선생님',
         emoji: '🧑‍🏫',
-        avatarText: 'Aa',
+        avatarText: '🇺🇸',
         avatarClass: 'tc-avatar-nat',
         systemPrompt: `You are Teacher Alex, a friendly NATIVE ENGLISH SPEAKER and an expert English tutor. 
 
