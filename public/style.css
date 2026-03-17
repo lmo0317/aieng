@@ -524,89 +524,82 @@ button:active { background: #4e49c0; }
 
 /* ─── Content Sections ───────────────────────────────────────────────── */
 .analysis-section, .structure-section, .explanation-section, .voca-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--r-lg);
-    margin-bottom: 0.65rem;
-    overflow: hidden;
-    border: 1px solid var(--border-2);
+    margin-bottom: 0.75rem;
+    padding: 1rem 1.15rem;
 }
 
 .section-label {
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding: 0.5rem 1rem;
+    gap: 6px;
     font-size: 0.68rem;
     font-weight: 700;
     font-family: var(--font-ui);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.6rem;
 }
-.section-label svg { flex-shrink: 0; }
+.section-label::before {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+.structure-section  .section-label { color: var(--green); }
+.explanation-section .section-label { color: var(--accent); }
+.voca-section        .section-label { color: #d49a28; }
 
 .section-body {
-    padding: 0.85rem 1rem;
     font-size: 0.875rem;
-    line-height: 1.8;
+    line-height: 1.85;
     color: var(--text-1);
-    background: var(--bg-2);
     white-space: pre-line;
 }
 
-.structure-section .section-label  { background: rgba(62,207,142,0.08); color: var(--green); border-bottom: 1px solid rgba(62,207,142,0.12); }
-.explanation-section .section-label { background: var(--accent-dim); color: var(--accent); border-bottom: 1px solid var(--accent-border); }
-.voca-section .section-label        { background: rgba(224,160,48,0.08); color: #d49a28; border-bottom: 1px solid rgba(224,160,48,0.12); }
+/* sentence_structure 태그 — 컬러 인라인 텍스트 */
+.stag { font-weight: 700; font-family: var(--font-en); }
+.stag-s { color: var(--green); }
+.stag-v { color: var(--accent); }
+.stag-o { color: #d49a28; }
+.stag-c { color: #7ab4d4; }
+.stag-m { color: var(--text-3); }
 
-.structure-section .section-body  { background: rgba(62,207,142,0.03); }
-.explanation-section .section-body { background: var(--bg-2); }
-.voca-section .section-body        { background: rgba(224,160,48,0.03); }
-
-/* sentence_structure 태그 강조 */
-.stag {
-    display: inline-block;
-    padding: 1px 5px;
-    border-radius: 4px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    font-family: var(--font-ui);
-    margin-right: 1px;
-    letter-spacing: 0.02em;
-}
-.stag-s  { background: rgba(62,207,142,0.15); color: var(--green); }
-.stag-v  { background: rgba(110,104,240,0.15); color: var(--accent); }
-.stag-o  { background: rgba(224,160,48,0.15); color: #d49a28; }
-.stag-c  { background: rgba(86,156,214,0.15); color: #7ab4d4; }
-.stag-m  { background: rgba(150,150,180,0.12); color: var(--text-2); }
-
-/* voca 칩 */
-.voca-list { display: flex; flex-direction: column; gap: 0.55rem; }
+/* voca 리스트 — 행 구분선 */
+.voca-list { display: flex; flex-direction: column; }
 .voca-item {
     display: flex;
     align-items: baseline;
-    gap: 0.5rem;
-    padding: 0.45rem 0.65rem;
-    background: var(--surface);
-    border-radius: var(--r-sm);
-    border: 1px solid var(--border-2);
-    font-size: 0.84rem;
-    line-height: 1.5;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-2);
+    font-size: 0.875rem;
+    flex-wrap: wrap;
 }
+.voca-item:last-child { border-bottom: none; padding-bottom: 0; }
+.voca-item:first-child { padding-top: 0; }
 .voca-word {
     font-family: var(--font-en);
     font-weight: 700;
-    color: #d49a28;
-    white-space: nowrap;
+    font-size: 0.95rem;
+    color: var(--text-1);
     flex-shrink: 0;
 }
 .voca-pos {
     font-size: 0.68rem;
     font-family: var(--font-ui);
-    color: var(--text-3);
+    color: #d49a28;
     font-weight: 600;
-    white-space: nowrap;
     flex-shrink: 0;
+    align-self: center;
 }
-.voca-mean { color: var(--text-2); flex: 1; }
-.voca-tip  { font-size: 0.78rem; color: var(--text-3); margin-top: 1px; }
+.voca-mean { color: var(--text-2); flex: 1; min-width: 120px; }
+.voca-tip  { font-size: 0.8rem; color: var(--text-3); width: 100%; padding-left: 0; margin-top: -0.2rem; }
 
 /* ─── Controls ───────────────────────────────────────────────────────── */
 .controls { margin-top: 1.25rem; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
