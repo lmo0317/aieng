@@ -538,13 +538,12 @@ button:active { background: #4e49c0; }
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 3px 10px 3px 7px;
+    padding: 4px 12px 4px 9px;
     border-radius: 20px;
-    font-size: 0.68rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    font-family: var(--font-ui);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-family: var(--font-body);
+    letter-spacing: 0;
     margin-bottom: 0.8rem;
 }
 .structure-section   .section-label { background: rgba(62,207,142,0.12);  color: var(--green); }
