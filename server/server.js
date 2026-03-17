@@ -397,6 +397,12 @@ const requireAdminKey = (req, res, next) => {
     next();
 };
 
+// Admin key endpoint (for data management page)
+app.get('/api/admin-key', (req, res) => {
+    const adminKey = process.env.ADMIN_API_KEY || '';
+    res.json({ key: adminKey });
+});
+
 // Save Pre-Analyzed Trends API (for CLI script)
 app.post('/api/trends/save', requireAdminKey, async (req, res) => {
     try {

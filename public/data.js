@@ -2,8 +2,15 @@
 const manageSongsList = document.getElementById('manage-songs-list');
 const manageTrendsList = document.getElementById('manage-trends-list');
 
+let adminKey = '';
+
 // 페이지 로드 시 즉시 데이터 로드
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const r = await fetch('/api/admin-key');
+        const d = await r.json();
+        adminKey = d.key || '';
+    } catch (e) {}
     loadManagementLists();
 });
 
@@ -102,7 +109,7 @@ function renderTrendsByDate(container, items) {
                 try {
                     const resp = await fetch('/api/trends/clear-today', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
                         body: JSON.stringify({ date })
                     });
                     if (resp.ok) {
@@ -179,7 +186,7 @@ function createItemElement(item, type) {
     delBtn.onclick = async () => {
         if (confirm(`'${item.title}'을(를) 삭제하시겠습니까?`)) {
             try {
-                const resp = await fetch(`/api/trends/${item.id}`, { method: 'DELETE' });
+                const resp = await fetch(`/api/trends/${item.id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
                 if (resp.ok) {
                     showToast('삭제되었습니다.');
                     loadManagementLists();
