@@ -150,7 +150,7 @@ triggers:
 **Testable**: JSON 파싱 100% 성공, 모든 필수 필드 존재
 **Readable**: 자연스러운 한국어 번역, 명확한 설명
 **Understandable**: Level3 난이도 부합, 문맥 일관성
-**Secured**: JSON escape 올바름, 한자 미포함
+**Secured**: JSON escape 올바름, 한자 미포함, **news_title/category 한글 필수**
 **Trackable**: 에러 추적 가능, 검증 로그 존재
 
 ## 🎯 카테고리별 분포
@@ -163,6 +163,11 @@ triggers:
 - **금융**: 2개
 
 ## ⚠️ 제약 사항
+
+**한글 필수**:
+- ✅ news_title: 반드시 한글로 작성
+- ✅ category: 반드시 한글로 작성 (정치/연애/스포츠/테크/금융)
+- ❌ 영어 제목/카테고리 절대 사용 금지
 
 **JSON Escape**:
 - ✅ Single Quote(`'`)만 사용
@@ -195,7 +200,7 @@ triggers:
    10개 퀴즈 생성
    ↓
 [6] qa-reviewer
-   TRUST 5 검증 + 한자 체크
+   TRUST 5 검증 + 한자 체크 + news_title/category 한글 확인
    ↓
 [7] tech-implementer
    JSON 저장 + DB 반영
