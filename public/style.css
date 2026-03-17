@@ -191,8 +191,8 @@ body .chat-message-text, body .chat-messages {
 .trends-date-header h3 {
     margin: 0;
     font-family: var(--font-body);
-    font-size: 0.72rem;
-    color: var(--text-3);
+    font-size: 0.88rem;
+    color: var(--text-2);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
