@@ -537,23 +537,38 @@ function showSentence() {
     ttsBtn.classList.remove('hidden');
 
     if (current.sentence_structure) {
-        structureDiv.innerHTML = `<strong>🧩 문장 구성 요소:</strong><br/>${current.sentence_structure}`;
+        structureDiv.innerHTML = `
+            <div class="section-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                문장 구조
+            </div>
+            <div class="section-body">${highlightStructure(current.sentence_structure)}</div>`;
     } else {
         structureDiv.innerHTML = '';
     }
 
     if (current.explanation) {
-        explanationDiv.innerHTML = `<strong>💡 AI 학습 가이드:</strong><br/>${formatAnalysis(current.explanation)}`;
+        explanationDiv.innerHTML = `
+            <div class="section-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                AI 학습 가이드
+            </div>
+            <div class="section-body">${formatAnalysis(current.explanation)}</div>`;
     } else {
         explanationDiv.innerHTML = '';
     }
 
     if (current.voca && Array.isArray(current.voca) && current.voca.length > 0) {
         const vocaHtml = current.voca.map(v => {
-            if (typeof v === 'string') return v;
-            return `${v.word}: ${v.mean}`;
-        }).join('<br/>');
-        vocaDiv.innerHTML = `<strong>📖 주요 어휘 및 표현:</strong><br/>` + vocaHtml;
+            const raw = typeof v === 'string' ? v : `${v.word}: ${v.mean}`;
+            return renderVocaItem(raw);
+        }).join('');
+        vocaDiv.innerHTML = `
+            <div class="section-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                핵심 어휘
+            </div>
+            <div class="section-body"><div class="voca-list">${vocaHtml}</div></div>`;
     } else {
         vocaDiv.innerHTML = '';
     }
@@ -568,6 +583,41 @@ function showSentence() {
 
     // 진행률 업데이트
     currentCountSpan.textContent = `${currentCount + 1} / ${sentences.length}`;
+}
+
+// S(주어:...) → 컬러 태그로 변환
+function highlightStructure(text) {
+    return text
+        .replace(/\bS\(([^)]*)\)/g, '<span class="stag stag-s">S($1)</span>')
+        .replace(/\bV\(([^)]*)\)/g, '<span class="stag stag-v">V($1)</span>')
+        .replace(/\bO\(([^)]*)\)/g, '<span class="stag stag-o">O($1)</span>')
+        .replace(/\b(SC|OC|IO|C)\(([^)]*)\)/g, '<span class="stag stag-c">$1($2)</span>')
+        .replace(/\bM\(([^)]*)\)/g, '<span class="stag stag-m">M($1)</span>');
+}
+
+// "word(품사): 뜻 - 팁" 형식 파싱
+function renderVocaItem(raw) {
+    // 형식: "단어(품사): 뜻 - 팁" 또는 "단어: 뜻"
+    const posMatch = raw.match(/^([^(：:]+)\(([^)]+)\)\s*[：:]\s*(.+)$/);
+    if (posMatch) {
+        const [, word, pos, rest] = posMatch;
+        const dashIdx = rest.indexOf(' - ');
+        const mean = dashIdx !== -1 ? rest.substring(0, dashIdx) : rest;
+        const tip  = dashIdx !== -1 ? rest.substring(dashIdx + 3) : '';
+        return `<div class="voca-item">
+            <span class="voca-word">${word.trim()}</span>
+            <span class="voca-pos">${pos}</span>
+            <span class="voca-mean">${mean.trim()}${tip ? `<span class="voca-tip"> — ${tip}</span>` : ''}</span>
+        </div>`;
+    }
+    // 단순 "word: 뜻" 형식 fallback
+    const colonIdx = raw.indexOf(':');
+    if (colonIdx !== -1) {
+        const word = raw.substring(0, colonIdx).trim();
+        const mean = raw.substring(colonIdx + 1).trim();
+        return `<div class="voca-item"><span class="voca-word">${word}</span><span class="voca-mean">${mean}</span></div>`;
+    }
+    return `<div class="voca-item"><span class="voca-mean">${raw}</span></div>`;
 }
 
 function formatAnalysis(analysis) {
