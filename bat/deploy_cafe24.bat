@@ -18,7 +18,7 @@ git commit -m "%commit_msg%"
 :: 다른 리모트 이름이나 브랜치를 사용하신다면 아래 줄을 수정해주세요.
 echo.
 echo [3/3] Cafe24 서버로 푸시합니다...
-git push cafe24 master
+git push cafe24 master --force
 
 echo.
 echo ===================================================
