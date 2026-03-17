@@ -161,11 +161,29 @@ try {
 
 ### 4. Server API Integration
 
-**Endpoint**: `POST http://localhost:80/api/trends/save`
+**Endpoint**: `POST {SERVER_URL}/api/trends/save`
+
+서버 URL과 API 키는 `.env` 파일에서 읽습니다:
+- `SERVER_URL`: 배포 서버 URL (기본값: `http://aieng.cafe24app.com`)
+- `ADMIN_API_KEY`: 관리 API 키 (필수)
 
 **Request Format**:
 ```javascript
 const http = require('http');
+const https = require('https');
+const dotenv = require('dotenv');
+const path = require('path');
+
+// Load .env from project root
+dotenv.config({ path: path.resolve(__dirname, '..', '..', '..', '.env') });
+
+const SERVER_URL = process.env.SERVER_URL || 'http://aieng.cafe24app.com';
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY || '';
+
+// Parse URL to determine http vs https
+const url = new URL(SERVER_URL);
+const transport = url.protocol === 'https:' ? https : http;
+const port = url.port || (url.protocol === 'https:' ? 443 : 80);
 
 // Convert data for server
 const trendsToSave = data.content.map(item => ({
@@ -198,24 +216,27 @@ const trendsToSave = data.content.map(item => ({
 const postData = JSON.stringify({ trends: trendsToSave });
 
 const options = {
-  hostname: 'localhost',
-  port: 80,
+  hostname: url.hostname,
+  port: port,
   path: '/api/trends/save',
   method: 'POST',
   headers: {
     'Content-Type': 'application/json; charset=utf-8',
-    'Content-Length': Buffer.byteLength(postData, 'utf8')
+    'Content-Length': Buffer.byteLength(postData, 'utf8'),
+    'x-admin-key': ADMIN_API_KEY
   }
 };
 
-const req = http.request(options, (res) => {
+const req = transport.request(options, (res) => {
   let resData = '';
   res.on('data', (chunk) => resData += chunk);
   res.on('end', () => {
     try {
       const result = JSON.parse(resData);
       if (result.success) {
-        console.log(`서버 업데이트 성공! (${trendsToSave.length}개 저장)`);
+        console.log(`서버 업데이트 성공! (${trendsToSave.length}개 저장) → ${SERVER_URL}`);
+      } else {
+        console.error('서버 에러:', result.error);
       }
     } catch (e) {
       console.error('서버 응답 파싱 실패');
@@ -224,15 +245,25 @@ const req = http.request(options, (res) => {
 });
 
 req.on('error', (e) => {
-  console.error(`서버 연결 실패 (localhost:80): ${e.message}`);
+  console.error(`서버 연결 실패 (${SERVER_URL}): ${e.message}`);
 });
 
 req.write(postData, 'utf8');
 req.end();
 ```
 
+**기사별 개별 저장** (페이로드 크기 제한 대응):
+```javascript
+// 기사 하나씩 개별 저장 (413 에러 방지)
+for (const trend of trendsToSave) {
+  await saveToServer({ trends: [trend] });
+  await new Promise(r => setTimeout(r, 500)); // 0.5초 간격
+}
+```
+
 **Error Handling**:
 - 서버 응답 200: 성공
+- 서버 응답 401: ADMIN_API_KEY 불일치 → .env 확인
 - 서버 응답 500: 서버 에러 로그
 - 서버 응답 400: JSON 형식 에러 확인
 - Connection refused: 서버 실행 중인지 확인

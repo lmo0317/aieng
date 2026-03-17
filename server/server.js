@@ -330,8 +330,19 @@ app.post('/api/trends/fetch', async (req, res) => {
     }
 });
 
+// Admin API Key middleware
+const requireAdminKey = (req, res, next) => {
+    const adminKey = process.env.ADMIN_API_KEY;
+    if (!adminKey) return next(); // key not configured, allow (backward compat)
+    const provided = req.headers['x-admin-key'] || req.query.adminKey;
+    if (provided !== adminKey) {
+        return res.status(401).json({ error: 'Unauthorized: invalid admin key' });
+    }
+    next();
+};
+
 // Save Pre-Analyzed Trends API (for CLI script)
-app.post('/api/trends/save', async (req, res) => {
+app.post('/api/trends/save', requireAdminKey, async (req, res) => {
     try {
         const { trends } = req.body;
         if (!Array.isArray(trends) || trends.length === 0) {
@@ -386,7 +397,7 @@ app.get('/api/songs/saved', (req, res) => {
     });
 });
 
-app.post('/api/songs/save', (req, res) => {
+app.post('/api/songs/save', requireAdminKey, (req, res) => {
     const { title, lyrics, difficulty, sentences, quiz, image } = req.body;
     if (!title || !sentences) {
         return res.status(400).json({ error: 'title과 sentences가 필요합니다.' });
@@ -406,7 +417,7 @@ app.post('/api/songs/save', (req, res) => {
 });
 
 // Clear Today's Data API
-app.post('/api/trends/clear-today', (req, res) => {
+app.post('/api/trends/clear-today', requireAdminKey, (req, res) => {
     const { date } = req.body;
     if (!date) {
         return res.status(400).json({ error: 'date 파라미터가 필요합니다.' });
@@ -426,7 +437,7 @@ app.post('/api/trends/clear-today', (req, res) => {
 });
 
 // Delete Trend or Song
-app.delete('/api/trends/:id', (req, res) => {
+app.delete('/api/trends/:id', requireAdminKey, (req, res) => {
     db.run("DELETE FROM trends WHERE id = ?", [req.params.id], (err) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ success: true });
