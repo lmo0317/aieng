@@ -6,3 +6,6 @@ archive/
 database.sqlite
 db/database.sqlite
 *.sqlite
+
+# Generated output files
+output/
