@@ -523,83 +523,134 @@ button:active { background: #4e49c0; }
 }
 
 /* ─── Content Sections ───────────────────────────────────────────────── */
-.analysis-section, .structure-section, .explanation-section, .voca-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
+.structure-section, .explanation-section, .voca-section {
     border-radius: var(--r-lg);
-    margin-bottom: 0.75rem;
-    padding: 1rem 1.15rem;
+    margin-bottom: 0.875rem;
+    padding: 1.1rem 1.2rem;
+    background: var(--surface);
 }
+.structure-section   { border: 1.5px solid rgba(62,207,142,0.35); }
+.explanation-section { border: 1.5px solid rgba(110,104,240,0.35); }
+.voca-section        { border: 1.5px solid rgba(212,154,40,0.35); }
 
+/* 섹션 라벨 — 필 뱃지 */
 .section-label {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
+    padding: 3px 10px 3px 7px;
+    border-radius: 20px;
     font-size: 0.68rem;
     font-weight: 700;
     font-family: var(--font-ui);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.6rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.8rem;
 }
-.section-label::before {
-    content: '';
-    display: block;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-}
-.structure-section  .section-label { color: var(--green); }
-.explanation-section .section-label { color: var(--accent); }
-.voca-section        .section-label { color: #d49a28; }
+.structure-section   .section-label { background: rgba(62,207,142,0.12);  color: var(--green); }
+.explanation-section .section-label { background: rgba(110,104,240,0.12); color: var(--accent); }
+.voca-section        .section-label { background: rgba(212,154,40,0.12);  color: #d49a28; }
 
 .section-body {
     font-size: 0.875rem;
     line-height: 1.85;
     color: var(--text-1);
-    white-space: pre-line;
 }
 
-/* sentence_structure 태그 — 컬러 인라인 텍스트 */
-.stag { font-weight: 700; font-family: var(--font-en); }
+/* ── 문장 구조: 형식 뱃지 + 태그 */
+.struct-form-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    font-family: var(--font-ui);
+    background: rgba(62,207,142,0.15);
+    color: var(--green);
+    margin-right: 6px;
+    vertical-align: middle;
+}
+.stag { font-weight: 700; }
 .stag-s { color: var(--green); }
 .stag-v { color: var(--accent); }
 .stag-o { color: #d49a28; }
 .stag-c { color: #7ab4d4; }
 .stag-m { color: var(--text-3); }
 
-/* voca 리스트 — 행 구분선 */
-.voca-list { display: flex; flex-direction: column; }
+/* ── 설명: 번호 포인트 */
+.exp-point {
+    display: flex;
+    gap: 0.65rem;
+    margin-bottom: 0.55rem;
+    line-height: 1.7;
+}
+.exp-point:last-child { margin-bottom: 0; }
+.exp-num {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 0.68rem;
+    font-weight: 800;
+    font-family: var(--font-ui);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+}
+.exp-text { color: var(--text-2); font-size: 0.875rem; flex: 1; }
+
+/* ── 어휘 리스트 */
+.voca-list { display: flex; flex-direction: column; gap: 0; }
 .voca-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 0.75rem;
+    row-gap: 0.1rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--border-2);
+}
+.voca-item:first-child { padding-top: 0; }
+.voca-item:last-child  { border-bottom: none; padding-bottom: 0; }
+
+.voca-head {
+    grid-column: 1;
+    grid-row: 1;
     display: flex;
     align-items: baseline;
-    gap: 0.75rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--border-2);
-    font-size: 0.875rem;
-    flex-wrap: wrap;
+    gap: 5px;
 }
-.voca-item:last-child { border-bottom: none; padding-bottom: 0; }
-.voca-item:first-child { padding-top: 0; }
 .voca-word {
     font-family: var(--font-en);
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: var(--text-1);
-    flex-shrink: 0;
 }
 .voca-pos {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     font-family: var(--font-ui);
+    font-weight: 700;
     color: #d49a28;
-    font-weight: 600;
-    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.voca-mean {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 0.875rem;
+    color: var(--text-1);
     align-self: center;
 }
-.voca-mean { color: var(--text-2); flex: 1; min-width: 120px; }
-.voca-tip  { font-size: 0.8rem; color: var(--text-3); width: 100%; padding-left: 0; margin-top: -0.2rem; }
+.voca-tip {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 0.78rem;
+    color: var(--text-3);
+    padding-left: 0;
+}
 
 /* ─── Controls ───────────────────────────────────────────────────────── */
 .controls { margin-top: 1.25rem; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }

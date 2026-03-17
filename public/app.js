@@ -585,43 +585,69 @@ function showSentence() {
     currentCountSpan.textContent = `${currentCount + 1} / ${sentences.length}`;
 }
 
-// S(주어:...) → 컬러 태그로 변환
+// "3형식 / S(주어:...) + V(동사:...) ..." → 형식 뱃지 + 컬러 태그
 function highlightStructure(text) {
-    return text
-        .replace(/\bS\(([^)]*)\)/g, '<span class="stag stag-s">S($1)</span>')
-        .replace(/\bV\(([^)]*)\)/g, '<span class="stag stag-v">V($1)</span>')
-        .replace(/\bO\(([^)]*)\)/g, '<span class="stag stag-o">O($1)</span>')
+    // "3형식" 또는 "제3형식" 앞부분 추출
+    const formMatch = text.match(/^(\d형식|제\d형식)/);
+    let badge = '';
+    let body = text;
+    if (formMatch) {
+        badge = `<span class="struct-form-badge">${formMatch[1]}</span>`;
+        body = text.replace(/^(\d형식|제\d형식)\s*[\/\-]?\s*/, '');
+    }
+    body = body
+        .replace(/\bS\(([^)]*)\)/g,          '<span class="stag stag-s">S($1)</span>')
+        .replace(/\bV\(([^)]*)\)/g,          '<span class="stag stag-v">V($1)</span>')
+        .replace(/\bO\(([^)]*)\)/g,          '<span class="stag stag-o">O($1)</span>')
         .replace(/\b(SC|OC|IO|C)\(([^)]*)\)/g, '<span class="stag stag-c">$1($2)</span>')
-        .replace(/\bM\(([^)]*)\)/g, '<span class="stag stag-m">M($1)</span>');
+        .replace(/\bM\(([^)]*)\)/g,          '<span class="stag stag-m">M($1)</span>');
+    return badge + body;
 }
 
-// "word(품사): 뜻 - 팁" 형식 파싱
+// ①②③④ 포인트를 개별 행으로 렌더링
+function formatAnalysis(text) {
+    const circled = ['①','②','③','④','⑤'];
+    const parts = text.split(/(①|②|③|④|⑤)/);
+    if (parts.length <= 1) return text.replace(/\n/g, '<br>');
+
+    let html = parts[0] ? `<p style="margin:0 0 .4rem;color:var(--text-2)">${parts[0].trim()}</p>` : '';
+    for (let i = 1; i < parts.length; i += 2) {
+        const num = parts[i];
+        const content = (parts[i + 1] || '').replace(/^\s*/, '').replace(/\n/g, '<br>');
+        const idx = circled.indexOf(num) + 1;
+        html += `<div class="exp-point">
+            <span class="exp-num">${idx}</span>
+            <span class="exp-text">${content}</span>
+        </div>`;
+    }
+    return html;
+}
+
+// "word(품사): 뜻 - 팁" 파싱 → 그리드 카드
 function renderVocaItem(raw) {
-    // 형식: "단어(품사): 뜻 - 팁" 또는 "단어: 뜻"
     const posMatch = raw.match(/^([^(：:]+)\(([^)]+)\)\s*[：:]\s*(.+)$/);
     if (posMatch) {
         const [, word, pos, rest] = posMatch;
         const dashIdx = rest.indexOf(' - ');
-        const mean = dashIdx !== -1 ? rest.substring(0, dashIdx) : rest;
-        const tip  = dashIdx !== -1 ? rest.substring(dashIdx + 3) : '';
+        const mean = dashIdx !== -1 ? rest.substring(0, dashIdx).trim() : rest.trim();
+        const tip  = dashIdx !== -1 ? rest.substring(dashIdx + 3).trim() : '';
         return `<div class="voca-item">
-            <span class="voca-word">${word.trim()}</span>
-            <span class="voca-pos">${pos}</span>
-            <span class="voca-mean">${mean.trim()}${tip ? `<span class="voca-tip"> — ${tip}</span>` : ''}</span>
+            <div class="voca-head">
+                <span class="voca-word">${word.trim()}</span>
+                <span class="voca-pos">${pos}</span>
+            </div>
+            <span class="voca-mean">${mean}</span>
+            ${tip ? `<span class="voca-tip">— ${tip}</span>` : ''}
         </div>`;
     }
-    // 단순 "word: 뜻" 형식 fallback
     const colonIdx = raw.indexOf(':');
     if (colonIdx !== -1) {
-        const word = raw.substring(0, colonIdx).trim();
-        const mean = raw.substring(colonIdx + 1).trim();
-        return `<div class="voca-item"><span class="voca-word">${word}</span><span class="voca-mean">${mean}</span></div>`;
+        return `<div class="voca-item">
+            <div class="voca-head"><span class="voca-word">${raw.substring(0, colonIdx).trim()}</span></div>
+            <span class="voca-mean">${raw.substring(colonIdx + 1).trim()}</span>
+        </div>`;
     }
-    return `<div class="voca-item"><span class="voca-mean">${raw}</span></div>`;
-}
-
-function formatAnalysis(analysis) {
-    return analysis.replace(/\n/g, '<br>');
+    return `<div class="voca-item"><div class="voca-head"></div><span class="voca-mean">${raw}</span></div>`;
 }
 
 // 고급 TTS 함수 - 브라우저 TTS 최적화
