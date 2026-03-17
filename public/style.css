@@ -552,8 +552,8 @@ button:active { background: #4e49c0; }
 .voca-section        .section-label { background: rgba(212,154,40,0.12);  color: #d49a28; }
 
 .section-body {
-    font-size: 0.875rem;
-    line-height: 1.85;
+    font-size: 0.95rem;
+    line-height: 1.9;
     color: var(--text-1);
 }
 
@@ -570,12 +570,8 @@ button:active { background: #4e49c0; }
     margin-right: 6px;
     vertical-align: middle;
 }
-.stag { font-weight: 700; }
-.stag-s { color: var(--green); }
-.stag-v { color: var(--accent); }
-.stag-o { color: #d49a28; }
-.stag-c { color: #7ab4d4; }
-.stag-m { color: var(--text-3); }
+.stag { font-weight: 700; color: var(--text-1); }
+.stag-s, .stag-v, .stag-o, .stag-c, .stag-m { color: var(--text-1); }
 
 /* ── 설명: 번호 포인트 */
 .exp-point {
@@ -587,12 +583,12 @@ button:active { background: #4e49c0; }
 .exp-point:last-child { margin-bottom: 0; }
 .exp-num {
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: var(--accent-dim);
     color: var(--accent);
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     font-weight: 800;
     font-family: var(--font-ui);
     display: flex;
@@ -600,7 +596,7 @@ button:active { background: #4e49c0; }
     justify-content: center;
     margin-top: 2px;
 }
-.exp-text { color: var(--text-2); font-size: 0.875rem; flex: 1; }
+.exp-text { color: var(--text-2); font-size: 0.95rem; flex: 1; }
 
 /* ── 어휘 리스트 */
 .voca-list { display: flex; flex-direction: column; gap: 0; }
@@ -626,11 +622,11 @@ button:active { background: #4e49c0; }
 .voca-word {
     font-family: var(--font-en);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.05rem;
     color: var(--text-1);
 }
 .voca-pos {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-family: var(--font-ui);
     font-weight: 700;
     color: #d49a28;
@@ -640,14 +636,14 @@ button:active { background: #4e49c0; }
 .voca-mean {
     grid-column: 2;
     grid-row: 1;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     color: var(--text-1);
     align-self: center;
 }
 .voca-tip {
     grid-column: 1 / -1;
     grid-row: 2;
-    font-size: 0.78rem;
+    font-size: 0.83rem;
     color: var(--text-3);
     padding-left: 0;
 }
