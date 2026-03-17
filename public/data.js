@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 관리 데이터 로드
 async function loadManagementLists() {
-    manageSongsList.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">로딩 중...</p>';
-    manageTrendsList.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">로딩 중...</p>';
+    manageSongsList.innerHTML = '<p style="text-align: center; color: var(--text-3); padding: 20px;">로딩 중...</p>';
+    manageTrendsList.innerHTML = '<p style="text-align: center; color: var(--text-3); padding: 20px;">로딩 중...</p>';
 
     try {
         // 팝송 가져오기
@@ -33,7 +33,7 @@ function renderManageList(container, items, type) {
     container.innerHTML = '';
     
     if (items.length === 0) {
-        container.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 20px;">저장된 ${type === 'song' ? '팝송이' : '트렌드가'} 없습니다.</p>`;
+        container.innerHTML = `<p style="text-align: center; color: var(--text-3); padding: 20px;">저장된 ${type === 'song' ? '팝송이' : '트렌드가'} 없습니다.</p>`;
         return;
     }
 
@@ -48,7 +48,7 @@ function renderTrendsByDate(container, items) {
     container.innerHTML = '';
     
     if (items.length === 0) {
-        container.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 20px;">저장된 트렌드가 없습니다.</p>`;
+        container.innerHTML = `<p style="text-align: center; color: var(--text-3); padding: 20px;">저장된 트렌드가 없습니다.</p>`;
         return;
     }
 
@@ -68,9 +68,9 @@ function renderTrendsByDate(container, items) {
         dateGroup.className = 'date-group';
         dateGroup.style.marginBottom = '2rem';
         dateGroup.style.padding = '15px';
-        dateGroup.style.background = '#fff';
-        dateGroup.style.borderRadius = '15px';
-        dateGroup.style.border = '1px solid #e2e8f0';
+        dateGroup.style.background = 'var(--surface)';
+        dateGroup.style.borderRadius = 'var(--r-lg)';
+        dateGroup.style.border = '1px solid var(--border)';
 
         // 날짜 헤더 및 해당 날짜 삭제 버튼
         const header = document.createElement('div');
@@ -79,12 +79,12 @@ function renderTrendsByDate(container, items) {
         header.style.alignItems = 'center';
         header.style.marginBottom = '12px';
         header.style.paddingBottom = '10px';
-        header.style.borderBottom = '2px solid var(--primary-light)';
+        header.style.borderBottom = '1px solid var(--border)';
 
         const dateTitle = document.createElement('h4');
         dateTitle.textContent = `📅 ${date}`;
         dateTitle.style.margin = '0';
-        dateTitle.style.color = 'var(--text-main)';
+        dateTitle.style.color = 'var(--text-1)';
 
         const bulkDelBtn = document.createElement('button');
         bulkDelBtn.innerHTML = '🗑️ 이 날짜 전체 삭제';
@@ -144,9 +144,9 @@ function createItemElement(item, type) {
     itemDiv.style.justifyContent = 'space-between';
     itemDiv.style.alignItems = 'center';
     itemDiv.style.padding = '10px 12px';
-    itemDiv.style.background = '#f8fafc';
-    itemDiv.style.borderRadius = '10px';
-    itemDiv.style.border = '1px solid #e2e8f0';
+    itemDiv.style.background = 'var(--surface-2)';
+    itemDiv.style.borderRadius = 'var(--r-md)';
+    itemDiv.style.border = '1px solid var(--border)';
 
     const infoDiv = document.createElement('div');
     infoDiv.style.display = 'flex';
@@ -157,12 +157,12 @@ function createItemElement(item, type) {
     titleSpan.textContent = item.title;
     titleSpan.style.fontWeight = '600';
     titleSpan.style.fontSize = '0.95rem';
-    titleSpan.style.color = 'var(--text-main)';
+    titleSpan.style.color = 'var(--text-1)';
 
     const metaSpan = document.createElement('span');
     metaSpan.textContent = type === 'song' ? `${item.date || ''} | ${item.category || ''}` : `${item.category || ''}`;
     metaSpan.style.fontSize = '0.75rem';
-    metaSpan.style.color = 'var(--text-muted)';
+    metaSpan.style.color = 'var(--text-3)';
 
     infoDiv.appendChild(titleSpan);
     infoDiv.appendChild(metaSpan);
