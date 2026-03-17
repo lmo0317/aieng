@@ -16,8 +16,10 @@ const ChatState = {
 // 선생님 페르소나 설정
 const TEACHER_PERSONAS = {
     korean: {
-        name: '친절한 한국어 선생님',
+        name: 'Sophie 선생님',
         emoji: '👩‍🏫',
+        avatarText: '가',
+        avatarClass: 'tc-avatar-kor',
         systemPrompt: `당신은 'Trend Eng'의 친절한 한국어 영어 선생님 "Sophie 선생님"입니다.
 
 ## 가장 중요한 규칙:
@@ -38,8 +40,10 @@ const TEACHER_PERSONAS = {
 - 격려의 말로 마무리`
     },
     native: {
-        name: '원어민 강사',
+        name: 'Alex 선생님',
         emoji: '🧑‍🏫',
+        avatarText: 'Aa',
+        avatarClass: 'tc-avatar-nat',
         systemPrompt: `You are Teacher Alex, a friendly NATIVE ENGLISH SPEAKER and an expert English tutor. 
 
 ## Your Communication Rule:
@@ -110,7 +114,11 @@ function selectTeacher(teacherType) {
     const modalTitle = document.getElementById('chat-modal-title');
     if (modalTitle) modalTitle.textContent = ChatState.teacherPersona.name;
     const headerAvatar = document.getElementById('chat-header-avatar');
-    if (headerAvatar) headerAvatar.textContent = ChatState.teacherPersona.emoji;
+    if (headerAvatar) {
+        const p = ChatState.teacherPersona;
+        headerAvatar.className = 'chat-header-avatar ' + (p.avatarClass || '');
+        headerAvatar.textContent = p.avatarText || p.avatarText;
+    }
 
     const teacherSelection = document.getElementById('teacher-selection');
     const chatMessages = document.getElementById('chat-messages');
@@ -211,10 +219,11 @@ function connectWebSocket() {
                 if (cleanText.length === 0) return;
 
                 if (!ChatState.currentAiMessageTextDiv) {
-                    const emoji = ChatState.teacherPersona?.emoji || '🤖';
+                    const avText = ChatState.teacherPersona?.avatarText || 'AI';
+                    const avClass = ChatState.teacherPersona?.avatarClass || '';
                     const messageDiv = document.createElement('div');
                     messageDiv.className = `chat-message chat-message-ai`;
-                    messageDiv.innerHTML = `<div class="chat-ai-avatar">${emoji}</div><div class="chat-message-bubble"><div class="chat-message-text"></div></div>`;
+                    messageDiv.innerHTML = `<div class="chat-ai-avatar ${avClass}">${avText}</div><div class="chat-message-bubble"><div class="chat-message-text"></div></div>`;
                     chatMessages.appendChild(messageDiv);
                     ChatState.currentAiMessageTextDiv = messageDiv.querySelector('.chat-message-text');
 
@@ -296,8 +305,9 @@ function addMessage(type, text) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message chat-message-${type}`;
     if (type === 'ai') {
-        const emoji = ChatState.teacherPersona?.emoji || '🤖';
-        messageDiv.innerHTML = `<div class="chat-ai-avatar">${emoji}</div><div class="chat-message-bubble"><div class="chat-message-text">${text}</div></div>`;
+        const avText = ChatState.teacherPersona?.avatarText || 'AI';
+        const avClass = ChatState.teacherPersona?.avatarClass || '';
+        messageDiv.innerHTML = `<div class="chat-ai-avatar ${avClass}">${avText}</div><div class="chat-message-bubble"><div class="chat-message-text">${text}</div></div>`;
     } else {
         messageDiv.innerHTML = `<div class="chat-message-bubble"><div class="chat-message-text">${text}</div></div>`;
     }
@@ -317,10 +327,11 @@ function showTypingIndicator() {
     const existing = document.querySelector('.typing-indicator-wrap');
     if (existing) existing.remove();
 
-    const emoji = ChatState.teacherPersona?.emoji || '🤖';
+    const avText = ChatState.teacherPersona?.avatarText || 'AI';
+    const avClass = ChatState.teacherPersona?.avatarClass || '';
     const wrapDiv = document.createElement('div');
     wrapDiv.className = 'chat-message chat-message-ai typing-indicator-wrap';
-    wrapDiv.innerHTML = `<div class="chat-ai-avatar">${emoji}</div><div class="typing-indicator"><span></span><span></span><span></span></div>`;
+    wrapDiv.innerHTML = `<div class="chat-ai-avatar ${avClass}">${avText}</div><div class="typing-indicator"><span></span><span></span><span></span></div>`;
     chatMessages.appendChild(wrapDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
