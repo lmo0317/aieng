@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Trend Eng - 트렌드 맞춤형 영어 학습</title>
+    <title>팝송 학습 - Trend Eng</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
     <div class="container">
@@ -21,18 +21,17 @@
             </div>
         </div>
 
-        <!-- 실시간 트렌드 섹션 -->
-        <div id="trends-section">
+        <div id="songs-section">
             <div class="trends-page-header">
-                <h2>🔥 실시간 뉴스 트렌드</h2>
-                <p class="trends-subtitle">최신 이슈로 영어를 학습해보세요</p>
+                <h2>🎶 팝송 가사 학습</h2>
+                <p class="trends-subtitle">좋아하는 노래 가사로 즐겁게 공부하세요</p>
             </div>
-            <div id="realtime-trends-container" class="realtime-trends-container">
+            <div id="songs-container" class="realtime-trends-container">
                 <div class="trends-empty-state">
-                    <div class="empty-icon">🔍</div>
-                    <h3>아직 트렌드가 없습니다</h3>
-                    <p>데이터 관리 페이지에서 '실시간 트렌드 수집 시작'을 눌러 최신 트렌드를 가져오세요!</p>
-                    <button class="go-settings-btn" onclick="window.location.href='/data.html'">데이터 관리로 이동</button>
+                    <div class="empty-icon">🎵</div>
+                    <h3>저장된 팝송이 없습니다</h3>
+                    <p>데이터 관리 페이지에서 새로운 팝송을 추가해보세요!</p>
+                    <button class="go-settings-btn" onclick="window.location.href='/data.html'">팝송 추가하러 가기</button>
                 </div>
             </div>
         </div>
@@ -112,8 +111,8 @@
         </div>
     </div>
 
-    <script src="js/nav.js"></script>
-    <script src="chat.js"></script>
-    <script src="js/trends.js"></script>
+    <script src="/js/nav.js"></script>
+    <script src="/chat.js"></script>
+    <script src="/js/songs.js"></script>
 </body>
 </html>

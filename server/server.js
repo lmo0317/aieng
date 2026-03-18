@@ -20,6 +20,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// 페이지 라우트 (URL 기반 네비게이션)
+const pub = p => path.join(__dirname, '..', 'public', p);
+app.get('/songs', (req, res) => res.sendFile(pub('songs.html')));
+app.get('/topic', (req, res) => res.sendFile(pub('topic.html')));
+app.get('/learn', (req, res) => res.sendFile(pub('learn.html')));
+
 const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'Trend Eng'의 1타 AI 영어 강사입니다.
 주제: {topic}
 난이도: {difficulty} (level1: 왕초보 / level2: 초보 / level3: 중급 / level4: 고급 / level5: 원어민)
