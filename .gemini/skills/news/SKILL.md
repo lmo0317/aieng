@@ -41,10 +41,11 @@ description: >
 
 ### Phase 4: Quiz Maker (퀴즈 생성)
 - 학습한 `voca`를 기반으로 10개 퀴즈 생성 (객관식 5 + 빈칸 5).
+- **한글 문제 필수 (HARD RULE)**: 퀴즈의 질문(`question`)은 반드시 한국어로 작성하여 학습자의 이해를 돕습니다.
 
 ### Phase 5: QA Reviewer (품질 검수 - HARD RULES)
 - **한자/Emoji 제로**: 설명 및 모든 필드에 한자(漢字)가 발견되면 즉시 수정.
-- **퀴즈 무결성 (Critical)**: 기사당 반드시 **10개의 퀴즈**가 포함되어 있는지, `quiz` 필드가 비어있지 않은지 최종 확인.
+- **퀴즈 무결성 (Critical)**: 기사당 반드시 **10개의 퀴즈**가 포함되어 있는지, 질문이 **한글**로 되어 있는지 최종 확인.
 - **구조 무결성**: 10개 문장, 10개 퀴즈, 모든 필드 존재 여부 확인.
 - **신뢰성 (TRUST 5)**: Testable, Readable, Understandable, Secured, Trackable 기준 만족 확인.
 
@@ -53,7 +54,8 @@ description: >
 - **매핑 검증**: 서버 API 전송 전 `sentences` 뿐만 아니라 **`quiz` 데이터가 유실되지 않고 정확히 매핑되었는지** 재차 확인 후 `save-to-server.js` 실행.
 
 ### Phase 7: Notification (알림 전송)
-- 모든 작업이 성공적으로 완료되면, 추가된 기사의 제목, 카테고리, **포함된 퀴즈 개수**를 요약하여 텔레그램으로 전송합니다.
+- 모든 작업이 성공적으로 완료되면, 추가된 기사의 제목, 카테고리, 포함된 퀴즈 개수를 요약하여 텔레그램으로 전송합니다.
+- 메시지 인코딩이 깨지지 않도록 반드시 UTF-8로 처리합니다.
 
 ## 📋 출력 JSON 데이터 스키마 (엄수)
 ```json
@@ -75,7 +77,7 @@ description: >
         {
           "type": "multiple_choice | fill_in_blank",
           "word": "Target word",
-          "question": "Question text",
+          "question": "한국어로 작성된 퀴즈 질문",
           "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
           "answer": "Correct answer"
         }
@@ -89,5 +91,5 @@ description: >
 1. **news_title**: 100% 한글. 영어 포함 시 저장 거부.
 2. **explanation**: 단어 뜻만 적는 것은 '형편없는 수준'으로 간주. 반드시 문법적 이유와 뉘앙스를 설명하는 '강의' 형태일 것.
 3. **voca**: 절대 누락 금지. 형식은 `단어(품사): 뜻`으로 간결하게 작성.
-4. **quiz**: **절대 누락 금지.** 저장 직전 퀴즈 데이터 전송 여부를 반드시 검증할 것.
+4. **quiz**: **절대 누락 금지.** 질문(`question`)은 반드시 **한글**로 작성할 것.
 5. **한자**: 발견 시 즉시 제거 및 순순한 한글로 교체.
