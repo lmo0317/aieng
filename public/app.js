@@ -89,6 +89,7 @@ function showSection(sectionId, pushState = true) {
     // 학습 화면에서 나갈 때 상태 초기화
     if (sectionId === 'trends-section' || sectionId === 'songs-section' || sectionId === 'topic-section') {
         resetLearningState();
+        sessionStorage.removeItem('learningState');
     }
 
     // 모든 섹션 숨기기
@@ -321,7 +322,7 @@ function renderNextTrendsPage() {
 }
 
 // 트렌드에서 학습 시작
-async function startLearningFromTrend(topic, id) {
+async function startLearningFromTrend(topic, id, sourceSection = 'trends-section') {
     if (!topic && !id) return;
 
     showSection('learning-section');
@@ -360,6 +361,7 @@ async function startLearningFromTrend(topic, id) {
                         sentences = savedSentences;
                         quizData = Array.isArray(savedQuiz) ? savedQuiz : [];
                         currentCount = 0;
+                        sessionStorage.setItem('learningState', JSON.stringify({ id: id || null, title: topic, sourceSection }));
                         showSentence();
                         sendTopicToChat(topic);
 
@@ -385,8 +387,20 @@ async function startLearningFromTrend(topic, id) {
     }
 }
 
-// 초기화
-fetchRealtimeTrends();
+// 초기화 (새로고침 시 학습 상태 복원)
+(async function init() {
+    const savedLearning = sessionStorage.getItem('learningState');
+    if (savedLearning) {
+        try {
+            const { id, title, sourceSection } = JSON.parse(savedLearning);
+            await startLearningFromTrend(title, id, sourceSection);
+            return;
+        } catch (e) {
+            sessionStorage.removeItem('learningState');
+        }
+    }
+    fetchRealtimeTrends();
+})();
 
 // 팝송 목록 가져오기 및 렌더링
 async function fetchSavedSongs() {
@@ -431,7 +445,7 @@ function renderSavedSongs(songs) {
         `;
 
         card.querySelector('.trend-start-btn').addEventListener('click', async () => {
-            await startLearningFromTrend(song.title);
+            await startLearningFromTrend(song.title, song.id, 'songs-section');
         });
 
         songsContainer.appendChild(card);
@@ -770,8 +784,9 @@ nextBtn.addEventListener('click', () => {
 });
 
 finishBtn.addEventListener('click', () => {
+    const state = JSON.parse(sessionStorage.getItem('learningState') || '{}');
     alert('오늘의 트레이닝 완료! 고생하셨습니다. 🔥');
-    location.reload();
+    showSection(state.sourceSection || 'trends-section');
 });
 
 function finishLearning() {
@@ -988,7 +1003,8 @@ if(quizNextBtn) {
 
 if(quizFinishBtn) {
     quizFinishBtn.addEventListener('click', () => {
+        const state = JSON.parse(sessionStorage.getItem('learningState') || '{}');
         alert(`퀴즈 완료! 최종 점수: ${quizScore} / ${quizData.length * 10}점`);
-        location.reload();
+        showSection(state.sourceSection || 'trends-section');
     });
 }
