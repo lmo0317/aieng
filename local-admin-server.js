@@ -23,7 +23,31 @@ app.get('/admin/data', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin', 'data.html'));
 });
 
-// 2. 나머지 정적 파일 (CSS, JS 등) 서빙
+// 2. API Proxy (Port 80 -> Port 8001)
+// Cafe24와 통신하는 대신 로컬에서 실행 중인 메인 서버로 요청을 전달합니다.
+app.all('/api/*', (req, res) => {
+    const targetUrl = `http://localhost:8001${req.originalUrl}`;
+    const method = req.method;
+    const headers = { ...req.headers };
+    delete headers.host; // 호스트 헤더 충돌 방지
+
+    const proxyReq = http.request(targetUrl, {
+        method,
+        headers,
+    }, (proxyRes) => {
+        res.writeHead(proxyRes.statusCode, proxyRes.headers);
+        proxyRes.pipe(res, { end: true });
+    });
+
+    req.pipe(proxyReq, { end: true });
+
+    proxyReq.on('error', (err) => {
+        console.error('Proxy Error:', err.message);
+        res.status(500).json({ error: 'Proxy failed: ' + err.message });
+    });
+});
+
+// 3. 나머지 정적 파일 (CSS, JS 등) 서빙
 app.use(express.static(path.join(__dirname, 'public')));
 
 // SSE 로그 스트리밍

@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const manageTrendsList = document.getElementById('manage-trends-list');
     const clearTodayBtn = document.getElementById('clearTodayBtn');
 
-    const API_BASE = 'https://aieng.cafe24app.com/api';
+    const API_BASE = '/api';
     let adminKey = '';
 
     // 관리자 키 가져오기
