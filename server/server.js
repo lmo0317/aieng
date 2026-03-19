@@ -3,6 +3,7 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
+const { spawn } = require('child_process');
 const WebSocket = require('ws');
 const https = require('https');
 const db = require('./database');
@@ -391,6 +392,79 @@ app.post('/api/trends/fetch', async (req, res) => {
         broadcastTrendsProgress('error', error.message, 0, 0);
         res.status(500).json({ error: error.message });
     }
+});
+
+// News Generation Relay System
+let pendingCommand = false;
+let relayLogs = [];
+
+app.get('/api/admin/check-command', (req, res) => {
+    res.json({ run: pendingCommand });
+    if (pendingCommand) pendingCommand = false; // 신호를 확인하면 즉시 초기화
+});
+
+app.post('/api/admin/push-log', (req, res) => {
+    const { type, content, code } = req.body;
+    broadcastNewsLog(type, content, code); // SSE를 통해 웹 대시보드로 로그 전달
+    res.json({ success: true });
+});
+
+app.post('/api/admin/trigger-news', (req, res) => {
+    pendingCommand = true;
+    relayLogs = []; // 로그 초기화
+    res.json({ success: true, message: '명령이 전달되었습니다. 로컬 에이전트가 곧 시작합니다.' });
+});
+
+// News Generation Control and Monitoring
+let newsGenerationProcess = null;
+const newsStreamClients = new Set();
+
+app.get('/api/admin/news-stream', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const client = { res };
+    newsStreamClients.add(client);
+
+    req.on('close', () => {
+        newsStreamClients.delete(client);
+    });
+});
+
+const broadcastNewsLog = (type, content, code = null) => {
+    const data = JSON.stringify({ type, content, code });
+    newsStreamClients.forEach(client => {
+        client.res.write(`data: ${data}\n\n`);
+    });
+};
+
+app.post('/api/admin/run-news', (req, res) => {
+    if (newsGenerationProcess) {
+        return res.status(400).json({ success: false, error: '이미 뉴스 생성 프로세스가 실행 중입니다.' });
+    }
+
+    const scriptPath = path.join(__dirname, '..', 'news.sh');
+    newsGenerationProcess = spawn('bash', [scriptPath], {
+        cwd: path.join(__dirname, '..'),
+        env: { ...process.env, FORCE_COLOR: 'true' }
+    });
+
+    newsGenerationProcess.stdout.on('data', (data) => {
+        broadcastNewsLog('stdout', data.toString());
+    });
+
+    newsGenerationProcess.stderr.on('data', (data) => {
+        broadcastNewsLog('stderr', data.toString());
+    });
+
+    newsGenerationProcess.on('close', (code) => {
+        broadcastNewsLog('exit', `프로세스가 종료되었습니다.`, code);
+        newsGenerationProcess = null;
+    });
+
+    res.json({ success: true, message: '뉴스 생성 시작' });
 });
 
 // Admin API Key middleware

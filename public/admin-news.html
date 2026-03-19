@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend Eng - News Generator Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container { max-width: 900px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .console-box { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; font-family: 'Courier New', Courier, monospace; height: 500px; overflow-y: auto; margin-top: 20px; white-space: pre-wrap; font-size: 14px; line-height: 1.5; border: 1px solid #333; }
+        .btn-run { background: #2ecc71; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
+        .btn-run:hover { background: #27ae60; }
+        .btn-run:disabled { background: #95a5a6; cursor: not-allowed; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 15px; }
+        .status-idle { background: #ecf0f1; color: #7f8c8d; }
+        .status-running { background: #e67e22; color: white; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .log-info { color: #3498db; }
+        .log-success { color: #2ecc71; font-weight: bold; }
+        .log-error { color: #e74c3c; font-weight: bold; }
+        .log-warning { color: #f1c40f; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="header-flex">
+            <h1>📰 뉴스 생성 대시보드</h1>
+            <div id="statusBadge" class="status-badge status-idle">대기 중</div>
+        </div>
+        <p>버튼을 누르면 <code>news.sh</code> 스크립트가 실행되어 뉴스 10개를 자동 생성하고 서버에 반영합니다.</p>
+        
+        <button id="runBtn" class="btn-run">
+            <span>🚀 뉴스 생성 시작</span>
+        </button>
+
+        <div id="console" class="console-box">대시보드가 준비되었습니다. 로그가 여기에 표시됩니다.</div>
+    </div>
+
+    <script>
+        const runBtn = document.getElementById('runBtn');
+        const consoleBox = document.getElementById('console');
+        const statusBadge = document.getElementById('statusBadge');
+        let eventSource = null;
+
+        function appendLog(text, type = '') {
+            const span = document.createElement('span');
+            if (type) span.className = 'log-' + type;
+            
+            // ANSI 색상 코드 간단 처리
+            let cleanText = text.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+            span.textContent = cleanText;
+            
+            consoleBox.appendChild(span);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        runBtn.addEventListener('click', async () => {
+            if (!confirm('뉴스 10개 생성을 시작하시겠습니까? (서버 자원 및 API 비용이 발생합니다.)')) return;
+
+            runBtn.disabled = true;
+            consoleBox.innerHTML = '';
+            appendLog('>>> 실행 명령을 서버로 전송 중...\n', 'info');
+            statusBadge.className = 'status-badge status-running';
+            statusBadge.textContent = '실행 중';
+
+            // 로그 스트리밍 연결
+            if (eventSource) eventSource.close();
+            // 카페24 서버의 SSE 엔드포인트로 연결
+            eventSource = new EventSource('/api/admin/news-stream');
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'stdout') {
+                    appendLog(data.content);
+                } else if (data.type === 'stderr') {
+                    appendLog(data.content, 'warning');
+                } else if (data.type === 'exit') {
+                    appendLog(`\n>>> 프로세스 종료 (코드: ${data.code})\n`, data.code === 0 ? 'success' : 'error');
+                    statusBadge.className = 'status-badge status-idle';
+                    statusBadge.textContent = '완료';
+                    runBtn.disabled = false;
+                    eventSource.close();
+                }
+            };
+
+            eventSource.onerror = (err) => {
+                appendLog('\n[ERROR] 서버 스트리밍 연결 오류\n', 'error');
+                statusBadge.className = 'status-badge status-idle';
+                statusBadge.textContent = '오류 발생';
+                runBtn.disabled = false;
+                eventSource.close();
+            };
+
+            try {
+                // 카페24 서버에 실행 명령 전달
+                const res = await fetch('/api/admin/trigger-news', { method: 'POST' });
+                const result = await res.json();
+                if (!result.success) {
+                    appendLog(`\n[ERROR] ${result.error}\n`, 'error');
+                    statusBadge.className = 'status-badge status-idle';
+                    statusBadge.textContent = '실행 실패';
+                    runBtn.disabled = false;
+                }
+            } catch (err) {
+                appendLog(`\n[ERROR] 서버 통신 실패: ${err.message}\n`, 'error');
+                statusBadge.className = 'status-badge status-idle';
+                statusBadge.textContent = '통신 오류';
+                runBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
