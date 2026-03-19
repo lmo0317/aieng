@@ -27,6 +27,10 @@ app.get('/admin/data', (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'admin', 'data.html'));
 });
 
+app.get('/admin/songs', (req, res) => {
+    res.sendFile(path.join(PUBLIC_DIR, 'admin', 'popsong.html'));
+});
+
 // 2. API Proxy (Port 8080 -> Port 8001)
 app.use('/api', (req, res) => {
     const targetUrl = `http://localhost:8001/api${req.url}`;

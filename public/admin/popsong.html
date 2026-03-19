@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팝송 추가 - 트렌드 영어 관리자</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../settings.css">
+    <style>
+        .data-card {
+            background: var(--surface);
+            padding: 1.75rem;
+            border-radius: var(--r-lg);
+            border: 1px solid var(--border-2);
+            text-align: left;
+            margin-top: 1rem;
+        }
+        .data-card h3 {
+            font-family: var(--font-ui);
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-1) !important;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .json-textarea {
+            width: 100%;
+            min-height: 260px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .json-textarea:focus { outline: 2px solid #7c3aed; border-color: transparent; }
+        .btn-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+        .btn-parse {
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-parse:hover { background: #2c3e50; }
+        .btn-save {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-save:hover { background: #6d28d9; }
+        .btn-save:disabled { background: #95a5a6; cursor: not-allowed; }
+        .preview-box {
+            background: var(--surface-dim);
+            border: 1px solid var(--border-1);
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-1);
+            display: none;
+        }
+        .preview-box.visible { display: block; }
+        .preview-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+        .preview-meta { color: var(--text-muted); font-size: 0.82rem; }
+        .status-msg { margin-top: 10px; padding: 10px 14px; border-radius: 8px; font-size: 14px; display: none; }
+        .status-msg.visible { display: block; }
+        .status-msg.success { background: rgba(46,204,113,0.1); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
+        .status-msg.error { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--surface-dim);
+            border-radius: var(--r-md);
+            border: 1px solid var(--border-1);
+        }
+        .item-info { display: flex; flex-direction: column; gap: 4px; }
+        .item-title { font-weight: 700; color: var(--text-1); }
+        .item-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .btn-delete {
+            background: rgba(239,68,68,0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: var(--r-md);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .btn-delete:hover { background: #ef4444; color: white; border-color: #ef4444; }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-section">
+            <div class="nav-links">
+                <a href="/admin" class="nav-link">📰 뉴스 생성</a>
+                <a href="/admin/data" class="nav-link">🗑️ 리스트 삭제</a>
+                <a href="/admin/songs" class="nav-link active">🎵 팝송 추가</a>
+            </div>
+        </div>
+
+        <div class="settings-page-header">
+            <h2>🎵 팝송 추가</h2>
+            <p>AI가 생성한 팝송 JSON을 붙여넣으면 aieng.cafe24app.com 서버에 저장됩니다</p>
+        </div>
+
+        <!-- JSON 입력 섹션 -->
+        <div class="data-card">
+            <h3>📋 JSON 붙여넣기</h3>
+            <textarea id="jsonInput" class="json-textarea" placeholder='AI가 생성한 팝송 JSON을 여기에 붙여넣으세요.
+
+예시 형식:
+{
+  "title": "노래 제목",
+  "difficulty": "level3",
+  "content": [
+    {
+      "lyrics": "가사...",
+      "sentences": [
+        {
+          "en": "English sentence",
+          "ko": "한국어 번역",
+          "sentence_structure": "문장 구조 분석",
+          "explanation": "문법 설명",
+          "vocabulary": "word1, word2"
+        }
+      ]
+    }
+  ]
+}'></textarea>
+
+            <div class="btn-row">
+                <button id="parseBtn" class="btn-parse">🔍 미리보기</button>
+                <button id="saveBtn" class="btn-save" disabled>💾 Cafe24에 저장</button>
+            </div>
+
+            <div id="previewBox" class="preview-box">
+                <div id="previewContent"></div>
+            </div>
+            <div id="statusMsg" class="status-msg"></div>
+        </div>
+
+        <!-- 저장된 팝송 목록 -->
+        <div class="data-card" style="margin-top: 2rem;">
+            <h3 style="color: #7c3aed;">🎶 저장된 팝송 목록 (Cafe24)</h3>
+            <div id="songs-list" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="text-align: center; color: var(--text-muted); padding: 20px;">로딩 중...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="popsong.js"></script>
+</body>
+
+</html>

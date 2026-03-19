@@ -8,3 +8,7 @@ db/database.sqlite
 
 # Generated output files
 output/
+
+# SSH keys (배포용 키는 로컬에만 보관)
+webtools/keys/cafe24_deploy
+webtools/keys/cafe24_deploy.pub
