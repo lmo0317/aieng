@@ -6,32 +6,31 @@
     <title>Trend Eng - Data Management</title>
     <link rel="stylesheet" href="../style.css">
     <style>
-        /* 원본 aieng.cafe24app.com/data.html 스타일 복제 및 최적화 */
         body { background-color: #f0f2f5; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
         .admin-container { max-width: 1100px; margin: 30px auto; padding: 25px; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         
         .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #edf2f7; }
-        .header-left h1 { margin: 0; font-size: 24px; color: #1a202c; display: flex; align-items: center; gap: 10px; }
+        .header-left h1 { margin: 0; font-size: 24px; color: #1a202c; }
         
         .nav-group { display: flex; gap: 10px; align-items: center; }
         .btn { padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; font-size: 14px; display: flex; align-items: center; gap: 6px; text-decoration: none; }
         .btn-home { background: #edf2f7; color: #4a5568; }
-        .btn-home:hover { background: #e2e8f0; }
         .btn-refresh { background: #3182ce; color: white; }
-        .btn-refresh:hover { background: #2b6cb0; }
 
-        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 13px; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #edf2f7; }
-        td { padding: 16px 15px; border-bottom: 1px solid #edf2f7; color: #2d3748; font-size: 15px; }
-        tr:last-child td { border-bottom: none; }
+        /* 날짜별 섹션 스타일 */
+        .date-section { margin-bottom: 40px; }
+        .date-header { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        .date-label { font-size: 18px; font-weight: 800; color: #2d3748; }
+        .btn-clear-date { padding: 6px 14px; background: #fff5f5; color: #f56565; border: 1px solid #feb2b2; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; }
+        .btn-clear-date:hover { background: #f56565; color: white; }
+
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; background: white; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 12px; color: #718096; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
+        td { padding: 14px 15px; border-bottom: 1px solid #edf2f7; color: #2d3748; font-size: 14px; }
         tr:hover { background-color: #f7fafc; }
 
-        .id-cell { color: #a0aec0; font-family: monospace; font-size: 13px; }
-        .title-cell { font-weight: 600; color: #1a202c; }
-        .date-cell { color: #718096; font-size: 13px; }
-
-        .badge { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; color: white; display: inline-block; }
+        .badge { padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 700; color: white; }
         .badge-tech { background-color: #4299e1; }
         .badge-sports { background-color: #ed8936; }
         .badge-ent { background-color: #9f7aea; }
@@ -39,22 +38,18 @@
         .badge-politics { background-color: #f56565; }
         .badge-default { background-color: #a0aec0; }
 
-        .btn-delete { padding: 6px 12px; background: #fff5f5; color: #f56565; border: 1px solid #feb2b2; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+        .btn-delete { padding: 5px 10px; background: none; color: #f56565; border: 1px solid #feb2b2; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .btn-delete:hover { background: #f56565; color: white; }
 
-        .loading-spinner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px; color: #3182ce; }
-        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #3182ce; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .empty-state { text-align: center; padding: 80px 20px; color: #a0aec0; }
-        .empty-icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
+        .loading-spinner { text-align: center; padding: 60px; color: #3182ce; font-weight: bold; }
+        .empty-state { text-align: center; padding: 80px; color: #a0aec0; }
     </style>
 </head>
 <body>
     <div class="admin-container">
         <div class="header-flex">
             <div class="header-left">
-                <h1>📰 뉴스 데이터 관리</h1>
+                <h1>📊 뉴스 데이터 관리 (날짜별)</h1>
             </div>
             <div class="nav-group">
                 <a href="/admin" class="btn btn-home">🏠 생성기로 이동</a>
@@ -62,32 +57,9 @@
             </div>
         </div>
 
-        <div id="loading" class="loading-spinner" style="display:none;">
-            <div class="spinner"></div>
-            <span>Cafe24 서버에서 데이터를 가져오는 중...</span>
-        </div>
-        
-        <div class="table-wrapper">
-            <table id="newsTable">
-                <thead>
-                    <tr>
-                        <th style="width: 60px;">ID</th>
-                        <th style="width: 120px;">카테고리</th>
-                        <th>기사 제목</th>
-                        <th style="width: 180px;">생성 일시</th>
-                        <th style="width: 100px; text-align: center;">작업</th>
-                    </tr>
-                </thead>
-                <tbody id="newsList">
-                    <!-- 데이터 동적 삽입 -->
-                </tbody>
-            </table>
-        </div>
-
-        <div id="emptyMsg" class="empty-state" style="display:none;">
-            <div class="empty-icon">📭</div>
-            <p>저장된 뉴스 데이터가 없습니다.</p>
-        </div>
+        <div id="loading" class="loading-spinner" style="display:none;">데이터를 불러오는 중...</div>
+        <div id="content"></div>
+        <div id="emptyMsg" class="empty-state" style="display:none;">저장된 데이터가 없습니다.</div>
     </div>
 
     <script>
@@ -101,92 +73,122 @@
 
         let adminApiKey = '';
 
-        // 서버에서 어드민 키를 가져옵니다 (삭제 작업에 필요)
         async function getAdminKey() {
             try {
                 const res = await fetch('/api/admin-key');
                 const data = await res.json();
                 adminApiKey = data.key || '';
-            } catch (err) {
-                console.warn('Admin key fetch failed');
-            }
+            } catch (err) {}
         }
 
         async function fetchData() {
-            const listEl = document.getElementById('newsList');
+            const contentEl = document.getElementById('content');
             const loadingEl = document.getElementById('loading');
             const emptyEl = document.getElementById('emptyMsg');
 
-            listEl.innerHTML = '';
-            loadingEl.style.display = 'flex';
+            contentEl.innerHTML = '';
+            loadingEl.style.display = 'block';
             emptyEl.style.display = 'none';
 
             try {
                 if (!adminApiKey) await getAdminKey();
-
-                // 올바른 API 엔드포인트: /api/trends/saved
                 const response = await fetch('/api/trends/saved');
-                if (!response.ok) throw new Error('서버 응답 오류');
-                
                 const data = await response.json();
                 loadingEl.style.display = 'none';
 
-                // 응답 구조: { trends: [...] }
                 const trends = data.trends || [];
-
                 if (trends.length === 0) {
                     emptyEl.style.display = 'block';
                     return;
                 }
 
-                trends.forEach(news => {
-                    const tr = document.createElement('tr');
-                    const catClass = catClassMap[news.category] || 'badge-default';
-                    // trends 테이블의 날짜 필드(date) 또는 생성일(createdAt) 사용
-                    const rawDate = news.date || news.createdAt || news.created_at;
-                    const dateStr = rawDate ? new Date(rawDate).toLocaleString('ko-KR', {
-                        year: 'numeric', month: '2-digit', day: '2-digit',
-                        hour: '2-digit', minute: '2-digit'
-                    }) : '-';
-                    
-                    tr.innerHTML = `
-                        <td class="id-cell">${news.id}</td>
-                        <td><span class="badge ${catClass}">${news.category}</span></td>
-                        <td class="title-cell">${news.title}</td>
-                        <td class="date-cell">${dateStr}</td>
-                        <td style="text-align: center;">
-                            <button class="btn-delete" onclick="deleteNews(${news.id})">삭제</button>
-                        </td>
-                    `;
-                    listEl.appendChild(tr);
+                // 날짜별 그룹화
+                const groups = {};
+                trends.forEach(item => {
+                    const date = item.date || '날짜 미지정';
+                    if (!groups[date]) groups[date] = [];
+                    groups[date].push(item);
                 });
+
+                // 날짜 내림차순 정렬
+                const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+
+                sortedDates.forEach(date => {
+                    const section = document.createElement('div');
+                    section.className = 'date-section';
+
+                    section.innerHTML = `
+                        <div class="date-header">
+                            <span class="date-label">📅 ${date}</span>
+                            <button class="btn-clear-date" onclick="clearDateData('${date}')">이 날짜 데이터 전체 삭제</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;">ID</th>
+                                        <th style="width: 100px;">카테고리</th>
+                                        <th>기사 제목</th>
+                                        <th style="width: 80px; text-align: center;">관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${groups[date].map(news => `
+                                        <tr>
+                                            <td style="color:#a0aec0; font-family:monospace;">${news.id}</td>
+                                            <td><span class="badge ${catClassMap[news.category] || 'badge-default'}">${news.category}</span></td>
+                                            <td style="font-weight:600;">${news.title}</td>
+                                            <td style="text-align: center;">
+                                                <button class="btn-delete" onclick="deleteNews(${news.id})">삭제</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    contentEl.appendChild(section);
+                });
+
             } catch (err) {
-                loadingEl.innerHTML = `<span style="color:#f56565; font-weight:bold;">❌ 오류: ${err.message}</span>`;
-                console.error('Fetch error:', err);
+                loadingEl.innerHTML = `<span style="color:red">오류: ${err.message}</span>`;
+            }
+        }
+
+        async function clearDateData(date) {
+            if (!confirm(`[경고] ${date}의 모든 데이터를 삭제하시겠습니까?`)) return;
+
+            try {
+                const response = await fetch('/api/trends/clear-today', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-admin-key': adminApiKey },
+                    body: JSON.stringify({ date })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(`${date} 데이터가 삭제되었습니다.`);
+                    fetchData();
+                } else {
+                    alert('삭제 실패');
+                }
+            } catch (err) {
+                alert('통신 오류');
             }
         }
 
         async function deleteNews(id) {
-            if (!confirm(`뉴스(ID: ${id})를 영구 삭제하시겠습니까?`)) return;
-
+            if (!confirm(`뉴스를 삭제하시겠습니까?`)) return;
             try {
-                // Cafe24 API 서버로 삭제 요청 전송 (헤더에 어드민 키 포함)
-                const response = await fetch(`/api/trends/${id}`, { 
+                const response = await fetch(`/api/trends/${id}`, {
                     method: 'DELETE',
-                    headers: {
-                        'x-admin-key': adminApiKey
-                    }
+                    headers: { 'x-admin-key': adminApiKey }
                 });
                 const result = await response.json();
-
                 if (result.success) {
-                    alert('성공적으로 삭제되었습니다.');
-                    fetchData(); 
-                } else {
-                    alert('삭제 실패: ' + (result.error || '권한이 없거나 서버 오류입니다.'));
+                    fetchData();
                 }
             } catch (err) {
-                alert('통신 오류: ' + err.message);
+                alert('삭제 실패');
             }
         }
 
