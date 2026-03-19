@@ -55,6 +55,7 @@ app.use('/api', (req, res) => {
     // 필수 헤더가 존재할 때만 전달
     if (req.headers['content-type']) options.headers['Content-Type'] = req.headers['content-type'];
     if (req.headers['content-length']) options.headers['Content-Length'] = req.headers['content-length'];
+    if (req.headers['x-admin-key']) options.headers['x-admin-key'] = req.headers['x-admin-key'];
 
     const proxyReq = http.request(options, (proxyRes) => {
         console.log(`[Proxy Response] Status: ${proxyRes.statusCode}`);
