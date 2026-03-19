@@ -38,6 +38,64 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--surface-dim);
+            border-radius: var(--r-md);
+            border: 1px solid var(--border-1);
+            transition: all 0.2s ease;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item-title {
+            font-weight: 700;
+            color: var(--text-1);
+        }
+
+        .item-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: var(--r-md);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--r-md);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 
@@ -45,30 +103,31 @@
     <div class="container">
         <div class="header-section">
             <div class="nav-links">
+                <a href="/admin" class="nav-link">📰 대시보드</a>
+                <a href="/admin/data" class="nav-link active">📊 데이터 관리</a>
                 <a href="/" class="nav-link">🏠 홈으로</a>
-                <a href="/settings.html" class="nav-link">⚙️ 설정</a>
             </div>
         </div>
 
         <div class="settings-page-header">
             <h2>📊 데이터 관리</h2>
-            <p>저장된 학습 콘텐츠를 관리합니다</p>
+            <p>저장된 학습 콘텐츠를 관리하고 삭제할 수 있습니다</p>
         </div>
 
-        <!-- [관리 페이지] -->
         <div id="section-manage">
             <div class="data-card">
                 <h3 style="margin-bottom: 1rem; color: #7c3aed;">🎶 저장된 팝송 관리</h3>
                 <div id="manage-songs-list" style="display: flex; flex-direction: column; gap: 10px;">
-                    <!-- 팝송 리스트가 동적으로 추가됨 -->
                     <p style="text-align: center; color: var(--text-muted); padding: 20px;">로딩 중...</p>
                 </div>
             </div>
 
             <div class="data-card" style="margin-top: 2rem;">
-                <h3 style="margin-bottom: 1rem; color: var(--primary);">📰 뉴스 트렌드 관리</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0; color: var(--primary);">📰 뉴스 트렌드 관리</h3>
+                    <button id="clearTodayBtn" class="btn-clear">오늘 데이터 전체 삭제</button>
+                </div>
                 <div id="manage-trends-list" style="display: flex; flex-direction: column; gap: 10px;">
-                    <!-- 뉴스 트렌드 리스트가 동적으로 추가됨 -->
                     <p style="text-align: center; color: var(--text-muted); padding: 20px;">로딩 중...</p>
                 </div>
             </div>
