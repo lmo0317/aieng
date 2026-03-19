@@ -4,31 +4,66 @@ description: >
   🎵 팝송 가사 기반 영어 학습 콘텐츠 생성기. 가사 분석, 번역, 문법 설명, 어휘 정리, 퀴즈, 품질 검수, DB 저장을 수행합니다.
 ---
 
-# 🎵 Popsong Learning - Gemini Pipeline
+# 🎵 Popsong Learning - Star Tutor Pipeline
 
-팝송 가사를 분석하여 문법과 표현을 학습하고 서버에 저장합니다.
+팝송 가사를 분석하여 대한민국 최고의 1타 강사 스타일로 영어 학습 콘텐츠를 생성하고 서버에 저장합니다.
 
-## 🛠️ 주요 명령어
-1.  **팝송 학습 생성**: `/popsong [제목/가사]` (예: `/popsong Bruno Mars - Die With A Smile`)
-    *   **워크플로우**: 
-        1. **가사 분석**: 제공되거나 검색된 가사에서 학습 가치가 높은 문장 10개를 선정합니다. (슬랭/관용구/문법 포인트 우선)
-        2. **영어 교육 (1타 강사)**: 선정된 가사 문장별 번역, 구조 분석(N형식/S·V·O 태그), 4단계 상세 설명(맥락/문법/뉘앙스/실생활 팁)을 제공합니다.
-        3. **퀴즈 생성**: 학습 어휘 기반의 10개 복습 퀴즈를 생성합니다. (4지선다/빈칸채우기 혼합)
-        4. **품질 검수 (QA)**: TRUST 5 품질 기준 검증, **한자/Emoji 미포함 확인(필수)**, JSON 구조 무결성을 확인합니다.
-        5. **기술 구현 (Save)**: 결과를 JSON으로 저장하고 서버 API(`/api/songs/save`)를 호출하여 DB에 반영합니다.
+## 🤖 단계별 에이전트 역할 (Internal Workflow)
 
-## 📋 1타 강사 검수 기준 (TRUST 5)
-- **Testable**: JSON 파싱 100% 성공, 모든 필수 필드 존재
-- **Readable**: 가사 특유의 뉘앙스를 살린 자연스러운 번역
-- **Understandable**: Level3 난이도 부합, 문법 설명 4단계 준수
-- **Secured**: JSON escape 올바름, **한자/Emoji 절대 미포함**
-- **Trackable**: 에러 추적 가능, 검증 로그 존재
+### Phase 1: Song Analyst (가사 분석)
+- 제공된 제목/가사에서 **의미 없는 의성어(예: La la la, Ooh, Yeah 등)를 제외한 모든 가사 문장**을 추출합니다.
+- 문장 개수에 제한을 두지 않으며, 곡 전체의 서사를 빠짐없이 담아냅니다.
+- **제목 설정 (HARD RULE)**: `title` 필드는 반드시 **'Artist - Song Title' (영어 원문)** 형식으로만 작성합니다. (예: `James Ingram - Just Once`) 한국어 번역 절대 금지.
 
-## ⚠️ 제약 사항 및 규칙
-- **JSON Escape**: 문장 내부에서 Double Quote(`"`) 사용 금지, Single Quote(`'`)만 사용.
-- **가사 선정**: 학습 가치가 높은 완성된 문장 위주로 선정하며, 너무 단순한 반복구는 제외합니다.
-- **서버 URL**: `.env`의 `SERVER_URL`을 최우선으로 사용하며, 없으면 `http://localhost:80`을 사용합니다.
-- **API 키**: `.env`의 `ADMIN_API_KEY`를 `X-Admin-Key` 헤더에 담아 전송합니다.
+### Phase 2: Star English Tutor (1타 강사 교육)
+- **추출된 모든 가사 문장**에 대해 다음 정보를 생성합니다.
+- **자연스러운 번역 (`ko`)**: 가사의 감성과 뉘앙스를 살린 세련된 한국어 번역 제공.
+- **초정밀 문장 구조 분석 (`sentence_structure`)**: 
+    - 형식(1~5형식) 명시 필수.
+    - S(주어), V(동사), O(목적어), C(보어), M(수식어) 태그와 함께 **한글 명칭** 반드시 병기.
+- **소름 돋는 AI 가이드 (`explanation`)**: 
+    - 학생에게 직접 강의하는 1타 강사의 말투(`~하세요`, `~입니다!`).
+    - **최소 4문장 이상**: ①가사의 맥락, ②핵심 문법(시제/구조), ③감정선 및 뉘앙스, ④실전 활용 팁 포함.
+- **핵심 어휘 (`voca`)**: 문장당 3-5개 필수. 형식: `단어(품사): 뜻`
 
-## 📂 관련 스크립트
-- `.gemini/skills/popsong/scripts/save-to-server.js`: 생성된 데이터를 서버 API로 전송
+### Phase 3: Quiz Maker (퀴즈 생성)
+- 학습한 어휘를 기반으로 10개 퀴즈 생성 (객관식 5 + 빈칸 5).
+- **한글 문제 필수 (HARD RULE)**: 퀴즈 질문(`question`)은 반드시 한국어로 작성.
+
+### Phase 4: QA & Technical Save
+- **한자/이모지 금지**: 모든 텍스트에 한자가 포함되지 않도록 검수.
+- **구조 검증**: `en`, `ko`, `sentence_structure`, `explanation`, `voca` 필드가 누락되지 않았는지 확인.
+- 서버 API(`/api/songs/save`) 형식을 준수하여 전송.
+
+## 📋 출력 JSON 데이터 스키마 (엄수)
+```json
+{
+  "title": "Artist - Song Title",
+  "lyrics": "전체 가사 텍스트 (또는 요약)",
+  "difficulty": "level3",
+  "sentences": [
+    {
+      "en": "English lyrics sentence",
+      "ko": "한글 번역",
+      "sentence_structure": "N형식 / S(주어: ...) + V(동사: ...) + ...",
+      "explanation": "1타 강사의 상세 강의 (4문장 이상)",
+      "voca": ["단어(품사): 뜻"]
+    }
+  ],
+  "quiz": [
+    {
+      "type": "multiple_choice | fill_in_blank",
+      "word": "Target word",
+      "question": "한국어 퀴즈 질문",
+      "options": ["보기1", "Option 2", "Option 3", "Option 4"],
+      "answer": "정답"
+    }
+  ]
+}
+```
+
+## ⚠️ 절대 제약 사항
+1. **title**: 반드시 `Artist - Song Title` 영문 형식. 한국어 포함 시 수정.
+2. **explanation**: 4문장 미만 또는 단어 뜻만 적는 성의 없는 설명 엄격 금지.
+3. **quiz question**: 반드시 한국어.
+4. **Hanja**: 발견 시 즉시 제거.
