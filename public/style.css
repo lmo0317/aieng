@@ -297,6 +297,7 @@ body .chat-message-text, body .chat-messages {
 .trend-category.cat-금융  { background: rgba(200,146,42,0.1); color: #c8922a; border-color: rgba(200,146,42,0.2); }
 .trend-category.cat-전체  { background: rgba(204,80,80,0.1); color: #cc5050; border-color: rgba(204,80,80,0.2); }
 .trend-category.cat-일반  { background: var(--surface-2); color: var(--text-3); border-color: var(--border); }
+.trend-category.cat-팝송  { background: rgba(255,105,180,0.1); color: #ff69b4; border-color: rgba(255,105,180,0.2); }
 
 .badge-biz { background: rgba(76,175,128,0.1); color: #4caf80; border: 1px solid rgba(76,175,128,0.2); }
 .badge-ent { background: rgba(200,146,42,0.1); color: #c8922a; border: 1px solid rgba(200,146,42,0.2); }

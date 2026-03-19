@@ -2,6 +2,21 @@
 
 const realtimeTrendsContainer = document.getElementById('realtime-trends-container');
 
+// 카테고리 정규화: DB에 이미 저장된 영어 카테고리도 한글로 표시
+const _CAT_MAP = {
+    'ENTERTAINMENT':'연애','Entertainment':'연애','entertainment':'연애',
+    'SPORTS':'스포츠','Sports':'스포츠','sports':'스포츠',
+    'TECHNOLOGY':'테크','Technology':'테크','technology':'테크','TECH':'테크','Tech':'테크','tech':'테크',
+    'POLITICS':'정치','Politics':'정치','politics':'정치',
+    'FINANCE':'금융','Finance':'금융','finance':'금융','BUSINESS':'금융','Business':'금융',
+    'GENERAL':'일반','General':'일반','general':'일반',
+};
+function normCat(cat) {
+    if (!cat) return '일반';
+    const p = String(cat).split('/')[0].trim();
+    return _CAT_MAP[p] || _CAT_MAP[cat] || cat;
+}
+
 let trendsPagination = {
     allDates: [],
     groups: {},
@@ -79,11 +94,12 @@ function renderNextPage() {
 
             const keywords = item.keywords ? JSON.parse(item.keywords) : [];
             const kwHtml   = keywords.map(kw => `<span class="trend-keyword">${kw}</span>`).join('');
-            const catClass = `cat-${(item.category || '일반').replace(/\s+/g, '')}`;
+            const _cat = normCat(item.category);
+            const catClass = `cat-${_cat.replace(/\s+/g, '')}`;
 
             card.innerHTML = `
                 <div class="trend-card-top">
-                    <span class="trend-category ${catClass}">${item.category || '일반'}</span>
+                    <span class="trend-category ${catClass}">${_cat}</span>
                 </div>
                 <div class="trend-card-body">
                     <h4 class="trend-card-title">${item.title}</h4>

@@ -484,6 +484,22 @@ app.get('/api/admin-key', (req, res) => {
     res.json({ key: adminKey });
 });
 
+// 카테고리 정규화: AI가 영어로 생성하는 모든 카테고리 값을 한글로 통일
+const CATEGORY_MAP = {
+    'ENTERTAINMENT': '연애', 'Entertainment': '연애', 'entertainment': '연애', 'ENT': '연애',
+    'SPORTS': '스포츠', 'Sports': '스포츠', 'sports': '스포츠', 'SPO': '스포츠',
+    'TECHNOLOGY': '테크', 'Technology': '테크', 'technology': '테크', 'TECH': '테크', 'Tech': '테크', 'tech': '테크', 'TEC': '테크',
+    'POLITICS': '정치', 'Politics': '정치', 'politics': '정치',
+    'FINANCE': '금융', 'Finance': '금융', 'finance': '금융', 'BUSINESS': '금융', 'Business': '금융', 'business': '금융',
+    'GENERAL': '일반', 'General': '일반', 'general': '일반',
+    'TOP': '전체',
+};
+function normalizeCategory(cat) {
+    if (!cat) return '일반';
+    const primary = String(cat).split('/')[0].trim(); // "Tech/Game" → "Tech"
+    return CATEGORY_MAP[primary] || CATEGORY_MAP[cat] || cat;
+}
+
 // Save Pre-Analyzed Trends API (for CLI script)
 app.post('/api/trends/save', requireAdminKey, async (req, res) => {
     try {
@@ -501,8 +517,9 @@ app.post('/api/trends/save', requireAdminKey, async (req, res) => {
                 const sentences = typeof t.sentences === 'object' ? JSON.stringify(t.sentences) : t.sentences;
                 const quiz = t.quiz ? (typeof t.quiz === 'object' ? JSON.stringify(t.quiz) : t.quiz) : '[]';
                 const cleanTitle = String(t.title || '').trim();
+                const category = normalizeCategory(t.category);
 
-                stmt.run(cleanTitle, t.category, t.summary || '', keywords, sentences, quiz, t.difficulty || 'level3', today, 'news');
+                stmt.run(cleanTitle, category, t.summary || '', keywords, sentences, quiz, t.difficulty || 'level3', today, 'news');
             });
             stmt.finalize();
         });
