@@ -1,140 +1,171 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>데이터 관리 - 트렌드 영어</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Trend Eng - Data Management</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../settings.css">
     <style>
-        .data-card {
-            background: var(--surface);
-            padding: 1.75rem;
-            border-radius: var(--r-lg);
-            border: 1px solid var(--border-2);
-            text-align: left;
-            margin-top: 1rem;
-        }
-        .data-info {
-            margin-bottom: 1.25rem;
-            padding: 0.9rem 1.1rem;
-            background: var(--accent-dim);
-            border-radius: var(--r-md);
-            color: var(--text-1);
-            font-size: 0.92rem;
-            line-height: 1.6;
-            border: 1px solid var(--accent-border);
-        }
-        .data-card h3 {
-            font-family: var(--font-ui);
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--text-1) !important;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+        /* 원본 aieng.cafe24app.com/data.html 스타일 복제 및 최적화 */
+        body { background-color: #f0f2f5; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
+        .admin-container { max-width: 1100px; margin: 30px auto; padding: 25px; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #edf2f7; }
+        .header-left h1 { margin: 0; font-size: 24px; color: #1a202c; display: flex; align-items: center; gap: 10px; }
+        
+        .nav-group { display: flex; gap: 10px; align-items: center; }
+        .btn { padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; font-size: 14px; display: flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn-home { background: #edf2f7; color: #4a5568; }
+        .btn-home:hover { background: #e2e8f0; }
+        .btn-refresh { background: #3182ce; color: white; }
+        .btn-refresh:hover { background: #2b6cb0; }
 
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: var(--surface-dim);
-            border-radius: var(--r-md);
-            border: 1px solid var(--border-1);
-            transition: all 0.2s ease;
-        }
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 13px; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #edf2f7; }
+        td { padding: 16px 15px; border-bottom: 1px solid #edf2f7; color: #2d3748; font-size: 15px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f7fafc; }
 
-        .item-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .id-cell { color: #a0aec0; font-family: monospace; font-size: 13px; }
+        .title-cell { font-weight: 600; color: #1a202c; }
+        .date-cell { color: #718096; font-size: 13px; }
 
-        .item-title {
-            font-weight: 700;
-            color: var(--text-1);
-        }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; color: white; display: inline-block; }
+        .badge-tech { background-color: #4299e1; }
+        .badge-sports { background-color: #ed8936; }
+        .badge-ent { background-color: #9f7aea; }
+        .badge-economy { background-color: #48bb78; }
+        .badge-politics { background-color: #f56565; }
+        .badge-default { background-color: #a0aec0; }
 
-        .item-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
+        .btn-delete { padding: 6px 12px; background: #fff5f5; color: #f56565; border: 1px solid #feb2b2; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+        .btn-delete:hover { background: #f56565; color: white; }
 
-        .btn-delete {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: var(--r-md);
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 700;
-            transition: all 0.2s;
-        }
-
-        .btn-delete:hover {
-            background: #ef4444;
-            color: white;
-            border-color: #ef4444;
-            transform: translateY(-2px);
-        }
-
-        .btn-clear {
-            background: #f59e0b;
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: var(--r-md);
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
+        .loading-spinner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px; color: #3182ce; }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #3182ce; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .empty-state { text-align: center; padding: 80px 20px; color: #a0aec0; }
+        .empty-icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="header-section">
-            <div class="nav-links">
-                <a href="/admin" class="nav-link">📰 뉴스 생성</a>
-                <a href="/admin/data" class="nav-link active">🗑️ 리스트 삭제</a>
-                <a href="/admin/songs" class="nav-link">🎵 팝송 추가</a>
+    <div class="admin-container">
+        <div class="header-flex">
+            <div class="header-left">
+                <h1>📰 뉴스 데이터 관리</h1>
+            </div>
+            <div class="nav-group">
+                <a href="/admin" class="btn btn-home">🏠 생성기로 이동</a>
+                <button onclick="fetchData()" class="btn btn-refresh">🔄 새로고침</button>
             </div>
         </div>
 
-        <div class="settings-page-header">
-            <h2>🗑️ 리스트 삭제</h2>
-            <p>aieng.cafe24app.com 서버의 학습 콘텐츠를 조회하고 삭제할 수 있습니다</p>
+        <div id="loading" class="loading-spinner" style="display:none;">
+            <div class="spinner"></div>
+            <span>Cafe24 서버에서 데이터를 가져오는 중...</span>
+        </div>
+        
+        <div class="table-wrapper">
+            <table id="newsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th style="width: 120px;">카테고리</th>
+                        <th>기사 제목</th>
+                        <th style="width: 180px;">생성 일시</th>
+                        <th style="width: 100px; text-align: center;">작업</th>
+                    </tr>
+                </thead>
+                <tbody id="newsList">
+                    <!-- 데이터 동적 삽입 -->
+                </tbody>
+            </table>
         </div>
 
-        <div id="section-manage">
-            <div class="data-card">
-                <h3 style="margin-bottom: 1rem; color: #7c3aed;">🎶 저장된 팝송 관리</h3>
-                <div id="manage-songs-list" style="display: flex; flex-direction: column; gap: 10px;">
-                    <p style="text-align: center; color: var(--text-muted); padding: 20px;">로딩 중...</p>
-                </div>
-            </div>
-
-            <div class="data-card" style="margin-top: 2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h3 style="margin: 0; color: var(--primary);">📰 뉴스 트렌드 관리</h3>
-                    <button id="clearTodayBtn" class="btn-clear">오늘 데이터 전체 삭제</button>
-                </div>
-                <div id="manage-trends-list" style="display: flex; flex-direction: column; gap: 10px;">
-                    <p style="text-align: center; color: var(--text-muted); padding: 20px;">로딩 중...</p>
-                </div>
-            </div>
+        <div id="emptyMsg" class="empty-state" style="display:none;">
+            <div class="empty-icon">📭</div>
+            <p>저장된 뉴스 데이터가 없습니다.</p>
         </div>
     </div>
 
-    <script src="data.js"></script>
-</body>
+    <script>
+        const catClassMap = {
+            '테크': 'badge-tech', 'Tech': 'badge-tech',
+            '스포츠': 'badge-sports', 'Sports': 'badge-sports',
+            '엔터': 'badge-ent', 'Entertainment': 'badge-ent',
+            '경제': 'badge-economy', 'Economy': 'badge-economy',
+            '정치': 'badge-politics', 'Politics': 'badge-politics'
+        };
 
+        async function fetchData() {
+            const listEl = document.getElementById('newsList');
+            const loadingEl = document.getElementById('loading');
+            const emptyEl = document.getElementById('emptyMsg');
+
+            listEl.innerHTML = '';
+            loadingEl.style.display = 'flex';
+            emptyEl.style.display = 'none';
+
+            try {
+                // admin-server.js 프록시를 통해 실제 aieng.cafe24app.com/api/news 호출
+                const response = await fetch('/api/news');
+                if (!response.ok) throw new Error('서버 응답 오류');
+                
+                const data = await response.json();
+                loadingEl.style.display = 'none';
+
+                if (!data || data.length === 0) {
+                    emptyEl.style.display = 'block';
+                    return;
+                }
+
+                data.forEach(news => {
+                    const tr = document.createElement('tr');
+                    const catClass = catClassMap[news.category] || 'badge-default';
+                    const dateStr = new Date(news.created_at).toLocaleString('ko-KR', {
+                        year: 'numeric', month: '2-digit', day: '2-digit',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+                    
+                    tr.innerHTML = `
+                        <td class="id-cell">${news.id}</td>
+                        <td><span class="badge ${catClass}">${news.category}</span></td>
+                        <td class="title-cell">${news.title}</td>
+                        <td class="date-cell">${dateStr}</td>
+                        <td style="text-align: center;">
+                            <button class="btn-delete" onclick="deleteNews(${news.id})">삭제</button>
+                        </td>
+                    `;
+                    listEl.appendChild(tr);
+                });
+            } catch (err) {
+                loadingEl.innerHTML = `<span style="color:#f56565; font-weight:bold;">❌ 오류: ${err.message}</span>`;
+                console.error('Fetch error:', err);
+            }
+        }
+
+        async function deleteNews(id) {
+            if (!confirm(`뉴스(ID: ${id})를 영구 삭제하시겠습니까?`)) return;
+
+            try {
+                // Cafe24 API 서버로 삭제 요청 전송
+                const response = await fetch(`/api/news/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('성공적으로 삭제되었습니다.');
+                    fetchData(); 
+                } else {
+                    alert('삭제 실패: ' + (result.error || '권한이 없거나 서버 오류입니다.'));
+                }
+            } catch (err) {
+                alert('통신 오류: ' + err.message);
+            }
+        }
+
+        window.onload = fetchData;
+    </script>
+</body>
 </html>

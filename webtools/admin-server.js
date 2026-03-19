@@ -31,17 +31,33 @@ app.get('/admin/songs', (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'admin', 'popsong.html'));
 });
 
-// 2. API Proxy (Port 8080 -> Port 8001)
+// 2. API Proxy (Port 8080 -> aieng.cafe24app.com)
+// 카페24 서버가 HTTP만 지원하므로 http 모듈을 사용합니다.
 app.use('/api', (req, res) => {
-    const targetUrl = `http://localhost:8001/api${req.url}`;
-    const method = req.method;
-    const headers = { ...req.headers };
-    delete headers.host;
+    const targetHost = 'aieng.cafe24app.com';
+    // /api/news -> /news 로 변경하여 시도합니다.
+    const targetPath = `${req.url}`; 
+    
+    console.log(`[Proxy] ${req.method} ${req.url} -> http://${targetHost}${targetPath}`);
 
-    const proxyReq = http.request(targetUrl, {
-        method,
-        headers,
-    }, (proxyRes) => {
+    const options = {
+        hostname: targetHost,
+        port: 80,
+        path: targetPath,
+        method: req.method,
+        headers: {
+            'Host': targetHost,
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json'
+        }
+    };
+
+    // 필수 헤더가 존재할 때만 전달
+    if (req.headers['content-type']) options.headers['Content-Type'] = req.headers['content-type'];
+    if (req.headers['content-length']) options.headers['Content-Length'] = req.headers['content-length'];
+
+    const proxyReq = http.request(options, (proxyRes) => {
+        console.log(`[Proxy Response] Status: ${proxyRes.statusCode}`);
         res.writeHead(proxyRes.statusCode, proxyRes.headers);
         proxyRes.pipe(res, { end: true });
     });
@@ -49,8 +65,10 @@ app.use('/api', (req, res) => {
     req.pipe(proxyReq, { end: true });
 
     proxyReq.on('error', (err) => {
-        console.error('Proxy Error:', err.message);
-        res.status(500).json({ error: 'Proxy failed: ' + err.message });
+        console.error('[Proxy Error]:', err.code, err.message);
+        if (!res.headersSent) {
+            res.status(500).json({ success: false, error: 'Proxy connection failed: ' + err.message });
+        }
     });
 });
 
