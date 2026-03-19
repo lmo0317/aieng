@@ -156,23 +156,24 @@
         }
 
         async function clearDateData(date) {
-            if (!confirm(`[경고] ${date}의 모든 데이터를 삭제하시겠습니까?`)) return;
+            const cleanDate = date.trim();
+            if (!confirm(`[경고] ${cleanDate}의 모든 데이터를 삭제하시겠습니까?`)) return;
 
             try {
                 const response = await fetch('/api/trends/clear-today', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'x-admin-key': adminApiKey },
-                    body: JSON.stringify({ date })
+                    body: JSON.stringify({ date: cleanDate })
                 });
                 const result = await response.json();
                 if (result.success) {
-                    alert(`${date} 데이터가 삭제되었습니다.`);
+                    alert(`${cleanDate} 데이터가 ${result.deleted || 0}건 삭제되었습니다.`);
                     fetchData();
                 } else {
-                    alert('삭제 실패');
+                    alert('삭제 실패: ' + (result.error || '대상 데이터를 찾을 수 없거나 서버 오류입니다.'));
                 }
             } catch (err) {
-                alert('통신 오류');
+                alert('통신 오류: ' + err.message);
             }
         }
 
