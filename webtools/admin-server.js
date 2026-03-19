@@ -35,8 +35,8 @@ app.get('/admin/songs', (req, res) => {
 // 카페24 서버가 HTTP만 지원하므로 http 모듈을 사용합니다.
 app.use('/api', (req, res) => {
     const targetHost = 'aieng.cafe24app.com';
-    // /api/news -> /news 로 변경하여 시도합니다.
-    const targetPath = `${req.url}`; 
+    // 카페24 서버의 API는 /api 접두어를 사용하므로 다시 복구합니다.
+    const targetPath = `/api${req.url}`; 
     
     console.log(`[Proxy] ${req.method} ${req.url} -> http://${targetHost}${targetPath}`);
 

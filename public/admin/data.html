@@ -94,10 +94,23 @@
         const catClassMap = {
             '테크': 'badge-tech', 'Tech': 'badge-tech',
             '스포츠': 'badge-sports', 'Sports': 'badge-sports',
-            '엔터': 'badge-ent', 'Entertainment': 'badge-ent',
+            '엔터': 'badge-ent', 'Entertainment': 'badge-ent', '연애': 'badge-ent',
             '경제': 'badge-economy', 'Economy': 'badge-economy',
             '정치': 'badge-politics', 'Politics': 'badge-politics'
         };
+
+        let adminApiKey = '';
+
+        // 서버에서 어드민 키를 가져옵니다 (삭제 작업에 필요)
+        async function getAdminKey() {
+            try {
+                const res = await fetch('/api/admin-key');
+                const data = await res.json();
+                adminApiKey = data.key || '';
+            } catch (err) {
+                console.warn('Admin key fetch failed');
+            }
+        }
 
         async function fetchData() {
             const listEl = document.getElementById('newsList');
@@ -109,25 +122,32 @@
             emptyEl.style.display = 'none';
 
             try {
-                // admin-server.js 프록시를 통해 실제 aieng.cafe24app.com/api/news 호출
-                const response = await fetch('/api/news');
+                if (!adminApiKey) await getAdminKey();
+
+                // 올바른 API 엔드포인트: /api/trends/saved
+                const response = await fetch('/api/trends/saved');
                 if (!response.ok) throw new Error('서버 응답 오류');
                 
                 const data = await response.json();
                 loadingEl.style.display = 'none';
 
-                if (!data || data.length === 0) {
+                // 응답 구조: { trends: [...] }
+                const trends = data.trends || [];
+
+                if (trends.length === 0) {
                     emptyEl.style.display = 'block';
                     return;
                 }
 
-                data.forEach(news => {
+                trends.forEach(news => {
                     const tr = document.createElement('tr');
                     const catClass = catClassMap[news.category] || 'badge-default';
-                    const dateStr = new Date(news.created_at).toLocaleString('ko-KR', {
+                    // trends 테이블의 날짜 필드(date) 또는 생성일(createdAt) 사용
+                    const rawDate = news.date || news.createdAt || news.created_at;
+                    const dateStr = rawDate ? new Date(rawDate).toLocaleString('ko-KR', {
                         year: 'numeric', month: '2-digit', day: '2-digit',
                         hour: '2-digit', minute: '2-digit'
-                    });
+                    }) : '-';
                     
                     tr.innerHTML = `
                         <td class="id-cell">${news.id}</td>
@@ -150,8 +170,13 @@
             if (!confirm(`뉴스(ID: ${id})를 영구 삭제하시겠습니까?`)) return;
 
             try {
-                // Cafe24 API 서버로 삭제 요청 전송
-                const response = await fetch(`/api/news/${id}`, { method: 'DELETE' });
+                // Cafe24 API 서버로 삭제 요청 전송 (헤더에 어드민 키 포함)
+                const response = await fetch(`/api/trends/${id}`, { 
+                    method: 'DELETE',
+                    headers: {
+                        'x-admin-key': adminApiKey
+                    }
+                });
                 const result = await response.json();
 
                 if (result.success) {
