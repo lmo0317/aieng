@@ -178,6 +178,48 @@ app.post('/run-news', (req, res) => {
     res.json({ success: true });
 });
 
+// 팝송 생성 실행 API
+app.post('/run-popsong', (req, res) => {
+    const { artist, song } = req.body;
+    const args = [];
+    if (artist) args.push(artist);
+    if (song) args.push(song);
+
+    const PROJECT_ROOT = path.join(__dirname, '..');
+
+    if (newsProcess) {
+        return res.status(400).json({ success: false, error: '이미 다른 작업이 진행 중입니다.' });
+    }
+
+    const isWin = os.platform() === 'win32';
+    const scriptPath = path.resolve(__dirname, isWin ? 'popsong.bat' : 'popsong.sh');
+
+    console.log(`Starting popsong process...`);
+    console.log(`- Artist: ${artist}, Song: ${song}`);
+
+    if (isWin) {
+        newsProcess = spawn('cmd.exe', ['/c', scriptPath, ...args], {
+            cwd: PROJECT_ROOT,
+            windowsHide: true,
+            env: { ...process.env, CI: 'true', TERM: 'dumb' }
+        });
+    } else {
+        newsProcess = spawn('sudo', ['-E', '-u', 'lmo0317ea', 'bash', scriptPath, ...args], {
+            cwd: PROJECT_ROOT,
+            env: { ...process.env, FORCE_COLOR: 'true', HOME: '/home/lmo0317ea' }
+        });
+    }
+
+    newsProcess.stdout.on('data', (data) => broadcast('stdout', data.toString()));
+    newsProcess.stderr.on('data', (data) => broadcast('stderr', data.toString()));
+    newsProcess.on('close', (code) => {
+        broadcast('exit', `작업 완료 (종료 코드: ${code})`, code);
+        newsProcess = null;
+    });
+
+    res.json({ success: true });
+});
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`================================================`);
     console.log(`🚀 News Generator Admin Server is running!`);
