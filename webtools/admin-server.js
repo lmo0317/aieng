@@ -13,24 +13,23 @@ const PORT = process.env.PORT || 8080;
 let newsProcess = null;
 const clients = new Set();
 
-// 정적 파일 서빙 경로 수정: 이제 webtools 폴더에 있으므로 상위의 public을 참조합니다.
-const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+const WEBTOOLS_DIR = __dirname;
 
 // 1. 관리 페이지 라우트
 app.get('/', (req, res) => {
-    res.sendFile(path.join(PUBLIC_DIR, 'admin', 'index.html'));
+    res.sendFile(path.join(WEBTOOLS_DIR, 'admin', 'index.html'));
 });
 
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(PUBLIC_DIR, 'admin', 'index.html'));
+    res.sendFile(path.join(WEBTOOLS_DIR, 'admin', 'index.html'));
 });
 
 app.get('/admin/data', (req, res) => {
-    res.sendFile(path.join(PUBLIC_DIR, 'admin', 'data.html'));
+    res.sendFile(path.join(WEBTOOLS_DIR, 'admin', 'data.html'));
 });
 
 app.get('/admin/songs', (req, res) => {
-    res.sendFile(path.join(PUBLIC_DIR, 'admin', 'popsong.html'));
+    res.sendFile(path.join(WEBTOOLS_DIR, 'admin', 'popsong.html'));
 });
 
 // 2. API Proxy (Port 8080 -> aieng.cafe24app.com)
@@ -76,7 +75,7 @@ app.use('/api', (req, res) => {
 });
 
 // 3. 정적 파일 (CSS, JS 등) 서빙
-app.use(express.static(PUBLIC_DIR));
+app.use(express.static(WEBTOOLS_DIR));
 
 // SSE 로그 스트리밍
 app.get('/logs', (req, res) => {

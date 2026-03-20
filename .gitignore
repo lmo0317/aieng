@@ -8,6 +8,8 @@ db/database.sqlite
 
 # Generated output files
 output/
+temp/
+tunnel_url.txt
 
 # SSH keys (배포용 키는 로컬에만 보관)
 webtools/keys/cafe24_deploy
