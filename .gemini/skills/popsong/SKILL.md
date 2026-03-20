@@ -31,6 +31,7 @@ description: >
 - **한글 문제 필수 (HARD RULE)**: 퀴즈 질문(`question`)은 반드시 한국어로 작성.
 
 ### Phase 4: QA & Technical Save
+- **임시 파일 생성 (중요)**: 서버에 저장하기 전 데이터를 임시 JSON 파일로 저장할 경우, **반드시 `file_path`를 명시**하십시오. (예: `artist_song_analysis.json`)
 - **한자/이모지 금지**: 모든 텍스트에 한자가 포함되지 않도록 검수.
 - **구조 검증**: `en`, `ko`, `sentence_structure`, `explanation`, `voca` 필드가 누락되지 않았는지 확인.
 - 서버 API(`/api/songs/save`) 형식을 준수하여 전송.
