@@ -96,8 +96,15 @@ app.get('/logs', (req, res) => {
 });
 
 const broadcast = (type, content, code = null) => {
+    // SSE에서는 줄바꿈 문자가 메시지를 끝낼 수 있으므로 안전하게 JSON 문자열로 변환합니다.
     const data = JSON.stringify({ type, content, code });
-    clients.forEach(c => c.res.write(`data: ${data}\n\n`));
+    clients.forEach(c => {
+        try {
+            c.res.write(`data: ${data}\n\n`);
+        } catch (err) {
+            console.error('Broadcast failed:', err.message);
+        }
+    });
 };
 
 // 뉴스 생성 실행 API (OS 감지 및 강제 재시작 로직 추가)

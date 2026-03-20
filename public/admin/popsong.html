@@ -104,15 +104,19 @@
             eventSource = new EventSource('/logs');
 
             eventSource.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'stdout') appendLog(data.content);
-                else if (data.type === 'stderr') appendLog(data.content, 'warning');
-                else if (data.type === 'exit') {
-                    appendLog(`\n>>> 프로세스 종료 (코드: ${data.code})\n`, data.code === 0 ? 'success' : 'error');
-                    statusBadge.className = 'status-badge status-idle';
-                    statusBadge.textContent = '완료';
-                    runBtn.disabled = false;
-                    eventSource.close();
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'stdout') appendLog(data.content);
+                    else if (data.type === 'stderr') appendLog(data.content, 'warning');
+                    else if (data.type === 'exit') {
+                        appendLog(`\n>>> 프로세스 종료 (코드: ${data.code})\n`, data.code === 0 ? 'success' : 'error');
+                        statusBadge.className = 'status-badge status-idle';
+                        statusBadge.textContent = '완료';
+                        runBtn.disabled = false;
+                        eventSource.close();
+                    }
+                } catch (e) {
+                    console.error('SSE JSON Parse Error:', e, event.data);
                 }
             };
 
