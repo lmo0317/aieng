@@ -203,7 +203,7 @@
 
             try {
                 if (!adminApiKey) await getAdminKey();
-                const response = await fetch('/api/songs/list');
+                const response = await fetch('/api/songs/saved'); // 경로 수정
                 const data = await response.json();
                 loadingEl.style.display = 'none';
 
@@ -275,7 +275,7 @@
         async function deleteSong(id) {
             if (!confirm(`팝송 데이터를 삭제하시겠습니까?`)) return;
             try {
-                const response = await fetch(`/api/songs/${id}`, {
+                const response = await fetch(`/api/trends/${id}`, { // 경로 수정
                     method: 'DELETE',
                     headers: { 'x-admin-key': adminApiKey }
                 });
