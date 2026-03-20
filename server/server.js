@@ -27,7 +27,8 @@ app.get('/songs', (req, res) => res.sendFile(pub('songs.html')));
 app.get('/topic', (req, res) => res.sendFile(pub('topic.html')));
 app.get('/learn', (req, res) => res.sendFile(pub('learn.html')));
 app.get('/chat',  (req, res) => res.sendFile(pub('chat.html')));
-app.get('/puzzle', (req, res) => res.sendFile(pub('puzzle.html')));
+app.get('/puzzle',      (req, res) => res.sendFile(pub('puzzle.html')));
+app.get('/puzzle/play', (req, res) => res.sendFile(pub('puzzle-play.html')));
 
 const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'Trend Eng'의 1타 AI 영어 강사입니다.
 주제: {topic}

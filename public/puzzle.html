@@ -2,411 +2,197 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trend Eng - Premium Word Puzzle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>퍼즐 - Trend Eng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        
-        :root {
-            --primary: #3498db;
-            --primary-glow: rgba(52, 152, 219, 0.3);
-            --bg: #f0f2f5;
-            --cell-bg: #ffffff;
-            --cell-border: #dcdde1;
-            --text: #2f3640;
-            --grid-bg: #2f3640;
-            --cell-size: 50px;
-            --radius: 8px;
+        .puzzle-page-header { text-align: center; padding: 32px 0 24px; }
+        .puzzle-page-header h2 { font-size: 1.6rem; font-weight: 800; margin: 0 0 6px; }
+        .puzzle-page-header p { color: #888; font-size: 0.9rem; margin: 0; }
+
+        .puzzle-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 16px 40px;
         }
 
-        body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 40px 20px; margin: 0; }
-        
-        .game-header { text-align: center; margin-bottom: 40px; }
-        .game-header h1 { font-weight: 900; font-size: 2.5rem; margin: 0; letter-spacing: -1.5px; color: var(--grid-bg); }
-        .game-header h1 span { color: var(--primary); }
-
-        .game-wrapper { display: flex; gap: 50px; max-width: 1100px; width: 100%; align-items: flex-start; justify-content: center; }
-
-        /* 퍼즐 보드 */
-        .board-container { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); 
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .puzzle-grid { 
-            display: grid; 
-            background: #dfe4ea; 
-            gap: 4px; 
-            padding: 4px;
-            border-radius: 12px;
-        }
-
-        .cell { 
-            width: var(--cell-size); 
-            height: var(--cell-size); 
-            background: var(--cell-bg); 
-            position: relative; 
-            border-radius: var(--radius);
-            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.05);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid var(--cell-border);
-        }
-
-        .cell.black { 
-            background: var(--grid-bg); 
-            border-color: var(--grid-bg);
-            box-shadow: none;
-        }
-
-        .cell input { 
-            width: 100%; 
-            height: 100%; 
-            border: none; 
-            text-align: center; 
-            font-size: 24px; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            outline: none; 
-            background: transparent; 
-            color: var(--text);
-            caret-color: transparent; /* 커서 숨김 */
-            cursor: pointer;
-        }
-
-        /* 셀 상태 효과 */
-        .cell.highlight-word { 
-            background: #f1f9ff; 
-            border-color: #badcff;
-        }
-
-        .cell.active-cell { 
-            background: #ffffff !important; 
-            border-color: var(--primary);
-            border-width: 2px;
-            transform: translateY(-4px); 
-            box-shadow: 0 10px 20px var(--primary-glow);
-            z-index: 10;
-        }
-
-        .cell.word-correct { 
-            background: #e8faf0 !important; 
-            border-color: #2ecc71 !important;
-            box-shadow: inset 0 -3px 0 #27ae60;
-        }
-        .cell.word-correct input { color: #27ae60; }
-
-        .cell.word-wrong { 
-            background: #fff5f5 !important; 
-            border-color: #ff7675 !important;
-            animation: shake 0.4s;
-            box-shadow: inset 0 -3px 0 #d63031;
-        }
-        .cell.word-wrong input { color: #d63031; }
-
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
-
-        .cell .num { 
-            position: absolute; 
-            top: 4px; 
-            left: 6px; 
-            font-size: 11px; 
-            color: #a4b0be; 
-            font-weight: 800; 
-            pointer-events: none; 
-        }
-
-        /* 힌트 카드 */
-        .clues-wrapper { flex: 1; display: flex; flex-direction: column; gap: 20px; min-width: 380px; }
-        .clue-card { 
-            background: white; 
-            padding: 25px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-            border: 1px solid #f1f2f6;
-        }
-        .clue-card h3 { 
-            margin: 0 0 20px 0; 
-            font-size: 1.2rem; 
-            color: #2f3542;
+        .puzzle-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px 22px;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-        .clue-list { list-style: none; padding: 0; margin: 0; }
-        .clue-item { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 14px 16px; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-size: 15px; 
-            margin-bottom: 8px; 
-            transition: all 0.2s; 
-            border: 1px solid transparent;
-            background: #f8f9fa;
-        }
-        .clue-item:hover { background: #f1f2f6; }
-        .clue-item.active { 
-            background: white; 
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
-        }
-        .clue-text { flex: 1; margin-right: 15px; line-height: 1.5; color: #57606f; }
-        .clue-item.active .clue-text { color: var(--primary); font-weight: 600; }
-        
-        .btn-check-word { 
-            padding: 6px 14px; 
-            font-size: 12px; 
-            font-weight: 800; 
-            border-radius: 8px; 
-            border: none; 
-            background: #dfe4ea; 
-            color: #747d8c;
-            cursor: pointer; 
-            transition: all 0.2s; 
-        }
-        .btn-check-word:hover { background: var(--primary); color: white; }
-
-        .btn-hint-word { 
-            padding: 6px 14px; 
-            font-size: 12px; 
-            font-weight: 800; 
-            border-radius: 8px; 
-            border: none; 
-            background: #f1c40f; 
-            color: white;
-            cursor: pointer; 
-            transition: all 0.2s; 
-            margin-right: 5px;
-        }
-        .btn-hint-word:hover { background: #f39c12; }
-
-        .clue-item.completed { opacity: 0.5; }
-        .clue-item.completed .clue-text { text-decoration: line-through; }
-
-        .footer-controls { margin-top: 40px; }
-        .btn-reset { 
-            padding: 14px 40px; 
-            border-radius: 50px; 
-            border: none; 
-            background: #2f3542; 
-            color: white; 
-            font-weight: 800; 
+            gap: 16px;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transition: all 0.2s;
+            border: 1.5px solid #f0f0f0;
+            transition: all 0.18s;
+            text-decoration: none;
+            color: inherit;
         }
-        .btn-reset:hover { transform: scale(1.05); background: #000; }
+        .puzzle-card:hover {
+            border-color: #6366f1;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.12);
+            transform: translateY(-2px);
+        }
 
-        .status-toast { position: fixed; bottom: 40px; padding: 16px 40px; border-radius: 50px; color: white; font-weight: 800; display: none; z-index: 100; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .puzzle-card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .puzzle-card-body { flex: 1; min-width: 0; }
+        .puzzle-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0 0 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .puzzle-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+        .badge-diff-easy   { background: #dcfce7; color: #16a34a; }
+        .badge-diff-medium { background: #dbeafe; color: #1d4ed8; }
+        .badge-diff-hard   { background: #fef3c7; color: #d97706; }
+        .badge-cat { background: #f3f4f6; color: #555; }
+
+        .puzzle-card-info {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 4px;
+        }
+
+        .puzzle-card-arrow {
+            color: #ccc;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .puzzle-card:hover .puzzle-card-arrow { color: #6366f1; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state p { font-size: 14px; }
+
+        .loading { text-align: center; padding: 60px 20px; color: #aaa; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div class="game-header">
-        <h1>Word <span>Puzzle</span></h1>
-        <p>세련된 디자인의 퍼즐을 풀어보세요!</p>
-    </div>
-    
-    <div class="game-wrapper">
-        <div class="board-container">
-            <div id="grid" class="puzzle-grid"></div>
-        </div>
-        
-        <div class="clues-wrapper">
-            <div class="clue-card">
-                <h3>↔️ Across</h3>
-                <ul id="across-clues" class="clue-list"></ul>
-            </div>
-            <div class="clue-card">
-                <h3>↕️ Down</h3>
-                <ul id="down-clues" class="clue-list"></ul>
+    <div class="container">
+        <div class="header-section">
+            <div class="nav-links">
+                <a href="/" class="nav-link">🔥 <span>실시간 트렌드</span></a>
+                <a href="/songs" class="nav-link">🎶 <span>팝송 학습</span></a>
+                <a href="/topic" class="nav-link">✏️ <span>주제 입력</span></a>
+                <a href="/chat" class="nav-link">💬 <span>AI 튜터</span></a>
+                <a href="/puzzle" class="nav-link active">🧩 <span>퍼즐</span></a>
+                <a href="/settings.html" class="settings-link">⚙️</a>
             </div>
         </div>
+
+        <div class="puzzle-page-header">
+            <h2>🧩 가로세로 영어 퀴즈</h2>
+            <p>영단어 퍼즐을 풀며 영어를 학습해보세요</p>
+        </div>
+
+        <div id="puzzle-list" class="puzzle-list">
+            <div class="loading">퍼즐 목록을 불러오는 중...</div>
+        </div>
     </div>
 
-    <div class="footer-controls">
-        <button class="btn-reset" onclick="location.reload()">🔄 Reset Puzzle</button>
-    </div>
-
-    <div id="toast" class="status-toast"></div>
-
+    <script src="/js/nav.js"></script>
     <script>
-        const puzzleData = {
-            gridSize: 10,
-            words: [
-                { id: "w1", answer: "GEMINI", clue: "Google's most capable AI model.", x: 1, y: 1, direction: "across", number: 1 },
-                { id: "w2", answer: "MIND", clue: "The element of a person that enables them to be aware of the world.", x: 3, y: 1, direction: "down", number: 2 },
-                { id: "w3", answer: "INDIA", clue: "A large country in South Asia.", x: 3, y: 2, direction: "across", number: 3 },
-                { id: "w4", answer: "DATE", clue: "The day of the month or year as specified by a number.", x: 5, y: 2, direction: "down", number: 4 }
-            ]
+        const CATEGORY_ICON = {
+            tech:          { icon: '💻', bg: '#ede9fe', color: '#7c3aed' },
+            sports:        { icon: '⚽', bg: '#dcfce7', color: '#16a34a' },
+            entertainment: { icon: '🎬', bg: '#fce7f3', color: '#db2777' },
+            politics:      { icon: '🏛️', bg: '#e0f2fe', color: '#0284c7' },
+            economy:       { icon: '📈', bg: '#fef9c3', color: '#ca8a04' },
+            popsong:       { icon: '🎵', bg: '#fce7f3', color: '#db2777' },
+            general:       { icon: '📰', bg: '#f3f4f6', color: '#555' },
         };
+        const DIFF_LABEL = { easy: '초급', medium: '중급', hard: '고급' };
 
-        let activeWord = null;
+        async function loadList() {
+            const container = document.getElementById('puzzle-list');
+            try {
+                const res = await fetch('/puzzle-data/index.json');
+                if (!res.ok) throw new Error('index.json not found');
+                const { puzzles } = await res.json();
 
-        function initGrid() {
-            const gridEl = document.getElementById('grid');
-            gridEl.style.gridTemplateColumns = `repeat(${puzzleData.gridSize}, var(--cell-size))`;
-            gridEl.innerHTML = '';
-
-            const cellMap = {};
-            puzzleData.words.forEach(w => {
-                for(let i=0; i<w.answer.length; i++) {
-                    const x = w.direction === 'across' ? w.x + i : w.x;
-                    const y = w.direction === 'across' ? w.y : w.y + i;
-                    const key = `${x},${y}`;
-                    if(!cellMap[key]) cellMap[key] = { char: w.answer[i], num: (i === 0 ? w.number : null), words: [] };
-                    cellMap[key].words.push(w);
+                if (!puzzles || puzzles.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">🧩</div>
+                            <p>아직 퍼즐이 없습니다.<br>스킬로 퍼즐을 생성해보세요!</p>
+                        </div>`;
+                    return;
                 }
-            });
 
-            for(let y=0; y<puzzleData.gridSize; y++) {
-                for(let x=0; x<puzzleData.gridSize; x++) {
-                    const cellEl = document.createElement('div');
-                    const key = `${x},${y}`;
-                    const data = cellMap[key];
-                    
-                    cellEl.className = 'cell' + (data ? '' : ' black');
-                    if(data) {
-                        if(data.num) {
-                            const num = document.createElement('span');
-                            num.className = 'num'; num.textContent = data.num;
-                            cellEl.appendChild(num);
-                        }
-                        const input = document.createElement('input');
-                        input.maxLength = 1;
-                        input.dataset.x = x; input.dataset.y = y;
-                        input.dataset.ans = data.char;
-                        
-                        // 첫 글자 힌트 채우기 로직
-                        if (data.num) { 
-                            input.value = data.char;
-                            input.disabled = true;
-                            cellEl.style.background = "#f0f7ff";
-                            input.style.color = "var(--primary)";
-                        }
-                        
-                        input.addEventListener('focus', () => selectWord(data.words[0], x, y));
-                        input.addEventListener('keydown', (e) => handleKey(e, x, y));
-                        cellEl.appendChild(input);
-                    }
-                    gridEl.appendChild(cellEl);
-                }
-            }
-            renderClues();
-        }
+                container.innerHTML = '';
+                // 최신순 정렬
+                puzzles.sort((a, b) => b.date.localeCompare(a.date));
 
-        function renderClues() {
-            const lists = { across: document.getElementById('across-clues'), down: document.getElementById('down-clues') };
-            lists.across.innerHTML = ''; lists.down.innerHTML = '';
-            
-            puzzleData.words.forEach(w => {
-                const li = document.createElement('li');
-                li.className = 'clue-item';
-                li.id = `clue-${w.id}`;
-                li.innerHTML = `
-                    <div class="clue-text" onclick="focusWord('${w.id}')"><strong>${w.number}.</strong> ${w.clue}</div>
-                    <div style="display: flex;">
-                        <button class="btn-hint-word" onclick="revealWord('${w.id}')">힌트</button>
-                        <button class="btn-check-word" onclick="validateWord('${w.id}')">확인</button>
-                    </div>
-                `;
-                lists[w.direction].appendChild(li);
-            });
-        }
+                puzzles.forEach(p => {
+                    const cat = CATEGORY_ICON[p.category] || CATEGORY_ICON.general;
+                    const diffClass = `badge-diff-${p.difficulty || 'medium'}`;
+                    const diffLabel = DIFF_LABEL[p.difficulty] || '중급';
 
-        function revealWord(id) {
-            const w = puzzleData.words.find(word => word.id === id);
-            for(let i=0; i<w.answer.length; i++) {
-                const x = w.direction === 'across' ? w.x + i : w.x;
-                const y = w.direction === 'across' ? w.y : w.y + i;
-                const input = document.querySelector(`input[data-x="${x}"][data-y="${y}"]`);
-                input.value = w.answer[i];
-            }
-            validateWord(id); // 채운 후 즉시 검증하여 성공 표시
-        }
-
-        function selectWord(word, curX, curY) {
-            activeWord = word;
-            document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-cell', 'highlight-word'));
-            document.querySelectorAll('.clue-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(`clue-${word.id}`).classList.add('active');
-
-            for(let i=0; i<word.answer.length; i++) {
-                const x = word.direction === 'across' ? word.x + i : word.x;
-                const y = word.direction === 'across' ? word.y : word.y + i;
-                const cell = document.querySelector(`input[data-x="${x}"][data-y="${y}"]`).parentElement;
-                cell.classList.add(x === curX && y === curY ? 'active-cell' : 'highlight-word');
+                    const card = document.createElement('a');
+                    card.className = 'puzzle-card';
+                    card.href = `/puzzle/play?data=puzzle-data/${p.file}`;
+                    card.innerHTML = `
+                        <div class="puzzle-card-icon" style="background:${cat.bg};">${cat.icon}</div>
+                        <div class="puzzle-card-body">
+                            <div class="puzzle-card-title">${p.title}</div>
+                            <div class="puzzle-card-meta">
+                                <span class="badge ${diffClass}">${diffLabel}</span>
+                                <span class="badge badge-cat">${p.category}</span>
+                                ${p.wordCount ? `<span class="badge badge-cat">단어 ${p.wordCount}개</span>` : ''}
+                            </div>
+                            <div class="puzzle-card-info">
+                                ${p.date}${p.source ? ' · ' + p.source : ''}
+                            </div>
+                        </div>
+                        <div class="puzzle-card-arrow">›</div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚠️</div>
+                        <p>퍼즐 목록을 불러올 수 없습니다.</p>
+                    </div>`;
             }
         }
 
-        function focusWord(id) {
-            const w = puzzleData.words.find(word => word.id === id);
-            const input = document.querySelector(`input[data-x="${w.x}"][data-y="${w.y}"]`);
-            input.focus();
-            selectWord(w, w.x, w.y);
-        }
-
-        function handleKey(e, x, y) {
-            if(e.key === 'Backspace') {
-                if(e.target.value === '') moveFocus(-1);
-            } else if(e.key.length === 1 && e.key.match(/[a-z]/i)) {
-                e.target.value = e.key.toUpperCase();
-                moveFocus(1);
-                e.preventDefault();
-            }
-        }
-
-        function moveFocus(step) {
-            const inputs = [];
-            for(let i=0; i<activeWord.answer.length; i++) {
-                const tx = activeWord.direction === 'across' ? activeWord.x + i : activeWord.x;
-                const ty = activeWord.direction === 'across' ? activeWord.y : activeWord.y + i;
-                inputs.push(document.querySelector(`input[data-x="${tx}"][data-y="${ty}"]`));
-            }
-            const curIdx = inputs.indexOf(document.activeElement);
-            const nextIdx = curIdx + step;
-            if(nextIdx >= 0 && nextIdx < inputs.length) inputs[nextIdx].focus();
-        }
-
-        function validateWord(id) {
-            const w = puzzleData.words.find(word => word.id === id);
-            let isCorrect = true;
-            const cells = [];
-
-            for(let i=0; i<w.answer.length; i++) {
-                const x = w.direction === 'across' ? w.x + i : w.x;
-                const y = w.direction === 'across' ? w.y : w.y + i;
-                const input = document.querySelector(`input[data-x="${x}"][data-y="${y}"]`);
-                cells.push(input.parentElement);
-                if(input.value.toUpperCase() !== w.answer[i]) isCorrect = false;
-            }
-
-            cells.forEach(c => {
-                c.classList.remove('word-correct', 'word-wrong');
-                void c.offsetWidth;
-                c.classList.add(isCorrect ? 'word-correct' : 'word-wrong');
-            });
-
-            if(isCorrect) {
-                document.getElementById(`clue-${id}`).classList.add('completed');
-                showToast("Great! That's correct!", "#2ecc71");
-            } else {
-                showToast("Not quite. Check again!", "#e74c3c");
-            }
-        }
-
-        function showToast(msg, color) {
-            const t = document.getElementById('toast');
-            t.textContent = msg; t.style.background = color;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
-        }
-
-        window.onload = initGrid;
+        loadList();
     </script>
 </body>
 </html>

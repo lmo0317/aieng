@@ -1,0 +1,14 @@
+{
+  "puzzles": [
+    {
+      "id": "puzzle-20260321-001",
+      "file": "sample.json",
+      "title": "AI 기술 영어 퀴즈",
+      "category": "tech",
+      "difficulty": "medium",
+      "date": "2026-03-21",
+      "wordCount": 4,
+      "source": "Google Gemini 2.5 발표 뉴스"
+    }
+  ]
+}

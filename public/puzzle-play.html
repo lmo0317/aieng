@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>가로세로 영어퀴즈 - Trend Eng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #f4f6f8;
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 상단 헤더 */
+        .top-bar {
+            width: 100%;
+            background: #fff;
+            border-bottom: 1px solid #e4e6ea;
+            padding: 0 16px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .top-bar .back-btn {
+            font-size: 22px;
+            color: #555;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px 8px 4px 0;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .top-bar .back-btn:hover { color: #1a1a2e; }
+        .top-bar .title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .top-bar .title .badge {
+            background: #03c75a;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
+        }
+        .top-bar .progress-info {
+            font-size: 13px;
+            color: #888;
+            flex-shrink: 0;
+        }
+        .top-bar .progress-info span {
+            color: #03c75a;
+            font-weight: 700;
+        }
+
+        /* 메인 컨테이너 */
+        .game-container {
+            width: 100%;
+            max-width: 520px;
+            padding: 16px 16px 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* 그리드 영역 */
+        .grid-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: center;
+        }
+
+        .puzzle-grid {
+            display: grid;
+            border: 2px solid #222;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .cell {
+            width: var(--cell-size, 44px);
+            height: var(--cell-size, 44px);
+            background: #fff;
+            position: relative;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            transition: background 0.15s;
+        }
+        .cell:last-child { border-right: none; }
+
+        .cell.black {
+            background: #e0e3e8;
+            border-color: #d0d3d8;
+        }
+
+        .cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            outline: none;
+            background: transparent;
+            color: #1a1a2e;
+            caret-color: transparent;
+            cursor: pointer;
+            padding-top: 6px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .cell .num {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            font-size: 9px;
+            color: #555;
+            font-weight: 700;
+            pointer-events: none;
+            line-height: 1;
+        }
+
+        /* 셀 상태 */
+        .cell.hint-cell {
+            background: #f0f8ff;
+        }
+        .cell.hint-cell input { color: #2563eb; }
+
+        /* 선택된 단어 라인 — 연한 녹색 배경 + 녹색 테두리 */
+        .cell.highlight-word {
+            background: #d1fae5;
+            outline: 1px solid #34d399;
+            outline-offset: -1px;
+        }
+
+        /* 현재 입력 셀 — 진한 녹색 테두리 */
+        .cell.active-cell {
+            background: #a7f3d0 !important;
+            outline: 2px solid #059669 !important;
+            outline-offset: -2px;
+            z-index: 5;
+        }
+        .cell.active-cell input { color: #064e3b; font-weight: 800; }
+
+        .cell.word-correct {
+            background: #dcfce7 !important;
+        }
+        .cell.word-correct input { color: #16a34a; font-weight: 800; }
+
+        .cell.word-wrong {
+            background: #fee2e2 !important;
+            animation: shake 0.35s;
+        }
+        .cell.word-wrong input { color: #dc2626; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        /* 선택된 힌트 패널 */
+        .active-clue-panel {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+            min-height: 80px;
+        }
+
+        .active-clue-header {
+            background: #1a73e8;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .active-clue-dir-badge {
+            background: rgba(255,255,255,0.25);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        .active-clue-num {
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .active-clue-body {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .active-clue-text {
+            font-size: 15px;
+            color: #222;
+            line-height: 1.5;
+            flex: 1;
+        }
+        .active-clue-text.empty {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .active-clue-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .btn-hint {
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 1px solid #f59e0b;
+            background: #fef3c7;
+            color: #d97706;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn-hint:hover { background: #fde68a; }
+        .btn-check {
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 8px;
+            border: none;
+            background: #1a73e8;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn-check:hover { background: #1557b0; }
+
+        /* 힌트 목록 탭 */
+        .clue-section {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .clue-tabs {
+            display: flex;
+            border-bottom: 1px solid #e4e6ea;
+        }
+        .clue-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-family: inherit;
+        }
+        .clue-tab.active {
+            color: #1a73e8;
+            border-bottom-color: #1a73e8;
+        }
+
+        .clue-panel { display: none; }
+        .clue-panel.active { display: block; }
+
+        .clue-list {
+            list-style: none;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .clue-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 10px;
+            transition: background 0.1s;
+        }
+        .clue-item:last-child { border-bottom: none; }
+        .clue-item:hover { background: #f7f8fa; }
+        .clue-item.active {
+            background: #eff6ff;
+        }
+        .clue-item.completed {
+            opacity: 0.45;
+        }
+        .clue-item.completed .clue-item-text {
+            text-decoration: line-through;
+        }
+
+        .clue-item-num {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a73e8;
+            min-width: 24px;
+        }
+        .clue-item.active .clue-item-num { color: #1a73e8; }
+        .clue-item-text {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.45;
+            flex: 1;
+        }
+        .clue-item.active .clue-item-text { color: #1a73e8; font-weight: 600; }
+        .clue-item-len {
+            font-size: 12px;
+            color: #aaa;
+            flex-shrink: 0;
+        }
+
+        /* 하단 리셋 버튼 */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 520px;
+            background: #fff;
+            border-top: 1px solid #e4e6ea;
+            padding: 10px 16px;
+            display: flex;
+            gap: 8px;
+        }
+        .btn-reset {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #e4e6ea;
+            background: #f7f8fa;
+            color: #555;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn-reset:hover { background: #e4e6ea; }
+        .btn-check-all {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: #1a73e8;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn-check-all:hover { background: #1557b0; }
+
+        /* 토스트 */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 24px;
+            border-radius: 24px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            display: none;
+            z-index: 200;
+            white-space: nowrap;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        /* 완료 오버레이 */
+        .complete-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+        }
+        .complete-overlay.show { display: flex; }
+        .complete-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px 32px;
+            text-align: center;
+            max-width: 320px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .complete-card .emoji { font-size: 52px; margin-bottom: 16px; }
+        .complete-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #1a1a2e; }
+        .complete-card p { font-size: 14px; color: #888; margin-bottom: 24px; }
+        .complete-card button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: #1a73e8;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 상단 바 -->
+    <div class="top-bar">
+        <button class="back-btn" onclick="location.href='/puzzle'">‹</button>
+        <div class="title">
+            가로세로 영어퀴즈
+            <span class="badge">QUIZ</span>
+        </div>
+        <div class="progress-info">완료 <span id="solved-count">0</span>/<span id="total-count">0</span></div>
+    </div>
+
+    <div class="game-container">
+
+        <!-- 그리드 -->
+        <div class="grid-section">
+            <div id="grid" class="puzzle-grid"></div>
+        </div>
+
+        <!-- 선택 힌트 패널 -->
+        <div class="active-clue-panel">
+            <div class="active-clue-header" id="active-clue-header">
+                <span class="active-clue-dir-badge" id="active-dir-badge">가로</span>
+                <span class="active-clue-num" id="active-clue-num">단어를 선택하세요</span>
+            </div>
+            <div class="active-clue-body">
+                <div class="active-clue-text empty" id="active-clue-text">그리드에서 단어를 클릭하면 힌트가 표시됩니다.</div>
+                <div class="active-clue-actions" id="active-clue-actions" style="display:none;">
+                    <button class="btn-hint" id="btn-hint-active" onclick="revealActiveWord()">힌트</button>
+                    <button class="btn-check" id="btn-check-active" onclick="validateActiveWord()">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 힌트 목록 -->
+        <div class="clue-section">
+            <div class="clue-tabs">
+                <button class="clue-tab active" id="tab-across" onclick="switchTab('across')">가로 열쇠</button>
+                <button class="clue-tab" id="tab-down" onclick="switchTab('down')">세로 열쇠</button>
+            </div>
+            <div class="clue-panel active" id="panel-across">
+                <ul class="clue-list" id="across-clues"></ul>
+            </div>
+            <div class="clue-panel" id="panel-down">
+                <ul class="clue-list" id="down-clues"></ul>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 하단 버튼 -->
+    <div class="bottom-bar">
+        <button class="btn-reset" onclick="location.reload()">초기화</button>
+        <button class="btn-check-all" onclick="validateAll()">전체 확인</button>
+    </div>
+
+    <!-- 토스트 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- 완료 오버레이 -->
+    <div class="complete-overlay" id="complete-overlay">
+        <div class="complete-card">
+            <div class="emoji">🎉</div>
+            <h2>모두 완성!</h2>
+            <p>모든 단어를 맞췄습니다. 수고하셨어요!</p>
+            <button onclick="location.reload()">다시 풀기</button>
+        </div>
+    </div>
+
+    <script>
+        // puzzle-data JSON 스키마 버전: 1.0
+        // 스키마 정의: docs/puzzle.schema.json
+        // URL 파라미터: ?data=puzzle-data/파일명.json
+        //   예) /puzzle?data=puzzle-data/sample.json
+        //   미지정 시 기본 샘플 데이터 사용
+
+        let puzzleData = null;
+        let activeWord = null;
+        let solvedIds = new Set();
+
+        /* ── JSON 로드 ── */
+        async function loadPuzzle() {
+            const params = new URLSearchParams(location.search);
+            const dataUrl = params.get('data');
+
+            if (dataUrl) {
+                try {
+                    const fetchUrl = dataUrl.startsWith('/') ? dataUrl : '/' + dataUrl;
+                    const res = await fetch(fetchUrl);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const json = await res.json();
+                    puzzleData = normalizeSchema(json);
+                } catch (e) {
+                    showToast('퍼즐 데이터를 불러오지 못했습니다: ' + e.message, '#dc2626');
+                    puzzleData = getDefaultPuzzle();
+                }
+            } else {
+                puzzleData = getDefaultPuzzle();
+            }
+
+            document.querySelector('.title').childNodes[0].textContent =
+                (puzzleData.meta?.title || '가로세로 영어퀴즈') + ' ';
+            initGrid();
+        }
+
+        /* ── 스키마 → 내부 포맷 정규화 ── */
+        // schema: { version, meta, grid, words[{id,number,answer,clue,clue_ko,direction,startX,startY}] }
+        // internal: { gridSize, words[{id,number,answer,clue,x,y,direction}] }
+        function normalizeSchema(json) {
+            return {
+                meta: json.meta || {},
+                gridSize: Math.max(json.grid?.width || 10, json.grid?.height || 10),
+                gridWidth: json.grid?.width || 10,
+                gridHeight: json.grid?.height || 10,
+                words: (json.words || []).map(w => ({
+                    id:        w.id,
+                    number:    w.number,
+                    answer:    w.answer.toUpperCase(),
+                    clue:      w.clue,
+                    clue_ko:   w.clue_ko || '',
+                    direction: w.direction,
+                    x:         w.startX,
+                    y:         w.startY
+                }))
+            };
+        }
+
+        /* ── 기본 샘플 데이터 ── */
+        function getDefaultPuzzle() {
+            return normalizeSchema({
+                version: "1.0",
+                meta: { id: "puzzle-20260321-001", title: "AI 기술 영어 퀴즈", date: "2026-03-21", category: "tech", difficulty: "medium" },
+                grid: { width: 10, height: 10 },
+                words: [
+                    { id:"w1", number:1, answer:"GEMINI", clue:"Google's most capable AI model family.", clue_ko:"구글의 가장 강력한 AI 모델 패밀리.",  direction:"across", startX:1, startY:1 },
+                    { id:"w2", number:2, answer:"MIND",   clue:"The element of a person that enables them to be aware of the world.", clue_ko:"사람이 세상을 인식할 수 있게 하는 요소.", direction:"down",   startX:3, startY:1 },
+                    { id:"w3", number:3, answer:"INDIA",  clue:"A large country in South Asia with the world's largest population.", clue_ko:"세계 최대 인구를 보유한 남아시아의 대국.",  direction:"across", startX:1, startY:4 },
+                    { id:"w4", number:4, answer:"DATE",   clue:"The day of the month or year as specified by a number.", clue_ko:"숫자로 지정된 월 또는 연도의 날.",          direction:"down",   startX:5, startY:3 }
+                ]
+            });
+        }
+
+        /* ── 그리드 초기화 ── */
+        function initGrid() {
+            const gridEl = document.getElementById('grid');
+
+            // 셀 크기: 화면 너비 기준 자동 조정
+            const maxGridPx = Math.min(window.innerWidth - 64, 440);
+            const cellSize = Math.floor(maxGridPx / puzzleData.gridSize);
+            document.documentElement.style.setProperty('--cell-size', cellSize + 'px');
+
+            gridEl.style.gridTemplateColumns = `repeat(${puzzleData.gridSize}, ${cellSize}px)`;
+            gridEl.innerHTML = '';
+
+            // cellMap 빌드
+            const cellMap = {};
+            puzzleData.words.forEach(w => {
+                for (let i = 0; i < w.answer.length; i++) {
+                    const x = w.direction === 'across' ? w.x + i : w.x;
+                    const y = w.direction === 'across' ? w.y : w.y + i;
+                    const key = `${x},${y}`;
+                    if (!cellMap[key]) cellMap[key] = { char: w.answer[i], num: null, words: [] };
+                    if (i === 0 && !cellMap[key].num) cellMap[key].num = w.number;
+                    cellMap[key].words.push(w);
+                }
+            });
+
+            // 그리드 렌더
+            for (let y = 0; y < puzzleData.gridSize; y++) {
+                for (let x = 0; x < puzzleData.gridSize; x++) {
+                    const key = `${x},${y}`;
+                    const data = cellMap[key];
+                    const cellEl = document.createElement('div');
+                    cellEl.className = 'cell' + (data ? '' : ' black');
+
+                    if (data) {
+                        if (data.num) {
+                            const numEl = document.createElement('span');
+                            numEl.className = 'num';
+                            numEl.textContent = data.num;
+                            cellEl.appendChild(numEl);
+                        }
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.maxLength = 1;
+                        input.dataset.x = x;
+                        input.dataset.y = y;
+                        input.dataset.ans = data.char;
+                        input.autocomplete = 'off';
+                        input.spellcheck = false;
+
+                        // 첫 글자(번호 셀) 힌트
+                        if (data.num) {
+                            input.value = data.char;
+                            input.disabled = true;
+                            cellEl.classList.add('hint-cell');
+                        }
+
+                        input.addEventListener('focus', () => selectWord(data.words[0], x, y));
+                        input.addEventListener('keydown', e => handleKey(e, x, y));
+                        input.addEventListener('input', e => {
+                            // 모바일 소프트 키보드 대응
+                            if (e.target.value.length > 1) e.target.value = e.target.value.slice(-1);
+                            if (e.target.value) {
+                                e.target.value = e.target.value.toUpperCase();
+                                moveFocus(1);
+                            }
+                        });
+                        cellEl.appendChild(input);
+                    }
+                    gridEl.appendChild(cellEl);
+                }
+            }
+
+            document.getElementById('total-count').textContent = puzzleData.words.length;
+            renderClues();
+        }
+
+        /* ── 힌트 목록 렌더 ── */
+        function renderClues() {
+            const lists = {
+                across: document.getElementById('across-clues'),
+                down:   document.getElementById('down-clues')
+            };
+            lists.across.innerHTML = '';
+            lists.down.innerHTML = '';
+
+            puzzleData.words.forEach(w => {
+                const li = document.createElement('li');
+                li.className = 'clue-item';
+                li.id = `clue-${w.id}`;
+                li.innerHTML = `
+                    <span class="clue-item-num">${w.number}</span>
+                    <span class="clue-item-text">${w.clue}</span>
+                    <span class="clue-item-len">${w.answer.length}글자</span>
+                `;
+                li.onclick = () => focusWord(w.id);
+                lists[w.direction].appendChild(li);
+            });
+        }
+
+        /* ── 탭 전환 ── */
+        function switchTab(dir) {
+            ['across', 'down'].forEach(d => {
+                document.getElementById(`tab-${d}`).classList.toggle('active', d === dir);
+                document.getElementById(`panel-${d}`).classList.toggle('active', d === dir);
+            });
+        }
+
+        /* ── 단어 선택 ── */
+        function selectWord(word, curX, curY) {
+            activeWord = word;
+
+            // 셀 하이라이트 초기화
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-cell', 'highlight-word'));
+            document.querySelectorAll('.clue-item').forEach(i => i.classList.remove('active'));
+
+            // 현재 단어 하이라이트
+            for (let i = 0; i < word.answer.length; i++) {
+                const x = word.direction === 'across' ? word.x + i : word.x;
+                const y = word.direction === 'across' ? word.y : word.y + i;
+                const input = document.querySelector(`input[data-x="${x}"][data-y="${y}"]`);
+                if (input) {
+                    const cls = (x === curX && y === curY) ? 'active-cell' : 'highlight-word';
+                    input.parentElement.classList.add(cls);
+                }
+            }
+
+            // 힌트 패널 업데이트
+            const dirLabel = word.direction === 'across' ? '가로' : '세로';
+            document.getElementById('active-dir-badge').textContent = dirLabel;
+            document.getElementById('active-dir-badge').style.background =
+                word.direction === 'across' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.15)';
+            document.getElementById('active-clue-num').textContent = `${word.number}번`;
+            const clueTextEl = document.getElementById('active-clue-text');
+            clueTextEl.innerHTML = word.clue +
+                (word.clue_ko ? `<br><span style="font-size:13px;color:#888;">${word.clue_ko}</span>` : '');
+            clueTextEl.classList.remove('empty');
+            document.getElementById('active-clue-actions').style.display = 'flex';
+
+            // 탭 자동 전환
+            switchTab(word.direction);
+
+            // 클루 리스트 active 표시 및 스크롤
+            const clueEl = document.getElementById(`clue-${word.id}`);
+            if (clueEl) {
+                clueEl.classList.add('active');
+                clueEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+
+        function focusWord(id) {
+            const w = puzzleData.words.find(word => word.id === id);
+            const input = document.querySelector(`input[data-x="${w.x}"][data-y="${w.y}"]`);
+            if (input) {
+                input.focus();
+                selectWord(w, w.x, w.y);
+            }
+        }
+
+        /* ── 키 입력 ── */
+        function handleKey(e, x, y) {
+            if (e.key === 'Backspace') {
+                if (e.target.value === '') moveFocus(-1);
+                else e.target.value = '';
+                e.preventDefault();
+            } else if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+                e.target.value = e.key.toUpperCase();
+                moveFocus(1);
+                e.preventDefault();
+            }
+        }
+
+        function moveFocus(step) {
+            if (!activeWord) return;
+            const inputs = [];
+            for (let i = 0; i < activeWord.answer.length; i++) {
+                const tx = activeWord.direction === 'across' ? activeWord.x + i : activeWord.x;
+                const ty = activeWord.direction === 'across' ? activeWord.y : activeWord.y + i;
+                const el = document.querySelector(`input[data-x="${tx}"][data-y="${ty}"]`);
+                if (el) inputs.push(el);
+            }
+            const curIdx = inputs.indexOf(document.activeElement);
+            const nextIdx = curIdx + step;
+            if (nextIdx >= 0 && nextIdx < inputs.length) inputs[nextIdx].focus();
+        }
+
+        /* ── 검증 ── */
+        function validateWord(id) {
+            const w = puzzleData.words.find(word => word.id === id);
+            let isCorrect = true;
+            const cells = [];
+
+            for (let i = 0; i < w.answer.length; i++) {
+                const x = w.direction === 'across' ? w.x + i : w.x;
+                const y = w.direction === 'across' ? w.y : w.y + i;
+                const input = document.querySelector(`input[data-x="${x}"][data-y="${y}"]`);
+                cells.push(input.parentElement);
+                if (input.value.toUpperCase() !== w.answer[i]) isCorrect = false;
+            }
+
+            cells.forEach(c => {
+                c.classList.remove('word-correct', 'word-wrong');
+                void c.offsetWidth;
+                c.classList.add(isCorrect ? 'word-correct' : 'word-wrong');
+            });
+
+            if (isCorrect) {
+                solvedIds.add(id);
+                document.getElementById(`clue-${id}`).classList.add('completed');
+                document.getElementById('solved-count').textContent = solvedIds.size;
+                showToast('정답입니다!', '#16a34a');
+                if (solvedIds.size === puzzleData.words.length) {
+                    setTimeout(() => document.getElementById('complete-overlay').classList.add('show'), 800);
+                }
+            } else {
+                showToast('틀렸습니다. 다시 확인해 보세요.', '#dc2626');
+            }
+            return isCorrect;
+        }
+
+        function validateActiveWord() {
+            if (activeWord) validateWord(activeWord.id);
+        }
+
+        function validateAll() {
+            let allCorrect = true;
+            puzzleData.words.forEach(w => {
+                if (!solvedIds.has(w.id)) {
+                    const ok = validateWord(w.id);
+                    if (!ok) allCorrect = false;
+                }
+            });
+            if (allCorrect) showToast('전부 정답입니다!', '#16a34a');
+        }
+
+        /* ── 힌트 (정답 채우기) ── */
+        function revealWord(id) {
+            const w = puzzleData.words.find(word => word.id === id);
+            for (let i = 0; i < w.answer.length; i++) {
+                const x = w.direction === 'across' ? w.x + i : w.x;
+                const y = w.direction === 'across' ? w.y : w.y + i;
+                const input = document.querySelector(`input[data-x="${x}"][data-y="${y}"]`);
+                if (input && !input.disabled) input.value = w.answer[i];
+            }
+            validateWord(id);
+        }
+
+        function revealActiveWord() {
+            if (activeWord) revealWord(activeWord.id);
+        }
+
+        /* ── 토스트 ── */
+        function showToast(msg, color) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.background = color;
+            t.style.display = 'block';
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.style.display = 'none', 2000);
+        }
+
+        window.addEventListener('load', loadPuzzle);
+        window.addEventListener('resize', () => { if (puzzleData) initGrid(); });
+    </script>
+</body>
+</html>
