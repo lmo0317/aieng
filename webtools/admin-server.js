@@ -5,6 +5,8 @@ const http = require('http');
 const os = require('os');
 
 const app = express();
+app.use(express.json()); // JSON 파싱 미들웨어 추가
+
 // 윈도우에서 80번 포트는 이미 다른 서비스가 사용하는 경우가 많으므로 8080으로 변경합니다.
 const PORT = process.env.PORT || 8080; 
 
@@ -100,6 +102,11 @@ const broadcast = (type, content, code = null) => {
 
 // 뉴스 생성 실행 API (OS 감지 및 강제 재시작 로직 추가)
 app.post('/run-news', (req, res) => {
+    const { count, topic } = req.body;
+    const args = [];
+    if (count) args.push(count);
+    if (topic) args.push(topic);
+
     // 프로젝트 루트 경로 (webtools의 상위 폴더)
     const PROJECT_ROOT = path.join(__dirname, '..');
 
@@ -124,17 +131,12 @@ app.post('/run-news', (req, res) => {
     console.log(`Starting news process...`);
     console.log(`- Root: ${PROJECT_ROOT}`);
     console.log(`- Script: ${scriptPath}`);
+    console.log(`- Args: ${args.join(', ')}`);
 
     if (isWin) {
         // 윈도우: shell: true 대신 cmd.exe를 명시적으로 사용.
-        // shell: true는 CREATE_NO_WINDOW 플래그를 설정하여 실제 Win32 콘솔을 없앰.
-        // gemini CLI의 @lydell/node-pty(ConPTY)는 실제 콘솔이 필요하므로
-        // cmd.exe를 직접 호출하고 windowsHide: false로 콘솔 핸들 상속을 보장함.
-        newsProcess = spawn('cmd.exe', ['/c', scriptPath], {
+        newsProcess = spawn('cmd.exe', ['/c', scriptPath, ...args], {
             cwd: PROJECT_ROOT,
-            // CREATE_NO_WINDOW: VS Code/터미널 콘솔 상속 체인 차단
-            // 상속된 콘솔이 없어야 node-pty의 conpty_console_list_agent가
-            // AttachConsole(shellPid) 호출에 성공함 (이미 콘솔이 있으면 AttachConsole 실패)
             windowsHide: true,
             env: {
                 ...process.env,
@@ -146,7 +148,7 @@ app.post('/run-news', (req, res) => {
         });
     } else {
         // 리눅스: 프로젝트 루트에서 실행.
-        newsProcess = spawn('sudo', ['-u', 'lmo0317ea', 'bash', scriptPath], {
+        newsProcess = spawn('sudo', ['-u', 'lmo0317ea', 'bash', scriptPath, ...args], {
             cwd: PROJECT_ROOT,
             env: { ...process.env, FORCE_COLOR: 'true', HOME: '/home/lmo0317ea' }
         });

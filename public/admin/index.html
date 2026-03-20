@@ -28,6 +28,11 @@
         .log-error { color: #e74c3c; font-weight: bold; }
         .log-warning { color: #f1c40f; }
         .header-flex { display: flex; justify-content: space-between; align-items: center; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; }
+        .input-item { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 150px; }
+        .input-item label { font-size: 13px; font-weight: bold; color: #495057; }
+        .input-item input { padding: 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; }
+        .input-item input:focus { border-color: #2ecc71; outline: none; box-shadow: 0 0 0 2px rgba(46,204,113,0.25); }
     </style>
 </head>
 <body>
@@ -42,8 +47,19 @@
             <h1>📰 뉴스 생성 대시보드</h1>
             <div id="statusBadge" class="status-badge status-idle">대기 중</div>
         </div>
-        <p>버튼을 누르면 <code>news.sh</code> 스크립트가 실행되어 뉴스 10개를 자동 생성하고 서버에 반영합니다.</p>
+        <p>설정된 값에 따라 뉴스 콘텐츠를 자동 생성하고 서버에 반영합니다.</p>
         
+        <div class="input-group">
+            <div class="input-item">
+                <label for="countInput">생성 개수</label>
+                <input type="number" id="countInput" value="10" min="1" max="20">
+            </div>
+            <div class="input-item">
+                <label for="topicInput">주제 (쉼표로 구분)</label>
+                <input type="text" id="topicInput" value="엔터, 스포츠, 테크, 경제, 정치" placeholder="예: 축구, IT, 주식">
+            </div>
+        </div>
+
         <div class="btn-group">
             <button id="runBtn" class="btn-run">
                 <span>🚀 뉴스 생성 시작</span>
@@ -60,6 +76,8 @@
     <script>
         const runBtn = document.getElementById('runBtn');
         const copyBtn = document.getElementById('copyBtn');
+        const countInput = document.getElementById('countInput');
+        const topicInput = document.getElementById('topicInput');
         const consoleBox = document.getElementById('console');
         const statusBadge = document.getElementById('statusBadge');
         let eventSource = null;
@@ -93,11 +111,14 @@
         }
 
         runBtn.addEventListener('click', async () => {
-            if (!confirm('뉴스 10개 생성을 시작하시겠습니까? (서버 자원 및 API 비용이 발생합니다.)')) return;
+            const count = countInput.value;
+            const topic = topicInput.value;
+
+            if (!confirm(`뉴스 ${count}개(${topic}) 생성을 시작하시겠습니까? (서버 자원 및 API 비용이 발생합니다.)`)) return;
 
             runBtn.disabled = true;
             consoleBox.innerHTML = '';
-            appendLog('>>> 실행 명령을 서버로 전송 중...\n', 'info');
+            appendLog(`>>> 실행 명령 전송 중... (설정: ${count}개, 주제: ${topic})\n`, 'info');
             statusBadge.className = 'status-badge status-running';
             statusBadge.textContent = '실행 중';
 
@@ -129,7 +150,11 @@
             };
 
             try {
-                const res = await fetch('/run-news', { method: 'POST' });
+                const res = await fetch('/run-news', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ count, topic })
+                });
                 const result = await res.json();
                 if (!result.success) {
                     appendLog(`\n[ERROR] ${result.error}\n`, 'error');
