@@ -43,6 +43,7 @@
         .badge-economy { background-color: #2ecc71; }
         .badge-politics { background-color: #e74c3c; }
         .badge-default { background-color: #95a5a6; }
+        .badge-date { background-color: #f1f2f6; color: #7f8c8d; border: 1px solid #dfe6e9; margin-left: 5px; }
 
         .btn-delete { background: none; color: #bdc3c7; border: 1px solid #ddd; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s; }
         .btn-delete:hover { color: #e74c3c; border-color: #e74c3c; background: #fff5f5; }
@@ -175,7 +176,10 @@
                                 ${groups[date].map(news => `
                                     <tr>
                                         <td style="color:#bdc3c7; font-size:11px;">${news.id}</td>
-                                        <td><span class="badge ${catClassMap[news.category] || 'badge-default'}">${news.category}</span></td>
+                                        <td>
+                                            <span class="badge ${catClassMap[news.category] || 'badge-default'}">${news.category}</span>
+                                            <span class="badge badge-date">${news.date || ''}</span>
+                                        </td>
                                         <td style="font-weight:600;">${news.title}</td>
                                         <td style="text-align: center;">
                                             <button class="btn-delete" onclick="deleteNews(${news.id})">삭제</button>
