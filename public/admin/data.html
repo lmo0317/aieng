@@ -14,21 +14,29 @@
         .admin-container { padding: 25px; background: #fff; border-radius: 0 0 12px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
         
         .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        
+        .sub-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #f1f2f6; padding-bottom: 10px; }
+        .sub-tab { padding: 8px 16px; cursor: pointer; border-radius: 6px; font-weight: bold; color: #7f8c8d; transition: all 0.2s; }
+        .sub-tab.active { background: #3498db; color: white; }
+
         .btn-refresh { background: #3498db; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn-refresh:hover { background: #2980b9; }
 
-        .date-section { margin-bottom: 35px; border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
-        .date-header { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 12px 20px; border-bottom: 1px solid #eee; }
-        .date-label { font-size: 16px; font-weight: 800; color: #2c3e50; }
-        .btn-clear-date { padding: 6px 14px; background: #fff; color: #e74c3c; border: 1px solid #fab1a0; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; transition: all 0.2s; }
-        .btn-clear-date:hover { background: #e74c3c; color: white; }
+        .data-section { display: none; }
+        .data-section.active { display: block; }
 
+        .item-group { margin-bottom: 35px; border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+        .item-header { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 12px 20px; border-bottom: 1px solid #eee; }
+        .item-label { font-size: 16px; font-weight: 800; color: #2c3e50; }
+        
         table { width: 100%; border-collapse: collapse; background: white; }
         th { background: #fff; padding: 12px 15px; text-align: left; font-size: 12px; color: #95a5a6; text-transform: uppercase; border-bottom: 2px solid #f1f2f6; }
         td { padding: 12px 15px; border-bottom: 1px solid #f1f2f6; color: #2d3436; font-size: 14px; }
         tr:hover { background-color: #f9f9f9; }
 
         .badge { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; display: inline-block; white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+        .badge-news { background-color: #3498db; }
+        .badge-song { background-color: #9b59b6; }
         .badge-tech { background-color: #3498db; }
         .badge-sports { background-color: #e67e22; }
         .badge-ent { background-color: #9b59b6; }
@@ -38,6 +46,9 @@
 
         .btn-delete { background: none; color: #bdc3c7; border: 1px solid #ddd; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s; }
         .btn-delete:hover { color: #e74c3c; border-color: #e74c3c; background: #fff5f5; }
+        
+        .btn-clear-all { padding: 6px 14px; background: #fff; color: #e74c3c; border: 1px solid #fab1a0; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .btn-clear-all:hover { background: #e74c3c; color: white; }
 
         .loading-spinner { text-align: center; padding: 50px; color: #3498db; font-weight: bold; }
         .empty-state { text-align: center; padding: 60px; color: #bdc3c7; font-size: 15px; }
@@ -47,22 +58,40 @@
     <div class="admin-outer">
         <nav class="admin-nav-bar">
             <a href="/admin" class="admin-nav-item">📰 뉴스 생성</a>
-            <a href="/admin/data" class="admin-nav-item active">🗑️ 리스트 삭제</a>
+            <a href="/admin/data" class="admin-nav-item active">📊 데이터 관리</a>
             <a href="/admin/songs" class="admin-nav-item">🎵 팝송 추가</a>
         </nav>
         <div class="admin-container">
             <div class="header-flex">
-                <h1>🗑️ 뉴스 데이터 관리 (날짜별)</h1>
-                <button onclick="fetchData()" class="btn-refresh">🔄 새로고침</button>
+                <h1>📊 통합 데이터 관리</h1>
+                <button onclick="refreshCurrentTab()" class="btn-refresh">🔄 새로고침</button>
             </div>
 
-            <div id="loading" class="loading-spinner" style="display:none;">데이터를 불러오는 중...</div>
-            <div id="content"></div>
-            <div id="emptyMsg" class="empty-state" style="display:none;">저장된 데이터가 없습니다.</div>
+            <div class="sub-tabs">
+                <div class="sub-tab active" onclick="switchTab('news')">📰 뉴스 데이터</div>
+                <div class="sub-tab" onclick="switchTab('songs')">🎵 팝송 데이터</div>
+            </div>
+
+            <!-- 뉴스 관리 섹션 -->
+            <div id="news-section" class="data-section active">
+                <div id="news-loading" class="loading-spinner" style="display:none;">뉴스 데이터를 불러오는 중...</div>
+                <div id="news-content"></div>
+                <div id="news-empty" class="empty-state" style="display:none;">저장된 뉴스 데이터가 없습니다.</div>
+            </div>
+
+            <!-- 팝송 관리 섹션 -->
+            <div id="songs-section" class="data-section">
+                <div id="songs-loading" class="loading-spinner" style="display:none;">팝송 데이터를 불러오는 중...</div>
+                <div id="songs-content"></div>
+                <div id="songs-empty" class="empty-state" style="display:none;">저장된 팝송 데이터가 없습니다.</div>
+            </div>
         </div>
     </div>
 
     <script>
+        let adminApiKey = '';
+        let currentTab = 'news';
+
         const catClassMap = {
             '테크': 'badge-tech', 'Tech': 'badge-tech',
             '스포츠': 'badge-sports', 'Sports': 'badge-sports',
@@ -70,8 +99,6 @@
             '경제': 'badge-economy', 'Economy': 'badge-economy',
             '정치': 'badge-politics', 'Politics': 'badge-politics'
         };
-
-        let adminApiKey = '';
 
         async function getAdminKey() {
             try {
@@ -81,10 +108,26 @@
             } catch (err) {}
         }
 
-        async function fetchData() {
-            const contentEl = document.getElementById('content');
-            const loadingEl = document.getElementById('loading');
-            const emptyEl = document.getElementById('emptyMsg');
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.sub-tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            document.querySelectorAll('.data-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`${tab}-section`).classList.add('active');
+            
+            refreshCurrentTab();
+        }
+
+        function refreshCurrentTab() {
+            if (currentTab === 'news') fetchNews();
+            else fetchSongs();
+        }
+
+        async function fetchNews() {
+            const contentEl = document.getElementById('news-content');
+            const loadingEl = document.getElementById('news-loading');
+            const emptyEl = document.getElementById('news-empty');
 
             contentEl.innerHTML = '';
             loadingEl.style.display = 'block';
@@ -113,12 +156,11 @@
 
                 sortedDates.forEach(date => {
                     const section = document.createElement('div');
-                    section.className = 'date-section';
-
+                    section.className = 'item-group';
                     section.innerHTML = `
-                        <div class="date-header">
-                            <span class="date-label">📅 ${date}</span>
-                            <button class="btn-clear-date" onclick="clearDateData('${date}')">이 날짜 일괄 삭제</button>
+                        <div class="item-header">
+                            <span class="item-label">📅 ${date}</span>
+                            <button class="btn-clear-all" onclick="clearDateData('${date}')">이 날짜 일괄 삭제</button>
                         </div>
                         <table>
                             <thead>
@@ -145,14 +187,68 @@
                     `;
                     contentEl.appendChild(section);
                 });
+            } catch (err) {
+                loadingEl.innerHTML = `<span style="color:red">오류: ${err.message}</span>`;
+            }
+        }
 
+        async function fetchSongs() {
+            const contentEl = document.getElementById('songs-content');
+            const loadingEl = document.getElementById('songs-loading');
+            const emptyEl = document.getElementById('songs-empty');
+
+            contentEl.innerHTML = '';
+            loadingEl.style.display = 'block';
+            emptyEl.style.display = 'none';
+
+            try {
+                if (!adminApiKey) await getAdminKey();
+                const response = await fetch('/api/songs/list');
+                const data = await response.json();
+                loadingEl.style.display = 'none';
+
+                const songs = data.songs || [];
+                if (songs.length === 0) {
+                    emptyEl.style.display = 'block';
+                    return;
+                }
+
+                const section = document.createElement('div');
+                section.className = 'item-group';
+                section.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-label">🎵 전체 팝송 리스트</span>
+                        <span style="font-size:12px; color:#95a5a6;">총 ${songs.length}곡</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">ID</th>
+                                <th>아티스트 - 곡 제목</th>
+                                <th style="width: 60px; text-align: center;">작업</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${songs.map(song => `
+                                <tr>
+                                    <td style="color:#bdc3c7; font-size:11px;">${song.id}</td>
+                                    <td style="font-weight:600;">${song.title}</td>
+                                    <td style="text-align: center;">
+                                        <button class="btn-delete" onclick="deleteSong(${song.id})">삭제</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                contentEl.appendChild(section);
             } catch (err) {
                 loadingEl.innerHTML = `<span style="color:red">오류: ${err.message}</span>`;
             }
         }
 
         async function clearDateData(date) {
-            if (!confirm(`[경고] ${date}의 모든 데이터를 삭제하시겠습니까?`)) return;
+            if (!confirm(`[경고] ${date}의 모든 뉴스 데이터를 삭제하시겠습니까?`)) return;
             try {
                 const response = await fetch('/api/trends/clear-today', {
                     method: 'POST',
@@ -160,15 +256,8 @@
                     body: JSON.stringify({ date: date.trim() })
                 });
                 const result = await response.json();
-                if (result.success) {
-                    alert(`${date} 데이터가 삭제되었습니다.`);
-                    fetchData();
-                } else {
-                    alert('삭제 실패: ' + (result.error || '오류 발생'));
-                }
-            } catch (err) {
-                alert('통신 오류: ' + err.message);
-            }
+                if (result.success) { alert(`${date} 데이터가 삭제되었습니다.`); fetchNews(); }
+            } catch (err) { alert('통신 오류: ' + err.message); }
         }
 
         async function deleteNews(id) {
@@ -179,13 +268,23 @@
                     headers: { 'x-admin-key': adminApiKey }
                 });
                 const result = await response.json();
-                if (result.success) fetchData();
-            } catch (err) {
-                alert('삭제 실패');
-            }
+                if (result.success) fetchNews();
+            } catch (err) { alert('삭제 실패'); }
         }
 
-        window.onload = fetchData;
+        async function deleteSong(id) {
+            if (!confirm(`팝송 데이터를 삭제하시겠습니까?`)) return;
+            try {
+                const response = await fetch(`/api/songs/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'x-admin-key': adminApiKey }
+                });
+                const result = await response.json();
+                if (result.success) { alert('팝송 데이터가 삭제되었습니다.'); fetchSongs(); }
+            } catch (err) { alert('삭제 실패'); }
+        }
+
+        window.onload = refreshCurrentTab;
     </script>
 </body>
 </html>
