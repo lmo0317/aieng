@@ -2,8 +2,9 @@
 # Trend Eng News Automation Script
 # 이 스크립트는 Gemini CLI를 호출하여 사용자 지침에 따른 뉴스 콘텐츠를 생성합니다.
 
-# 프로젝트 디렉토리로 이동
+# 프로젝트 디렉토리로 이동 후 루트로 한 단계 더 이동
 cd "$(dirname "$0")"
+cd ..
 
 # 인자 처리: $1은 개수, $2는 주제
 COUNT=${1:-10}
