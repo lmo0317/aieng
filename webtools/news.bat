@@ -19,7 +19,7 @@ echo 📍 설정: %COUNT%개, 주제: %TOPIC%
 
 :: 절대 경로 대신 현재 폴더의 상위(루트)를 기준으로 gemini 실행
 cd ..
-gemini -y "/news 총합 %COUNT%개만 만들어줘. 트렌드는 %TOPIC% 중에서 선정하고 설명 자세하고 꼼꼼하게 넣어줘. aieng.cafe24.com에 반영도 꼭하고 결과는 텔레그램으로 알려줘."
+gemini -m "gemini-3.1-pro-preview" -y "/news 총합 %COUNT%개만 만들어줘. 트렌드는 %TOPIC% 중에서 선정하고 설명 자세하고 꼼꼼하게 넣어줘. aieng.cafe24.com에 반영도 꼭하고 결과는 텔레그램으로 알려줘."
 
 if %ERRORLEVEL% equ 0 (
     echo.
