@@ -54,9 +54,16 @@
                 <label for="countInput">생성 개수</label>
                 <input type="number" id="countInput" value="10" min="1" max="20">
             </div>
-            <div class="input-item">
-                <label for="topicInput">주제 (쉼표로 구분)</label>
-                <input type="text" id="topicInput" value="엔터, 스포츠, 테크, 경제, 정치" placeholder="예: 축구, IT, 주식">
+            <div class="input-item" style="flex: 2;">
+                <label for="topicSelect">주제 선택</label>
+                <select id="topicSelect" style="padding: 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; background: white;">
+                    <option value="연애, 스포츠, 테크, 경제, 정치">전체 랜덤 (연애, 스포츠, 테크, 경제, 정치)</option>
+                    <option value="연애, 엔터테인먼트">연애 / 엔터테인먼트</option>
+                    <option value="스포츠">스포츠</option>
+                    <option value="테크, IT, 과학">테크 / IT / 과학</option>
+                    <option value="경제, 비즈니스, 주식">경제 / 비즈니스</option>
+                    <option value="정치, 사회">정치 / 사회</option>
+                </select>
             </div>
         </div>
 
@@ -77,7 +84,7 @@
         const runBtn = document.getElementById('runBtn');
         const copyBtn = document.getElementById('copyBtn');
         const countInput = document.getElementById('countInput');
-        const topicInput = document.getElementById('topicInput');
+        const topicSelect = document.getElementById('topicSelect'); // 변수명 변경
         const consoleBox = document.getElementById('console');
         const statusBadge = document.getElementById('statusBadge');
         let eventSource = null;
@@ -112,7 +119,7 @@
 
         runBtn.addEventListener('click', async () => {
             const count = countInput.value;
-            const topic = topicInput.value;
+            const topic = topicSelect.value; // 변수명 변경 및 드롭다운 값 사용
 
             if (!confirm(`뉴스 ${count}개(${topic}) 생성을 시작하시겠습니까? (서버 자원 및 API 비용이 발생합니다.)`)) return;
 
