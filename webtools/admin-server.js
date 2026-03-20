@@ -147,8 +147,8 @@ app.post('/run-news', (req, res) => {
             }
         });
     } else {
-        // 리눅스: 프로젝트 루트에서 실행.
-        newsProcess = spawn('sudo', ['-u', 'lmo0317ea', 'bash', scriptPath, ...args], {
+        // 리눅스: 프로젝트 루트에서 실행. -E 옵션을 추가하여 환경 변수를 보존합니다.
+        newsProcess = spawn('sudo', ['-E', '-u', 'lmo0317ea', 'bash', scriptPath, ...args], {
             cwd: PROJECT_ROOT,
             env: { ...process.env, FORCE_COLOR: 'true', HOME: '/home/lmo0317ea' }
         });
