@@ -9,6 +9,26 @@
       "date": "2026-03-21",
       "wordCount": 4,
       "source": "Google Gemini 2.5 발표 뉴스"
+    },
+    {
+      "id": "puzzle-20260321-002",
+      "file": "puzzle-20260321-002.json",
+      "title": "생활영어 영어 퀴즈",
+      "category": "general",
+      "difficulty": "easy",
+      "date": "2026-03-21",
+      "wordCount": 4,
+      "source": "생활영어"
+    },
+    {
+      "id": "puzzle-20260321-003",
+      "file": "puzzle-20260321-003.json",
+      "title": "초등 영어 퀴즈",
+      "category": "general",
+      "difficulty": "easy",
+      "date": "2026-03-21",
+      "wordCount": 10,
+      "source": "초등 영어"
     }
   ]
 }

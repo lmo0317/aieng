@@ -1,0 +1,114 @@
+{
+  "version": "1.0",
+  "meta": {
+    "id": "puzzle-20260321-003",
+    "title": "초등 영어 퀴즈",
+    "date": "2026-03-21",
+    "category": "general",
+    "difficulty": "easy",
+    "source": "초등 영어"
+  },
+  "grid": { "width": 13, "height": 13 },
+  "words": [
+    {
+      "id": "w1",
+      "number": 1,
+      "answer": "BREAD",
+      "clue": "A baked food made from flour, often eaten at breakfast or lunch.",
+      "clue_ko": "밀가루로 만든 구운 음식으로 아침이나 점심에 자주 먹습니다. '빵'.",
+      "direction": "down",
+      "startX": 4,
+      "startY": 1
+    },
+    {
+      "id": "w2",
+      "number": 2,
+      "answer": "TREES",
+      "clue": "Tall plants with trunks and branches that give us wood and shade.",
+      "clue_ko": "줄기와 가지가 있는 키 큰 식물로 나무 그늘을 줍니다. '나무들'.",
+      "direction": "across",
+      "startX": 2,
+      "startY": 3
+    },
+    {
+      "id": "w3",
+      "number": 3,
+      "answer": "NIGHT",
+      "clue": "The dark part of the day when the sun is not visible; opposite of day.",
+      "clue_ko": "태양이 보이지 않는 어두운 시간, 낮의 반대입니다. '밤'.",
+      "direction": "down",
+      "startX": 8,
+      "startY": 3
+    },
+    {
+      "id": "w4",
+      "number": 4,
+      "answer": "DOING",
+      "clue": "The present participle of 'do'; performing an action, as in 'What are you ___?'",
+      "clue_ko": "'do'의 현재분사형. '무엇을 하고 있니?'에서 쓰입니다. '하는 중인'.",
+      "direction": "across",
+      "startX": 4,
+      "startY": 5
+    },
+    {
+      "id": "w5",
+      "number": 5,
+      "answer": "CLEAN",
+      "clue": "Free from dirt or mess; the opposite of dirty.",
+      "clue_ko": "먼지나 오물이 없는 상태. 더러운(dirty)의 반대말입니다. '깨끗한'.",
+      "direction": "down",
+      "startX": 12,
+      "startY": 5
+    },
+    {
+      "id": "w6",
+      "number": 6,
+      "answer": "STONE",
+      "clue": "A small hard piece of rock found on the ground or in rivers.",
+      "clue_ko": "땅이나 강에서 발견되는 작고 단단한 바위 조각입니다. '돌'.",
+      "direction": "down",
+      "startX": 4,
+      "startY": 7
+    },
+    {
+      "id": "w7",
+      "number": 7,
+      "answer": "THOSE",
+      "clue": "Plural word used to point to things that are far away; 'I want ___ cookies over there.'",
+      "clue_ko": "멀리 있는 것들을 가리킬 때 쓰는 말입니다. '저것들'.",
+      "direction": "across",
+      "startX": 8,
+      "startY": 7
+    },
+    {
+      "id": "w8",
+      "number": 8,
+      "answer": "BLOOM",
+      "clue": "When a flower opens up and shows its colorful petals.",
+      "clue_ko": "꽃이 피어서 아름다운 꽃잎을 드러낼 때를 말합니다. '꽃피다'.",
+      "direction": "across",
+      "startX": 2,
+      "startY": 9
+    },
+    {
+      "id": "w9",
+      "number": 9,
+      "answer": "PLANT",
+      "clue": "A living thing with roots and leaves that grows in soil, like a flower or tree.",
+      "clue_ko": "꽃이나 나무처럼 흙에서 자라는 뿌리와 잎을 가진 생물입니다. '식물'.",
+      "direction": "down",
+      "startX": 8,
+      "startY": 9
+    },
+    {
+      "id": "w10",
+      "number": 10,
+      "answer": "SNAIL",
+      "clue": "A very slow animal that carries a spiral shell on its back.",
+      "clue_ko": "등에 나선형 껍데기를 지고 다니는 아주 느린 동물입니다. '달팽이'.",
+      "direction": "across",
+      "startX": 6,
+      "startY": 11
+    }
+  ]
+}
