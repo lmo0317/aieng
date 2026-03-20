@@ -14,7 +14,7 @@ echo "📍 대상 주제: ${TOPIC}"
 
 # 상세 프롬프트와 함께 Gemini 실행 (-y: 자동 승인 모드)
 # 인자를 포함하여 프롬프트를 구성합니다.
-/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin/gemini -y "/news ${COUNT}개 만들어줘. 트렌드는 ${TOPIC} 순으로 선정하고 설명은 SKILL.md 지침에 따라 문장당 5문장 이상 아주 자세하고 꼼꼼하게 넣어줘. 반드시 기사당 10문장을 꽉 채워야 하며, aieng.cafe24.com 서버 반영과 텔레그램 결과 보고까지 완벽하게 마쳐줘."
+/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin/gemini -y "/news 총합 ${COUNT}개만 만들어줘. 트렌드는 ${TOPIC} 중에서 선정하고 설명은 SKILL.md 지침에 따라 문장당 5문장 이상 아주 자세하고 꼼꼼하게 넣어줘. 반드시 기사당 10문장을 꽉 채워야 하며, aieng.cafe24.com 서버 반영과 텔레그램 결과 보고까지 완벽하게 마쳐줘."
 
 if [ $? -eq 0 ]; then
     echo "✅ 모든 작업이 성공적으로 완료되었습니다."
