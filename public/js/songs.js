@@ -28,17 +28,11 @@ function renderSavedSongs(songs) {
 
     songs.forEach(song => {
         const card = document.createElement('div');
-        card.className = 'realtime-trend-card';
+        card.className = 'realtime-trend-card trend-card-row';
         card.innerHTML = `
-            <div class="trend-card-top">
-                <span class="trend-category cat-연애">POP SONG</span>
-            </div>
-            <div class="trend-card-body">
-                <h4 class="trend-card-title">${song.title}</h4>
-            </div>
-            <div class="trend-card-footer">
-                <button class="trend-start-btn">학습 시작 →</button>
-            </div>`;
+            <span class="row-date">${song.date || (song.createdAt ? song.createdAt.slice(0, 10) : '')}</span>
+            <span class="row-title">${song.title}</span>
+            <button class="trend-start-btn">학습 시작 →</button>`;
 
         card.querySelector('.trend-start-btn').addEventListener('click', () => {
             window.location.href = `/learn?id=${song.id}&source=songs`;

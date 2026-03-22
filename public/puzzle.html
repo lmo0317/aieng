@@ -8,64 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
-    <style>
-        .puzzle-page-header { text-align: center; padding: 32px 0 24px; }
-        .puzzle-page-header h2 { font-size: 1.6rem; font-weight: 800; margin: 0 0 6px; }
-        .puzzle-page-header p { color: #888; font-size: 0.9rem; margin: 0; }
-
-        .puzzle-list {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            max-width: 680px;
-            margin: 0 auto;
-            padding: 0 16px 40px;
-        }
-
-        .puzzle-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            cursor: pointer;
-            border: 1.5px solid #f0f0f0;
-            transition: all 0.18s;
-            text-decoration: none;
-            color: inherit;
-        }
-        .puzzle-card:hover {
-            border-color: #6366f1;
-            box-shadow: 0 4px 20px rgba(99,102,241,0.12);
-            transform: translateY(-2px);
-        }
-
-        .puzzle-card-title {
-            font-size: 15px;
-            font-weight: 700;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .puzzle-card-date {
-            font-size: 12px;
-            color: #aaa;
-            flex-shrink: 0;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #aaa;
-        }
-        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-        .empty-state p { font-size: 14px; }
-
-        .loading { text-align: center; padding: 60px 20px; color: #aaa; font-size: 14px; }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -76,7 +18,7 @@
                 <a href="/puzzle" class="nav-link active">🧩 <span>퍼즐</span></a>
                 <button id="admin-toggle-btn" class="settings-link" style="display:none" title="관리자 메뉴">🧑‍💼</button>
                 <a href="/auth/google" id="nav-auth-btn" class="nav-auth-btn">🔑 <span>로그인</span></a>
-                        </div>
+            </div>
             <div id="admin-submenu" class="admin-submenu hidden">
                 <a href="/settings.html" class="admin-menu-item">⚙️ <span>설정</span></a>
                 <a href="/topic" class="admin-menu-item">✏️ <span>주제 입력</span></a>
@@ -84,57 +26,22 @@
             </div>
         </div>
 
-        <div class="puzzle-page-header">
-            <h2>🧩 가로세로 영어 퀴즈</h2>
-            <p>영단어 퍼즐을 풀며 영어를 학습해보세요</p>
-        </div>
-
-        <div id="puzzle-list" class="puzzle-list">
-            <div class="loading">퍼즐 목록을 불러오는 중...</div>
+        <div id="puzzle-section">
+            <div class="trends-page-header">
+                <h2>🧩 가로세로 영어 퀴즈</h2>
+                <p class="trends-subtitle">영단어 퍼즐을 풀며 영어를 학습해보세요</p>
+            </div>
+            <div id="puzzle-container" class="realtime-trends-container">
+                <div class="trends-empty-state">
+                    <div class="empty-icon">🧩</div>
+                    <h3>아직 퍼즐이 없습니다</h3>
+                    <p>스킬로 퍼즐을 생성해보세요!</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="/js/nav.js"></script>
-    <script>
-        async function loadList() {
-            const container = document.getElementById('puzzle-list');
-            try {
-                const res = await fetch('/puzzle-data/index.json');
-                if (!res.ok) throw new Error('index.json not found');
-                const { puzzles } = await res.json();
-
-                if (!puzzles || puzzles.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">🧩</div>
-                            <p>아직 퍼즐이 없습니다.<br>스킬로 퍼즐을 생성해보세요!</p>
-                        </div>`;
-                    return;
-                }
-
-                container.innerHTML = '';
-                puzzles.sort((a, b) => b.date.localeCompare(a.date));
-
-                puzzles.forEach(p => {
-                    const card = document.createElement('a');
-                    card.className = 'puzzle-card';
-                    card.href = `/puzzle/play?data=puzzle-data/${p.file}`;
-                    card.innerHTML = `
-                        <div class="puzzle-card-title">${p.title}</div>
-                        <div class="puzzle-card-date">${p.date}</div>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (e) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">⚠️</div>
-                        <p>퍼즐 목록을 불러올 수 없습니다.</p>
-                    </div>`;
-            }
-        }
-
-        loadList();
-    </script>
+    <script src="/js/puzzle.js"></script>
 </body>
 </html>
