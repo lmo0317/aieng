@@ -632,6 +632,85 @@ app.delete('/api/trends/:id', requireAdminKey, (req, res) => {
     });
 });
 
+// ─── Data Sync from Remote Server ────────────────────────────────────────────
+const REMOTE_BASE = 'http://aieng.cafe24app.com';
+
+app.post('/api/sync', async (req, res) => {
+    const results = { news: 0, songs: 0, puzzles: 0, skipped: 0, errors: [] };
+
+    try {
+        // 1. Sync news trends
+        try {
+            const newsRes = await axios.get(`${REMOTE_BASE}/api/trends/saved`, { timeout: 15000 });
+            const trends = newsRes.data.trends || [];
+            for (const t of trends) {
+                await new Promise((resolve) => {
+                    db.get("SELECT id FROM trends WHERE title = ? AND type = 'news'", [t.title], (err, row) => {
+                        if (row) { results.skipped++; return resolve(); }
+                        db.run(
+                            "INSERT INTO trends (title, category, summary, keywords, sentences, quiz, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'news')",
+                            [t.title, t.category, t.summary, t.keywords, t.sentences, t.quiz || '[]', t.difficulty || 'level3', t.date],
+                            (err) => { if (!err) results.news++; resolve(); }
+                        );
+                    });
+                });
+            }
+        } catch (e) { results.errors.push('뉴스 동기화 실패: ' + e.message); }
+
+        // 2. Sync songs
+        try {
+            const songsRes = await axios.get(`${REMOTE_BASE}/api/songs/saved`, { timeout: 15000 });
+            const songs = songsRes.data.songs || [];
+            for (const s of songs) {
+                await new Promise((resolve) => {
+                    db.get("SELECT id FROM trends WHERE title = ? AND type = 'song'", [s.title], (err, row) => {
+                        if (row) { results.skipped++; return resolve(); }
+                        db.run(
+                            "INSERT INTO trends (title, summary, difficulty, sentences, quiz, image, type) VALUES (?, ?, ?, ?, ?, ?, 'song')",
+                            [s.title, s.summary, s.difficulty || 'level3', s.sentences, s.quiz || '[]', s.image || null],
+                            (err) => { if (!err) results.songs++; resolve(); }
+                        );
+                    });
+                });
+            }
+        } catch (e) { results.errors.push('팝송 동기화 실패: ' + e.message); }
+
+        // 3. Sync puzzle data
+        try {
+            const remoteIndexRes = await axios.get(`${REMOTE_BASE}/puzzle-data/index.json`, { timeout: 15000 });
+            const remoteIndex = remoteIndexRes.data;
+
+            const localIndexRaw = fs.readFileSync(puzzleIndexPath, 'utf8');
+            const localIndex = JSON.parse(localIndexRaw);
+            const localIds = new Set(localIndex.puzzles.map(p => p.id));
+
+            for (const puzzle of (remoteIndex.puzzles || [])) {
+                if (localIds.has(puzzle.id)) { results.skipped++; continue; }
+
+                if (puzzle.file && puzzle.file !== 'sample.json') {
+                    try {
+                        const fileRes = await axios.get(`${REMOTE_BASE}/puzzle-data/${puzzle.file}`, { timeout: 15000 });
+                        const filePath = path.join(__dirname, '..', 'public', 'puzzle-data', puzzle.file);
+                        fs.writeFileSync(filePath, JSON.stringify(fileRes.data, null, 2));
+                    } catch (e) {
+                        results.errors.push(`퍼즐 파일 실패: ${puzzle.file}`);
+                        continue;
+                    }
+                }
+
+                localIndex.puzzles.push(puzzle);
+                results.puzzles++;
+            }
+
+            fs.writeFileSync(puzzleIndexPath, JSON.stringify(localIndex, null, 2));
+        } catch (e) { results.errors.push('퍼즐 동기화 실패: ' + e.message); }
+
+        res.json({ success: true, results });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // Start Express Server
 const server = app.listen(PORT, '0.0.0.0', async () => {
     console.log(`Express Server running on http://0.0.0.0:${PORT} (Dynamic Gemini Mode)`);

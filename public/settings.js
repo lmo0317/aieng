@@ -148,6 +148,73 @@ resetPromptBtn.addEventListener('click', async () => {
     }
 });
 
+// 데이터 동기화 핸들러
+const syncBtn = document.getElementById('sync-btn');
+const syncStatus = document.getElementById('sync-status');
+const syncProgressFill = document.getElementById('sync-progress-fill');
+const syncStatusText = document.getElementById('sync-status-text');
+const syncResult = document.getElementById('sync-result');
+
+syncBtn.addEventListener('click', async () => {
+    syncBtn.disabled = true;
+    syncBtn.textContent = '동기화 중...';
+    syncStatus.classList.remove('hidden');
+    syncResult.classList.add('hidden');
+    syncProgressFill.style.width = '0%';
+    syncStatusText.textContent = 'aieng.cafe24app.com에 연결 중...';
+
+    // 애니메이션용 진행 시뮬레이션
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        if (progress < 85) { progress += 5; syncProgressFill.style.width = progress + '%'; }
+    }, 400);
+
+    try {
+        const response = await fetch('/api/sync', { method: 'POST' });
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            throw new Error(`서버 응답 오류 (${response.status}): 서버를 재시작해주세요.`);
+        }
+        const data = await response.json();
+
+        clearInterval(progressInterval);
+        syncProgressFill.style.width = '100%';
+
+        if (data.success) {
+            const r = data.results;
+            const errMsg = r.errors && r.errors.length > 0
+                ? `<div class="sync-errors">⚠️ 오류: ${r.errors.join(', ')}</div>` : '';
+            syncResult.innerHTML = `
+                <div class="sync-result-success">
+                    <strong>✅ 동기화 완료!</strong>
+                    <div class="sync-counts">
+                        <span class="sync-count">📰 뉴스 <b>${r.news}개</b> 추가</span>
+                        <span class="sync-count">🎵 팝송 <b>${r.songs}개</b> 추가</span>
+                        <span class="sync-count">🧩 퍼즐 <b>${r.puzzles}개</b> 추가</span>
+                        <span class="sync-count">⏭️ 중복 <b>${r.skipped}개</b> 건너뜀</span>
+                    </div>
+                    ${errMsg}
+                </div>`;
+            syncStatusText.textContent = '동기화 완료!';
+            showToast(`동기화 완료: 뉴스 ${r.news}개, 팝송 ${r.songs}개, 퍼즐 ${r.puzzles}개 추가됨`, 'success');
+        } else {
+            syncResult.innerHTML = `<div class="sync-result-error">❌ 동기화 실패: ${data.error}</div>`;
+            syncStatusText.textContent = '동기화 실패';
+            showToast('동기화에 실패했습니다.', 'error');
+        }
+        syncResult.classList.remove('hidden');
+    } catch (error) {
+        clearInterval(progressInterval);
+        syncResult.innerHTML = `<div class="sync-result-error">❌ 오류: ${error.message}</div>`;
+        syncResult.classList.remove('hidden');
+        syncStatusText.textContent = '오류 발생';
+        showToast('동기화 중 오류가 발생했습니다.', 'error');
+    } finally {
+        syncBtn.disabled = false;
+        syncBtn.textContent = '🔄 원격 데이터 동기화';
+    }
+});
+
 function showToast(message, type = 'success') {
     toast.textContent = message;
     toast.className = 'toast ' + type;

@@ -144,6 +144,61 @@
 .settings-page-header h2 { font-family: var(--font-ui); font-size: 1.4rem; font-weight: 800; color: var(--text-1); margin-bottom: 0.2rem; letter-spacing: -0.01em; }
 .settings-page-header p { color: var(--text-3); font-size: 0.88rem; margin: 0; }
 
+/* ─── Sync Button ───────────────────────────────────────────────────── */
+.btn-sync {
+    padding: 10px 20px; border-radius: var(--r-sm);
+    font-size: 0.9rem; font-weight: 700; font-family: var(--font-ui);
+    cursor: pointer; border: none; transition: background 0.12s, opacity 0.12s;
+    background: linear-gradient(135deg, #2563eb, #4f46e5); color: #fff;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-sync:hover { opacity: 0.88; }
+.btn-sync:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Sync Progress ─────────────────────────────────────────────────── */
+.sync-status { margin: 1rem 0 0.5rem; }
+
+.sync-progress-bar {
+    width: 100%; height: 6px; background: var(--bg-2);
+    border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem;
+    border: 1px solid var(--border);
+}
+
+.sync-progress-fill {
+    height: 100%; width: 0%; border-radius: 3px;
+    background: linear-gradient(90deg, #2563eb, #4f46e5);
+    transition: width 0.4s ease;
+}
+
+.sync-status-text { font-size: 0.82rem; color: var(--text-3); font-family: var(--font-ui); margin: 0; }
+
+/* ─── Sync Result ───────────────────────────────────────────────────── */
+.sync-result { margin-top: 0.9rem; }
+
+.sync-result-success {
+    padding: 12px 16px; background: rgba(37, 99, 235, 0.07);
+    border: 1px solid rgba(37, 99, 235, 0.2); border-radius: var(--r-md);
+}
+
+.sync-result-error {
+    padding: 12px 16px; background: var(--red-dim);
+    border: 1px solid rgba(224, 85, 85, 0.25); border-radius: var(--r-md);
+    color: var(--red); font-size: 0.87rem;
+}
+
+.sync-result-success strong { display: block; font-family: var(--font-ui); color: #60a5fa; margin-bottom: 0.6rem; font-size: 0.9rem; }
+
+.sync-counts { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.sync-count {
+    padding: 4px 10px; background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 20px; font-size: 0.78rem; font-family: var(--font-ui); color: var(--text-2);
+}
+
+.sync-count b { color: var(--text-1); }
+
+.sync-errors { margin-top: 0.6rem; font-size: 0.8rem; color: var(--red); }
+
 /* ─── Hidden ────────────────────────────────────────────────────────── */
 .hidden { display: none !important; }
 
