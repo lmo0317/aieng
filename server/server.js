@@ -251,6 +251,7 @@ async function getGlobalSettings() {
     });
 }
 
+
 // Helper function to call Gemini API
 async function callGeminiAPI(apiKey, model, systemPrompt, userPrompt, config = {}) {
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;

@@ -1,5 +1,5 @@
-const modelsForm = document.getElementById('models-form');
 const promptForm = document.getElementById('prompt-form');
+const modelsForm = document.getElementById('models-form');
 const apiKeyInput = document.getElementById('api-key');
 const modelSelect = document.getElementById('model-select');
 const apiStatusBadge = document.getElementById('api-status-badge');
@@ -10,7 +10,6 @@ const deleteGeminiBtn = document.getElementById('delete-gemini-btn');
 const resetPromptBtn = document.getElementById('reset-prompt-btn');
 const toast = document.getElementById('toast');
 
-// Gemini 모델 목록 (정확한 API ID 맵핑)
 const geminiModels = [
     { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
     { value: 'gemini-3-flash-preview', label: 'Gemini 3 Flash' },
@@ -18,9 +17,8 @@ const geminiModels = [
     { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite' }
 ];
 
-// 모델 선택 옵션 초기화
-modelSelect.innerHTML = geminiModels.map(model => 
-    `<option value="${model.value}">${model.label}</option>`
+modelSelect.innerHTML = geminiModels.map(m =>
+    `<option value="${m.value}">${m.label}</option>`
 ).join('');
 
 async function loadSettings() {
@@ -28,7 +26,6 @@ async function loadSettings() {
         const response = await fetch('/api/settings');
         const data = await response.json();
 
-        // 1. API 상태 요약 배지 업데이트
         if (data.hasApiKey) {
             apiStatusBadge.textContent = '연결됨';
             apiStatusBadge.className = 'status-badge active';
@@ -39,46 +36,40 @@ async function loadSettings() {
             deleteGeminiBtn.classList.add('hidden');
         }
 
-        // 2. 모델 상태 요약 배지 업데이트
         if (data.model) {
             modelSelect.value = data.model;
             const modelObj = geminiModels.find(m => m.value === data.model);
-            modelStatusBadge.textContent = modelObj ? modelObj.label.split(' (')[0] : data.model;
+            modelStatusBadge.textContent = modelObj ? modelObj.label : data.model;
         } else {
             modelStatusBadge.textContent = '미설정';
         }
 
-        // 3. 시스템 프롬프트
         if (data.systemPrompt) {
             systemPromptInput.value = data.systemPrompt;
         }
-
     } catch (error) {
         console.error('Failed to load settings:', error);
         apiStatusBadge.textContent = '로드 실패';
     }
 }
 
-// 모델 저장 핸들러
 modelsForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const model = modelSelect.value;
     try {
         const response = await fetch('/api/settings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ geminiModel: model })
+            body: JSON.stringify({ geminiModel: modelSelect.value })
         });
         if (response.ok) {
             showToast('모델 설정이 적용되었습니다.', 'success');
             await loadSettings();
         }
-    } catch (error) {
+    } catch {
         showToast('저장에 실패했습니다.', 'error');
     }
 });
 
-// API Key 저장 핸들러
 saveGeminiBtn.addEventListener('click', async () => {
     const key = apiKeyInput.value.trim();
     if (!key) return showToast('API Key를 입력하세요.', 'error');
@@ -93,12 +84,11 @@ saveGeminiBtn.addEventListener('click', async () => {
             apiKeyInput.value = '';
             await loadSettings();
         }
-    } catch (error) {
+    } catch {
         showToast('저장에 실패했습니다.', 'error');
     }
 });
 
-// API Key 삭제 핸들러
 deleteGeminiBtn.addEventListener('click', async () => {
     if (!confirm('Gemini API Key를 삭제하시겠습니까?')) return;
     try {
@@ -107,7 +97,7 @@ deleteGeminiBtn.addEventListener('click', async () => {
             showToast('삭제되었습니다.', 'success');
             await loadSettings();
         }
-    } catch (error) {
+    } catch {
         showToast('삭제 실패.', 'error');
     }
 });

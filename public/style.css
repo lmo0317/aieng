@@ -141,11 +141,13 @@ body .chat-message-text, body .chat-messages {
     font-size: 1rem;
     margin-left: 2px;
     border: none;
-    transition: background 0.15s;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
     color: var(--text-3);
 }
 
 .settings-link:hover { background: var(--surface-2); color: var(--text-2); }
+.settings-link.active { background: var(--accent); color: #fff; }
 
 .nav-auth-btn {
     flex: 0 0 auto;
@@ -178,6 +180,49 @@ body .chat-message-text, body .chat-messages {
     .settings-link { width: 34px; }
     .nav-auth-btn { padding: 6px 8px; font-size: 0.78rem; }
     .nav-auth-btn span { display: none; }
+}
+
+/* ─── Admin Submenu ─────────────────────────────────────────────────── */
+.admin-submenu {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 5px;
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-full);
+    box-shadow: var(--shadow-sm);
+    animation: fadeSlideDown 0.15s ease-out;
+}
+
+@keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.admin-menu-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 9px 8px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    color: var(--text-2);
+    text-decoration: none;
+    border-radius: var(--r-full);
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.admin-menu-item:hover { color: var(--text-1); background: var(--surface-2); }
+.admin-menu-item.active { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(91,91,214,0.4); }
+
+@media (max-width: 768px) {
+    .admin-menu-item { font-size: 0.78rem; padding: 9px 4px; }
+    .admin-menu-item span { display: none; }
 }
 
 /* ─── Page Header ────────────────────────────────────────────────────── */

@@ -20,14 +20,13 @@
             <a href="/" class="back-home-link">← 홈으로 이동</a>
         </div>
 
-        <!-- 통합된 AI 설정 카드 -->
+        <!-- AI 모델 및 연결 설정 카드 -->
         <div class="settings-card">
             <div class="settings-card-header">
                 <h2>🤖 AI 모델 및 연결 설정</h2>
                 <p class="description">Gemini API 연결과 사용할 모델을 한곳에서 관리하세요.</p>
             </div>
 
-            <!-- 현재 상태 요약 배지 -->
             <div class="settings-status-summary">
                 <div class="status-item">
                     <span class="status-label">API 연결:</span>
@@ -41,7 +40,6 @@
 
             <hr class="section-divider">
 
-            <!-- API Key 설정 영역 -->
             <div class="setting-group-inline">
                 <div class="form-group">
                     <label for="api-key">Gemini API Key</label>
@@ -56,14 +54,11 @@
                 </div>
             </div>
 
-            <!-- 모델 선택 영역 -->
             <form id="models-form" class="settings-form">
                 <div class="form-group">
                     <label for="model-select">학습 및 대화 모델 선택</label>
                     <div class="model-select-wrapper">
-                        <select id="model-select" class="model-select">
-                            <!-- JS에서 목록 추가 -->
-                        </select>
+                        <select id="model-select" class="model-select"></select>
                         <button type="submit" class="btn-secondary">모델 변경 적용</button>
                     </div>
                     <small class="help-text">학습 문장 생성과 AI 튜터 대화에 공통으로 사용됩니다.</small>

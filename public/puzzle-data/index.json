@@ -29,8 +29,8 @@
       "date": "2026-03-21",
       "wordCount": 10,
       "source": "초등 영어"
-    }
-    ,{
+    },
+    {
       "id": "puzzle-20260322-001",
       "file": "puzzle-20260322-001.json",
       "title": "초등영어 퀴즈",
@@ -39,8 +39,8 @@
       "date": "2026-03-22",
       "wordCount": 8,
       "source": "초등영어"
-    }
-    ,{
+    },
+    {
       "id": "puzzle-20260322-002",
       "file": "puzzle-20260322-002.json",
       "title": "초등영어 퀴즈",
@@ -49,8 +49,8 @@
       "date": "2026-03-22",
       "wordCount": 6,
       "source": "초등영어"
-    }
-    ,{
+    },
+    {
       "id": "puzzle-20260322-003",
       "file": "puzzle-20260322-003.json",
       "title": "초등영어 퀴즈",

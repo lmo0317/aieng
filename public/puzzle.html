@@ -73,11 +73,14 @@
             <div class="nav-links">
                 <a href="/" class="nav-link">🔥 <span>실시간 트렌드</span></a>
                 <a href="/songs" class="nav-link">🎶 <span>팝송 학습</span></a>
-                <a href="/topic" class="nav-link">✏️ <span>주제 입력</span></a>
-                <a href="/chat" class="nav-link">💬 <span>AI 튜터</span></a>
                 <a href="/puzzle" class="nav-link active">🧩 <span>퍼즐</span></a>
-                <a href="/settings.html" class="settings-link">⚙️</a>
+                <button id="admin-toggle-btn" class="settings-link" style="display:none" title="관리자 메뉴">🧑‍💼</button>
                 <a href="/auth/google" id="nav-auth-btn" class="nav-auth-btn">🔑 <span>로그인</span></a>
+                        </div>
+            <div id="admin-submenu" class="admin-submenu hidden">
+                <a href="/settings.html" class="admin-menu-item">⚙️ <span>설정</span></a>
+                <a href="/topic" class="admin-menu-item">✏️ <span>주제 입력</span></a>
+                <a href="/chat" class="admin-menu-item">💬 <span>AI 튜터</span></a>
             </div>
         </div>
 
