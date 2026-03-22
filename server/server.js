@@ -6,6 +6,9 @@ const path = require('path');
 const { spawn } = require('child_process');
 const WebSocket = require('ws');
 const https = require('https');
+const session = require('express-session');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('./database');
 
 // Load .env from parent directory
@@ -19,6 +22,73 @@ const trendsClients = new Map();
 
 app.use(cors());
 app.use(express.json());
+
+// 세션 미들웨어
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'trend-eng-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7일
+}));
+
+// Passport 초기화
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport Google OAuth 전략
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: (process.env.SERVER_URL || 'http://localhost:' + (process.env.PORT || 8001)) + '/auth/google/callback'
+}, (accessToken, refreshToken, profile, done) => {
+    const user = {
+        id: profile.id,
+        name: profile.displayName,
+        email: profile.emails?.[0]?.value || '',
+        picture: profile.photos?.[0]?.value || ''
+    };
+    // DB에 upsert
+    db.run(
+        `INSERT OR REPLACE INTO users (id, name, email, picture) VALUES (?, ?, ?, ?)`,
+        [user.id, user.name, user.email, user.picture],
+        (err) => {
+            if (err) console.error('[Auth] User save error:', err.message);
+        }
+    );
+    return done(null, user);
+}));
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser((id, done) => {
+    db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
+        done(err, row || null);
+    });
+});
+
+// Google OAuth 라우트
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/?login=failed' }),
+    (req, res) => res.redirect('/')
+);
+
+app.get('/auth/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) console.error('[Auth] Logout error:', err.message);
+        res.redirect('/');
+    });
+});
+
+// 인증 상태 API
+app.get('/api/auth/status', (req, res) => {
+    if (req.isAuthenticated() && req.user) {
+        res.json({ loggedIn: true, user: { name: req.user.name, email: req.user.email, picture: req.user.picture } });
+    } else {
+        res.json({ loggedIn: false });
+    }
+});
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // 페이지 라우트 (URL 기반 네비게이션)

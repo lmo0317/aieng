@@ -147,10 +147,37 @@ body .chat-message-text, body .chat-messages {
 
 .settings-link:hover { background: var(--surface-2); color: var(--text-2); }
 
+.nav-auth-btn {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    transition: background 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+}
+.nav-auth-btn:hover { background: #4a4abf; box-shadow: 0 2px 8px rgba(91,91,214,0.4); }
+.nav-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
 @media (max-width: 768px) {
     .nav-link { padding: 9px 4px; font-size: 0.78rem; }
     .nav-link span { display: none; }
     .settings-link { width: 34px; }
+    .nav-auth-btn { padding: 6px 8px; font-size: 0.78rem; }
+    .nav-auth-btn span { display: none; }
 }
 
 /* ─── Page Header ────────────────────────────────────────────────────── */
