@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(r => r.json())
         .then(data => {
             const authBtn = document.getElementById('nav-auth-btn');
+            const settingsLink = document.querySelector('.settings-link');
+
+            // 설정 링크: 관리자만 표시
+            if (settingsLink) {
+                settingsLink.style.display = data.isAdmin ? '' : 'none';
+            }
+
             if (!authBtn) return;
             if (data.loggedIn) {
                 authBtn.innerHTML = `<img src="${data.user.picture}" class="nav-avatar" alt="프로필"> <span>${data.user.name.split(' ')[0]}</span>`;

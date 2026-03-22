@@ -80,14 +80,27 @@ app.get('/auth/logout', (req, res) => {
     });
 });
 
+// 어드민 체크 헬퍼
+const isAdmin = (user) => user && user.email === process.env.ADMIN_EMAIL;
+
 // 인증 상태 API
 app.get('/api/auth/status', (req, res) => {
     if (req.isAuthenticated() && req.user) {
-        res.json({ loggedIn: true, user: { name: req.user.name, email: req.user.email, picture: req.user.picture } });
+        res.json({ loggedIn: true, isAdmin: isAdmin(req.user), user: { name: req.user.name, email: req.user.email, picture: req.user.picture } });
     } else {
-        res.json({ loggedIn: false });
+        res.json({ loggedIn: false, isAdmin: false });
     }
 });
+
+// 관리자 전용 페이지 보호
+const requireAdmin = (req, res, next) => {
+    if (req.isAuthenticated() && isAdmin(req.user)) return next();
+    if (!req.isAuthenticated()) return res.redirect('/auth/google');
+    return res.status(403).sendFile(path.join(__dirname, '..', 'public', '403.html'));
+};
+
+app.get('/settings.html', requireAdmin, (req, res) => res.sendFile(pub('settings.html')));
+app.get('/data.html', requireAdmin, (req, res) => res.sendFile(pub('data.html')));
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
