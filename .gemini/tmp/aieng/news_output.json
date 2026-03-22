@@ -1,0 +1,280 @@
+{
+  "content": [
+    {
+      "news_title": "오픈AI, GPT-5.4와 자체 AI 칩 소버린 원 공개",
+      "category": "테크",
+      "sentences": [
+        {
+          "english": "OpenAI released GPT-5.4, which features native computer use capabilities.",
+          "korean": "오픈AI는 네이티브 컴퓨터 사용 기능을 갖춘 GPT-5.4를 출시했습니다.",
+          "sentence_structure": "[주어: OpenAI] + [동사: released] + [목적어: GPT-5.4] + [수식어: which features native computer use capabilities] (3형식 문장)",
+          "explanation": "이 문장은 3형식 구조로 이루어져 있습니다. 주어인 'OpenAI'가 'released'라는 동사를 통해 'GPT-5.4'라는 목적어를 취하고 있습니다. 뒤에 이어지는 관계대명사 'which'절은 선행사인 GPT-5.4를 수식하며 그 특징을 설명해 줍니다. 'feature'는 동사로 쓰일 때 '~을 특징으로 하다'라는 의미를 가집니다. AI가 이제 직접 컴퓨터를 다룬다는 놀라운 기술 발전을 보여주는 문장이니 꼼꼼히 익혀두세요! 앞으로 자주 접하게 될 IT 트렌드 표현입니다.",
+          "voca": "release(동사): 출시하다, feature(동사): ~을 특징으로 하다, capability(명사): 기능"
+        },
+        {
+          "english": "The new AI can navigate desktops and execute tasks directly.",
+          "korean": "이 새로운 AI는 바탕화면을 탐색하고 작업을 직접 실행할 수 있습니다.",
+          "sentence_structure": "[주어: The new AI] + [조동사: can] + [동사1: navigate] + [목적어1: desktops] + [접속사: and] + [동사2: execute] + [목적어2: tasks] + [부사: directly] (3형식 병렬 구조)",
+          "explanation": "이 문장은 조동사 'can' 뒤에 두 개의 동사 원형 'navigate'와 'execute'가 'and'로 연결된 병렬 구조입니다. 두 동사 모두 각각의 목적어인 'desktops'와 'tasks'를 취하는 3형식 형태를 띠고 있습니다. 'navigate'는 보통 길을 찾다라는 뜻이지만 컴퓨터 환경에서는 이리저리 돌아다니며 탐색한다는 의미로 쓰입니다. AI가 스스로 바탕화면을 제어하는 놀라운 상황을 떠올려 보세요. 'execute'는 실행하다라는 매우 자주 쓰이는 고급 어휘입니다. 실무 영어에서 꼭 필요한 단어입니다.",
+          "voca": "navigate(동사): 탐색하다, 길을 찾다, execute(동사): 실행하다, task(명사): 작업"
+        },
+        {
+          "english": "Anthropic countered with Claude Co-work for macOS.",
+          "korean": "앤스로픽은 macOS용 클로드 코워크(Claude Co-work)로 맞대응했습니다.",
+          "sentence_structure": "[주어: Anthropic] + [동사: countered] + [전치사구: with Claude Co-work for macOS] (1형식 문장)",
+          "explanation": "주어 'Anthropic'과 동사 'countered'로 이루어진 완벽한 1형식 문장입니다. 뒤에 붙은 'with' 전치사구는 어떤 수단으로 맞대응했는지 부연 설명해 주는 역할을 합니다. 'counter'는 카운터 펀치처럼 상대방의 행동에 맞서 반격하거나 대응할 때 쓰는 아주 생동감 넘치는 동사입니다. 라이벌 기업 간의 치열한 경쟁 상황을 묘사할 때 제격이죠. AI 비서 시장의 패권 다툼이 어떻게 흘러가는지 잘 보여주는 문장입니다. 비즈니스 영어에서 자주 등장하는 표현이니 꼭 외워두세요!",
+          "voca": "counter(동사): 반격하다, 맞대응하다"
+        },
+        {
+          "english": "This signals a shift from AI assistants to autonomous AI coworkers.",
+          "korean": "이것은 AI 비서에서 자율형 AI 동료로의 전환을 의미합니다.",
+          "sentence_structure": "[주어: This] + [동사: signals] + [목적어: a shift] + [전치사구: from AI assistants to autonomous AI coworkers] (3형식 문장)",
+          "explanation": "이 문장은 주어, 동사, 목적어로 구성된 깔끔한 3형식 문장입니다. 핵심은 'from A to B' 구문을 사용하여 A에서 B로의 변화나 이동을 명확하게 보여준다는 점입니다. 여기서 동사 'signal'은 단순한 신호를 보내는 것이 아니라 어떠한 중대한 변화를 시사하거나 나타낸다는 의미로 쓰였습니다. 'autonomous'는 스스로 생각하고 행동하는 자율성을 뜻하는 단어로 최근 테크 뉴스에서 빠질 수 없는 핵심 키워드입니다. 이제 AI가 단순한 도구가 아닌 진정한 동료로 거듭나고 있음을 알 수 있습니다.",
+          "voca": "signal(동사): 시사하다, 나타내다, shift(명사): 변화, 전환, autonomous(형용사): 자율적인"
+        },
+        {
+          "english": "OpenAI is reportedly developing its own AI chip, codenamed Sovereign One.",
+          "korean": "보도에 따르면 오픈AI는 소버린 원(Sovereign One)이라는 코드명의 자체 AI 칩을 개발 중입니다.",
+          "sentence_structure": "[주어: OpenAI] + [동사: is developing] + [목적어: its own AI chip] + [수식어: codenamed Sovereign One] + [부사: reportedly] (3형식 문장)",
+          "explanation": "현재 진행형 동사 'is developing'이 쓰인 3형식 구조입니다. 부사 'reportedly'는 뉴스 기사에서 전해지는 바에 따르면 이렇다라는 뉘앙스를 줄 때 아주 흔하게 사용됩니다. 뒤에 붙은 'codenamed'는 분사 형태로 앞의 명사 'AI chip'을 꾸며주며 개발 코드명을 알려주는 역할을 합니다. 'sovereign'은 주권, 독립적인 힘을 의미하는 단어로, 오픈AI가 외부 의존을 줄이고 스스로의 힘을 키우겠다는 강한 의지가 엿보이는 작명입니다. 최신 IT 기사를 읽을 때 자주 마주치는 패턴입니다.",
+          "voca": "reportedly(부사): 보도에 따르면, 전하는 바에 의하면, codename(동사): 코드명을 붙이다"
+        },
+        {
+          "english": "The company is partnering with Broadcom and TSMC for this project.",
+          "korean": "회사는 이 프로젝트를 위해 브로드컴 및 TSMC와 협력하고 있습니다.",
+          "sentence_structure": "[주어: The company] + [동사: is partnering] + [전치사구: with Broadcom and TSMC] + [전치사구: for this project] (1형식 문장)",
+          "explanation": "이 문장은 주어와 진행형 동사 'is partnering'으로 이루어진 1형식 문장입니다. 'partner with'는 누구누구와 파트너십을 맺다, 협력하다라는 의미로 비즈니스 환경에서 매일같이 쓰이는 필수 숙어입니다. 전치사 'for'는 그 협력의 목적이 무엇인지를 나타냅니다. 글로벌 반도체 기업들과의 거대한 연합 전선이 구축되는 모습을 상상하며 읽어보세요. 회사 간의 제휴나 협력을 영어로 표현할 때 이보다 더 깔끔하고 확실한 표현은 없습니다.",
+          "voca": "partner(동사): 파트너가 되다, 협력하다, project(명사): 프로젝트, 계획"
+        },
+        {
+          "english": "This strategic move aims to reduce dependence on Nvidia.",
+          "korean": "이러한 전략적 움직임은 엔비디아에 대한 의존도를 줄이는 것을 목표로 합니다.",
+          "sentence_structure": "[주어: This strategic move] + [동사: aims] + [목적어: to reduce dependence on Nvidia] (3형식 문장)",
+          "explanation": "이 문장은 'aim to 동사원형' 구문을 목적어로 취하는 3형식 구조입니다. 'aim'은 무엇을 달성하기 위해 겨냥하고 목표로 한다는 뜻의 동사입니다. 'dependence on'은 어딘가에 기대고 의존하는 상태를 나타내는 짝꿍 표현이므로 통째로 외우는 것이 좋습니다. 오픈AI가 현재 AI 반도체 시장을 장악하고 있는 엔비디아의 그늘에서 벗어나려는 치밀한 전략이 돋보입니다. 비즈니스 기사나 보고서에서 기업의 목표와 전략을 설명할 때 완벽하게 써먹을 수 있는 훌륭한 문장입니다.",
+          "voca": "strategic(형용사): 전략적인, aim(동사): 목표로 하다, dependence(명사): 의존, 의존도"
+        },
+        {
+          "english": "The new chip is optimized for reasoning-heavy AI models.",
+          "korean": "새로운 칩은 추론 중심의 AI 모델에 최적화되어 있습니다.",
+          "sentence_structure": "[주어: The new chip] + [동사: is optimized] + [전치사구: for reasoning-heavy AI models] (수동태 문장)",
+          "explanation": "수동태 'is optimized'가 쓰인 문장으로, 칩이 스스로 최적화하는 것이 아니라 누군가에 의해 최적화된 상태임을 보여줍니다. 'optimize for'는 특정 목적이나 조건에 가장 알맞게 만들어졌다는 뜻을 가진 테크 분야의 필수 어휘입니다. 복합어인 'reasoning-heavy'는 직역하면 추론이 무거운, 즉 추론 기능이 매우 강조되고 많이 쓰인다는 뜻을 감각적으로 표현한 것입니다. AI가 단순히 말을 잘하는 것을 넘어 깊이 생각하고 문제를 해결하는 방향으로 진화하고 있음을 알 수 있습니다.",
+          "voca": "optimize(동사): 최적화하다, reasoning(명사): 추론, heavy(형용사): 집중적인, 심한"
+        },
+        {
+          "english": "Meanwhile, Samsung announced its first rollable smartphone, the Galaxy Z Roll 5G.",
+          "korean": "한편, 삼성은 첫 롤러블 스마트폰인 갤럭시 Z 롤 5G를 발표했습니다.",
+          "sentence_structure": "[부사: Meanwhile] + [주어: Samsung] + [동사: announced] + [목적어: its first rollable smartphone] + [동격: the Galaxy Z Roll 5G] (3형식 문장)",
+          "explanation": "접속부사 'Meanwhile'로 시작하여 화제를 전환하는 전형적인 3형식 문장입니다. 목적어인 'its first rollable smartphone' 뒤에 콤마(,)를 찍고 제품명인 'the Galaxy Z Roll 5G'를 나란히 두어, 두 대상이 같음을 나타내는 동격 구조를 취했습니다. 'announce'는 대중에게 공식적으로 새로운 소식을 알리고 발표할 때 쓰는 동사입니다. 화면이 돌돌 말리는 롤러블 폰의 등장으로 스마트폰 시장에 또 한 번의 혁신이 일어날지 기대하게 만드는 문장입니다.",
+          "voca": "meanwhile(부사): 한편, announce(동사): 발표하다, 알리다, rollable(형용사): 말 수 있는"
+        },
+        {
+          "english": "It features an expandable display with peak brightness.",
+          "korean": "이 제품은 최고 밝기를 자랑하는 확장 가능한 디스플레이를 특징으로 합니다.",
+          "sentence_structure": "[주어: It] + [동사: features] + [목적어: an expandable display] + [수식어: with peak brightness] (3형식 문장)",
+          "explanation": "주어 'It'이 스마트폰을 가리키며 동사 'features'를 사용해 기기의 핵심 스펙을 설명하는 3형식 문장입니다. 앞서 1번 문장에서도 쓰였던 'feature'가 또 등장했네요, 제품 리뷰나 소개에서 이 단어가 얼마나 중요한지 아시겠죠? 전치사 'with'는 무언가를 함께 가지고 있다는 소유의 의미로 쓰여 디스플레이의 속성을 부연 설명합니다. 화면이 쭉 늘어나는 'expandable' 기술과 눈부신 'peak brightness'가 결합된 최첨단 기기의 매력을 잘 전달하는 깔끔한 영문장입니다.",
+          "voca": "expandable(형용사): 확장 가능한, peak(형용사): 최고의, 절정의, brightness(명사): 밝기"
+        }
+      ],
+      "quiz": [
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'navigate'의 올바른 뜻은 무엇인가요?",
+          "options": ["탐색하다", "파괴하다", "숨기다", "수리하다"],
+          "answer": "탐색하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'execute'의 올바른 뜻은 무엇인가요?",
+          "options": ["실행하다", "포기하다", "질문하다", "기록하다"],
+          "answer": "실행하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'counter'의 올바른 뜻은 무엇인가요?",
+          "options": ["반격하다", "도망치다", "동의하다", "계산하다"],
+          "answer": "반격하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'autonomous'의 올바른 뜻은 무엇인가요?",
+          "options": ["자율적인", "수동적인", "의존적인", "일시적인"],
+          "answer": "자율적인"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'shift'의 올바른 뜻은 무엇인가요?",
+          "options": ["변화", "고정", "불만", "칭찬"],
+          "answer": "변화"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'partner'의 올바른 뜻은 무엇인가요?",
+          "options": ["협력하다", "경쟁하다", "비난하다", "분리하다"],
+          "answer": "협력하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'strategic'의 올바른 뜻은 무엇인가요?",
+          "options": ["전략적인", "우연한", "감정적인", "물리적인"],
+          "answer": "전략적인"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'optimize'의 올바른 뜻은 무엇인가요?",
+          "options": ["최적화하다", "악화시키다", "무시하다", "지연시키다"],
+          "answer": "최적화하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'announce'의 올바른 뜻은 무엇인가요?",
+          "options": ["발표하다", "비밀로 하다", "거절하다", "질문하다"],
+          "answer": "발표하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'expandable'의 올바른 뜻은 무엇인가요?",
+          "options": ["확장 가능한", "축소되는", "단단한", "무거운"],
+          "answer": "확장 가능한"
+        }
+      ]
+    },
+    {
+      "news_title": "중동 갈등 고조로 글로벌 유가 급등 및 시장 변동성 확대",
+      "category": "경제",
+      "sentences": [
+        {
+          "english": "The strategic waterway is effectively closed due to the escalating war.",
+          "korean": "격화되는 전쟁으로 인해 이 전략적 수로가 사실상 폐쇄되었습니다.",
+          "sentence_structure": "[주어: The strategic waterway] + [동사: is closed] + [부사: effectively] + [전치사구: due to the escalating war] (수동태 문장)",
+          "explanation": "이 문장은 호르무즈 해협과 같은 중요한 해상 통로가 폐쇄된 심각한 상황을 묘사하는 수동태 문장입니다. 'effectively'는 효과적으로라는 뜻도 있지만 여기서는 사실상, 실질적으로라는 의미로 쓰여 사태의 무게감을 더해줍니다. 'due to'는 원인을 나타내는 전치사로 뒤에 명사구가 옵니다. 현재분사 'escalating'은 명사 'war'를 수식하며 점점 악화되고 고조되는 전쟁의 긴박함을 생생하게 전달합니다. 국제 뉴스에서 분쟁 상황을 전할 때 단골로 등장하는 표현 구조입니다.",
+          "voca": "strategic(형용사): 전략적인, waterway(명사): 수로, effectively(부사): 사실상, 실질적으로, escalate(동사): 확대되다, 격화되다"
+        },
+        {
+          "english": "This closure halts approximately 20 percent of the world's oil supply.",
+          "korean": "이러한 폐쇄는 전 세계 석유 공급의 약 20퍼센트를 중단시킵니다.",
+          "sentence_structure": "[주어: This closure] + [동사: halts] + [목적어: approximately 20 percent of the world's oil supply] (3형식 문장)",
+          "explanation": "이 문장은 주어, 동사, 목적어로 이루어진 아주 직관적인 3형식 구조입니다. 앞 문장에서 언급된 상황을 'This closure'라는 명사구로 깔끔하게 받아주고 있습니다. 'halt'는 가던 길을 멈추거나 어떤 과정을 뚝 끊어버릴 때 사용하는 동사로, 단순한 정지 이상의 강력한 단절을 의미합니다. 'approximately'는 수치 앞에서 대략적인 값을 나타낼 때 꼭 필요한 고급 부사입니다. 전 세계 경제에 미치는 막대한 충격을 간결하고 힘 있게 보여주는 문장입니다.",
+          "voca": "closure(명사): 폐쇄, halt(동사): 중단시키다, 멈추게 하다, approximately(부사): 대략, 약"
+        },
+        {
+          "english": "Global oil prices have spiked significantly as a result.",
+          "korean": "그 결과 글로벌 유가가 크게 급등했습니다.",
+          "sentence_structure": "[주어: Global oil prices] + [동사: have spiked] + [부사: significantly] + [전치사구: as a result] (1형식 문장)",
+          "explanation": "현재 완료 시제 'have spiked'가 쓰여 과거의 어떤 사건으로 인해 현재 유가가 엄청나게 치솟은 상태임을 강조하는 1형식 문장입니다. 'spike'는 명사로는 못이나 뾰족한 것을 뜻하지만 동사로는 그래프의 선이 수직으로 확 치솟는 급등을 의미합니다. 경제 기사에서 가격 상승을 묘사할 때 가장 역동적인 단어 중 하나입니다. 부사 'significantly'는 그 변화의 폭이 매우 크고 중대함을 알려줍니다. 'as a result'는 앞선 원인에 대한 결과를 자연스럽게 이어주는 최고의 연결 고리입니다.",
+          "voca": "spike(동사): 급등하다, significantly(부사): 상당히, 크게"
+        },
+        {
+          "english": "Brent crude jumped 28 percent in a single week.",
+          "korean": "브렌트유는 단 일주일 만에 28퍼센트나 뛰어올랐습니다.",
+          "sentence_structure": "[주어: Brent crude] + [동사: jumped] + [부사: 28 percent] + [전치사구: in a single week] (1형식 문장)",
+          "explanation": "주어 'Brent crude'가 얼마나 올랐는지를 동사 'jumped'를 통해 시각적으로 묘사하는 1형식 문장입니다. 'jump' 역시 수치나 가격이 껑충 뛰었을 때 자주 쓰는 표현입니다. 전치사 'in'은 기간을 나타내며, 뒤에 'a single week'를 붙여 일주일이라는 짧은 시간 동안 벌어진 일이라는 놀라움을 극대화합니다. 경제 뉴스를 읽다 보면 이렇게 원자재 가격의 변동을 동물적인 움직임에 빗대어 표현하는 문장들을 자주 만날 수 있습니다. 시장의 공황 상태가 그대로 전해지는 듯합니다.",
+          "voca": "crude(명사): 원유, jump(동사): 급등하다, 뛰다, single(형용사): 단 하나의"
+        },
+        {
+          "english": "The stock market fell 2.0 percent in the week leading up to March.",
+          "korean": "주식 시장은 3월을 앞둔 한 주 동안 2.0퍼센트 하락했습니다.",
+          "sentence_structure": "[주어: The stock market] + [동사: fell] + [부사: 2.0 percent] + [전치사구: in the week] + [수식어: leading up to March] (1형식 문장)",
+          "explanation": "이 문장은 주식 시장의 하락세를 담담하게 전하는 1형식 구조입니다. 동사 'fell'은 위에서 아래로 떨어지는 모습을 나타내며 지수 하락을 의미합니다. 가장 주목해야 할 부분은 분사구문 'leading up to'입니다. 이는 어떤 특정한 날짜나 사건으로 이어지는, 즉 그 시점 직전까지의 기간을 뜻하는 아주 유용한 숙어입니다. 특정한 시점을 앞두고 시장이 어떻게 반응했는지를 설명할 때 기자들이 즐겨 쓰는 고급 표현이니 통째로 암기해 두시면 좋습니다.",
+          "voca": "fall(동사): 떨어지다, 하락하다, lead up to(숙어): ~에 이르다, ~을 앞두고 있다"
+        },
+        {
+          "english": "International stocks saw sharper declines of nearly 7 percent.",
+          "korean": "국제 주식은 거의 7퍼센트에 달하는 더 가파른 하락세를 보였습니다.",
+          "sentence_structure": "[주어: International stocks] + [동사: saw] + [목적어: sharper declines] + [전치사구: of nearly 7 percent] (3형식 문장)",
+          "explanation": "이 문장에서 가장 흥미로운 점은 사물인 'International stocks'를 주어로 삼고 'see' 동사를 사용하여 마치 사람이 무언가를 목격한 것처럼 표현했다는 것입니다. 이런 무생물 주어 구문은 영어 특유의 간결하고 세련된 문장 구조를 만듭니다. 목적어인 'sharper declines'에서 'sharp'의 비교급을 써서 앞서 언급된 다른 시장보다 하락 폭이 훨씬 날카롭고 심각함을 강조했습니다. 금융 기사에서 트렌드나 수치 변화를 묘사할 때 'see' 동사가 어떻게 쓰이는지 잘 보여주는 완벽한 예시입니다.",
+          "voca": "decline(명사): 하락, 감소, sharp(형용사): 급격한, 가파른, nearly(부사): 거의"
+        },
+        {
+          "english": "The market volatility index rose 28 percent during this period.",
+          "korean": "이 기간 동안 시장 변동성 지수는 28퍼센트 상승했습니다.",
+          "sentence_structure": "[주어: The market volatility index] + [동사: rose] + [부사: 28 percent] + [전치사구: during this period] (1형식 문장)",
+          "explanation": "주어인 'The market volatility index'와 자동사 'rose'로 구성된 깔끔한 1형식 문장입니다. 'volatility'는 경제 뉴스에서 절대 빠질 수 없는 핵심 단어로, 시장이 얼마나 불안정하고 오르락내리락하는지를 나타내는 변동성을 뜻합니다. 'rise'는 스스로 위로 올라가는 자동사이므로 수동태로 쓰지 않는다는 점을 명심해야 합니다. 전치사 'during'은 특정 기간 내내 발생한 일을 설명할 때 쓰입니다. 투자자들의 공포 심리가 숫자로 어떻게 번역되는지 보여주는 대표적인 문장 형태입니다.",
+          "voca": "volatility(명사): 변동성, index(명사): 지수, rise(동사): 상승하다"
+        },
+        {
+          "english": "Central banks globally are reassessing their rate-cut plans.",
+          "korean": "전 세계 중앙은행들은 금리 인하 계획을 재평가하고 있습니다.",
+          "sentence_structure": "[주어: Central banks] + [부사: globally] + [동사: are reassessing] + [목적어: their rate-cut plans] (3형식 문장)",
+          "explanation": "현재 진행형 동사 'are reassessing'이 쓰여 각국의 중앙은행들이 지금 이 순간에도 바쁘게 정책을 수정하고 있음을 보여주는 3형식 문장입니다. 'reassess'는 접두사 re-가 붙어 상황이 바뀌었으니 원래의 계획이나 가치를 다시 따져보고 평가한다는 뜻을 가집니다. 목적어인 'rate-cut'은 이자율을 자르는 것, 즉 금리 인하를 의미하는 복합 명사입니다. 거시 경제의 흐름이 급변할 때 정책 입안자들이 어떻게 대응하는지를 서술하는 매우 전문적이고 격식 있는 표현입니다.",
+          "voca": "globally(부사): 전 세계적으로, reassess(동사): 재평가하다, rate-cut(명사): 금리 인하"
+        },
+        {
+          "english": "Rising energy prices threaten to reignite inflation worldwide.",
+          "korean": "상승하는 에너지 가격은 전 세계적으로 인플레이션을 재점화할 위협이 됩니다.",
+          "sentence_structure": "[주어: Rising energy prices] + [동사: threaten] + [목적어: to reignite inflation worldwide] (3형식 문장)",
+          "explanation": "이 문장은 현재분사 'Rising'이 주어를 꾸며주며 동사 'threaten'이 'to 부정사'를 목적어로 취하는 3형식 구조입니다. 'threaten to 동사원형'은 나쁜 일이 일어날 조짐이 보이거나 그렇게 될 우려가 있다는 뜻으로 경제 위기를 경고할 때 아주 유용합니다. 'reignite'는 꺼져가던 불씨에 다시 불을 붙인다는 의미로, 간신히 잡혀가던 물가 상승(inflation)이 유가 급등으로 인해 다시 폭발적으로 일어날 수 있다는 두려움을 시각적으로 생생하게 전달하는 훌륭한 단어입니다.",
+          "voca": "threaten(동사): 위협하다, 조짐을 보이다, reignite(동사): 재점화하다, 다시 불붙이다, inflation(명사): 인플레이션, 물가 상승"
+        },
+        {
+          "english": "Business surveys are expected to show a synchronized weakening across sectors.",
+          "korean": "기업 설문조사는 여러 부문에 걸쳐 동시다발적인 약화를 보여줄 것으로 예상됩니다.",
+          "sentence_structure": "[주어: Business surveys] + [동사: are expected] + [보어: to show a synchronized weakening across sectors] (수동태/5형식 수동구문)",
+          "explanation": "이 문장은 'expect A to B' 구조가 수동태로 변형된 형태로, 전문가들이나 시장의 일반적인 예상을 전달할 때 쓰는 전형적인 표현 방식입니다. 여기서 핵심 단어는 'synchronized'로 마치 싱크로나이즈드 스위밍 선수들처럼 여러 산업 분야(sectors)가 동시에 일제히 나빠지는(weakening) 현상을 절묘하게 포착해냈습니다. 'across'는 무엇무엇 전반에 걸쳐서라는 넓은 범위를 나타냅니다. 경제 전반에 먹구름이 끼고 있음을 보고서 형식으로 세련되게 작성한 문장입니다.",
+          "voca": "survey(명사): 설문조사, synchronized(형용사): 동기화된, 동시다발적인, weakening(명사): 약화, sector(명사): 부문, 분야"
+        }
+      ],
+      "quiz": [
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'escalate'의 올바른 뜻은 무엇인가요?",
+          "options": ["격화되다", "안정되다", "숨기다", "포기하다"],
+          "answer": "격화되다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'halt'의 올바른 뜻은 무엇인가요?",
+          "options": ["중단시키다", "계속하다", "보호하다", "장려하다"],
+          "answer": "중단시키다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'spike'의 올바른 뜻은 무엇인가요?",
+          "options": ["급등하다", "폭락하다", "유지하다", "제공하다"],
+          "answer": "급등하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'approximately'의 올바른 뜻은 무엇인가요?",
+          "options": ["대략", "정확히", "영원히", "빨리"],
+          "answer": "대략"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'decline'의 올바른 뜻은 무엇인가요?",
+          "options": ["하락", "증가", "성공", "기쁨"],
+          "answer": "하락"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'volatility'의 올바른 뜻은 무엇인가요?",
+          "options": ["변동성", "안정성", "영구성", "단순성"],
+          "answer": "변동성"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'reassess'의 올바른 뜻은 무엇인가요?",
+          "options": ["재평가하다", "포기하다", "시작하다", "무시하다"],
+          "answer": "재평가하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'threaten'의 올바른 뜻은 무엇인가요?",
+          "options": ["위협하다", "도와주다", "보상하다", "환영하다"],
+          "answer": "위협하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'reignite'의 올바른 뜻은 무엇인가요?",
+          "options": ["재점화하다", "소화하다", "식히다", "얼리다"],
+          "answer": "재점화하다"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "다음 중 'synchronized'의 올바른 뜻은 무엇인가요?",
+          "options": ["동기화된", "개별적인", "무작위의", "고립된"],
+          "answer": "동기화된"
+        }
+      ]
+    }
+  ]
+}

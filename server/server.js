@@ -681,15 +681,34 @@ app.post('/api/songs/save', requireAdminKey, (req, res) => {
 
     const sentencesStr = typeof sentences === 'string' ? sentences : JSON.stringify(sentences);
     const quizStr = quiz ? (typeof quiz === 'string' ? quiz : JSON.stringify(quiz)) : '[]';
+    const summary = lyrics.substring(0, 200);
 
-    db.run(
-        "INSERT INTO trends (title, summary, difficulty, sentences, quiz, image, type) VALUES (?, ?, ?, ?, ?, ?, 'song')",
-        [title, lyrics.substring(0, 200), difficulty || 'level3', sentencesStr, quizStr, image],
-        function(err) {
-            if (err) return res.status(500).json({ error: err.message });
-            res.json({ success: true, id: this.lastID });
+    // 중복 체크 및 UPSERT 로직
+    db.get("SELECT id FROM trends WHERE title = ? AND type = 'song'", [title], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (row) {
+            // 이미 존재하면 업데이트
+            db.run(
+                "UPDATE trends SET summary = ?, difficulty = ?, sentences = ?, quiz = ?, image = ? WHERE id = ?",
+                [summary, difficulty || 'level3', sentencesStr, quizStr, image, row.id],
+                function(err) {
+                    if (err) return res.status(500).json({ error: err.message });
+                    res.json({ success: true, id: row.id, action: 'updated' });
+                }
+            );
+        } else {
+            // 존재하지 않으면 새로 삽입
+            db.run(
+                "INSERT INTO trends (title, summary, difficulty, sentences, quiz, image, type) VALUES (?, ?, ?, ?, ?, ?, 'song')",
+                [title, summary, difficulty || 'level3', sentencesStr, quizStr, image],
+                function(err) {
+                    if (err) return res.status(500).json({ error: err.message });
+                    res.json({ success: true, id: this.lastID, action: 'inserted' });
+                }
+            );
         }
-    );
+    });
 });
 
 // Clear Today's Data API

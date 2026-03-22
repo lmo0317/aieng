@@ -14,16 +14,20 @@ async function sendNotification() {
     return;
   }
 
-  let message = process.argv[2];
+  let message = process.argv.slice(2).join(' '); // 모든 인자를 합쳐서 하나의 메시지로 처리
   if (!message) {
     console.error('No message provided for Telegram notification');
     return;
   }
 
-  // Ensure UTF-8 if possible or handle buffer if needed
-  // Note: Node.js process.argv is usually already UTF-16 in Windows, 
-  // but let's make sure we're sending a clean string.
-  message = message.toString().trim();
+  // Windows에서 UTF-8 인코딩이 깨진 채로 전달되는 경우를 대비한 처리 (이미 UTF-8인 경우는 유지)
+  try {
+    // 이미 UTF-8 스트링이라면 특별한 처리가 필요 없지만, 
+    // 전송 시 마크다운 파싱 에러 방지를 위해 이스케이프 처리를 강화할 수도 있습니다.
+    message = message.trim();
+  } catch (e) {
+    console.error('Message decoding error:', e);
+  }
 
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 

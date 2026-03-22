@@ -8,15 +8,20 @@ cd ..
 
 # 인자 처리: $1은 개수, $2는 주제
 COUNT=${1:-10}
-TOPIC=${2:-"엔터, 스포츠, 테크, 경제, 정치"}
+TOPIC=${2:-"엔터,스포츠,테크,경제,정치"}
 
+# 환경 변수 설정 (인코딩 및 터미널 안정화)
+export LANG=ko_KR.UTF-8
+export PYTHONIOENCODING=utf-8
+export CI=true
+
+echo "🚀 Trend Eng 뉴스 생성 자동화를 시작합니다..."
 echo "⏳ Gemini CLI를 호출하여 ${COUNT}개의 뉴스를 생성 중입니다..."
 echo "📍 대상 주제: ${TOPIC}"
 
 # 상세 프롬프트와 함께 Gemini 실행 (-y: 자동 승인 모드)
-# 인자를 포함하여 프롬프트를 구성합니다.
-# -m 옵션을 사용하여 최신 고성능 모델(gemini-3.1-pro-preview)을 지정합니다.
-/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin/gemini -m "gemini-3.1-pro-preview" -y "/news 총합 ${COUNT}개만 만들어줘. 트렌드는 ${TOPIC} 중에서 선정하되, **반드시 google_web_search로 오늘(2026-03-20)의 실시간 속보를 검색해서 작성**해줘. 뻔한 기술 업데이트나 예전 소식은 절대 금지하며, 구체적인 수치와 최신 인물 동정이 포함된 '날 것'의 뉴스여야 해. 설명은 SKILL.md 지침에 따라 문장당 5문장 이상 아주 자세하고 꼼꼼하게 넣어줘. 반드시 기사당 10문장을 꽉 채워야 하며, aieng.cafe24.com 서버 반영과 텔레그램 결과 보고(기사 제목, 주제, 문장수 포함)까지 완벽하게 마쳐줘."
+# 모델을 특정하지 않고 시스템 기본 모델(Auto)을 사용하도록 변경
+/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin/gemini -y "/news 총합 ${COUNT}개 생성. 주제: ${TOPIC}. 모든 규칙은 /news 스킬 지침(SKILL.md)을 엄격히 준수하여 운영 서버(aieng.cafe24app.com)에 반영해줘."
 
 if [ $? -eq 0 ]; then
     echo "✅ 모든 작업이 성공적으로 완료되었습니다."

@@ -216,6 +216,15 @@ const db = new sqlite3.Database(dbPath, (err) => {
                                 }
                             });
                         }
+                        if (!columnNames.includes('quiz')) {
+                            db.run("ALTER TABLE trends ADD COLUMN quiz TEXT", (err) => {
+                                if (err) {
+                                    console.error('Error adding quiz column:', err.message);
+                                } else {
+                                    console.log('Added quiz column to trends table');
+                                }
+                            });
+                        }
                     });
                 }
             });
