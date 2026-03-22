@@ -39,7 +39,7 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: (process.env.SERVER_URL || 'http://localhost:' + (process.env.PORT || 8001)) + '/auth/google/callback'
+    callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     const user = {
         id: profile.id,
@@ -76,7 +76,7 @@ app.get('/auth/google/callback',
 app.get('/auth/logout', (req, res) => {
     req.logout((err) => {
         if (err) console.error('[Auth] Logout error:', err.message);
-        res.redirect('/');
+        req.session.destroy(() => res.redirect('/'));
     });
 });
 
