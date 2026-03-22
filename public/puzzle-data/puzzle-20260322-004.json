@@ -1,0 +1,74 @@
+{
+  "version": "1.0",
+  "meta": {
+    "id": "puzzle-20260322-004",
+    "title": "자유주제 영어 퀴즈",
+    "date": "2026-03-22",
+    "category": "general",
+    "difficulty": "medium",
+    "source": "자유주제"
+  },
+  "grid": { "width": 8, "height": 8 },
+  "words": [
+    {
+      "id": "w1",
+      "number": 1,
+      "answer": "TIGER",
+      "clue": "The world's largest wild cat, with orange and black stripes.",
+      "clue_ko": "세계에서 가장 큰 야생 고양이로, 주황색과 검은 줄무늬가 특징.",
+      "direction": "down",
+      "startX": 1,
+      "startY": 0
+    },
+    {
+      "id": "w2",
+      "number": 2,
+      "answer": "GLOBE",
+      "clue": "A round model showing the map of the entire world.",
+      "clue_ko": "전 세계 지도를 보여주는 둥근 모형.",
+      "direction": "across",
+      "startX": 1,
+      "startY": 2
+    },
+    {
+      "id": "w3",
+      "number": 3,
+      "answer": "EARTH",
+      "clue": "The third planet from the sun; the planet we live on.",
+      "clue_ko": "태양으로부터 세 번째 행성; 우리가 사는 별.",
+      "direction": "down",
+      "startX": 5,
+      "startY": 2
+    },
+    {
+      "id": "w4",
+      "number": 4,
+      "answer": "RIVER",
+      "clue": "A large natural stream of water that flows toward the sea.",
+      "clue_ko": "바다를 향해 흐르는 큰 자연 물줄기.",
+      "direction": "across",
+      "startX": 1,
+      "startY": 4
+    },
+    {
+      "id": "w5",
+      "number": 5,
+      "answer": "VINE",
+      "clue": "A climbing plant with long stems, like a grapevine or ivy.",
+      "clue_ko": "포도나 담쟁이처럼 길게 뻗어 올라가는 덩굴 식물.",
+      "direction": "down",
+      "startX": 3,
+      "startY": 4
+    },
+    {
+      "id": "w6",
+      "number": 6,
+      "answer": "LEAN",
+      "clue": "To tilt or rest against something at an angle.",
+      "clue_ko": "무언가에 기대거나 비스듬히 기울이다.",
+      "direction": "across",
+      "startX": 0,
+      "startY": 6
+    }
+  ]
+}

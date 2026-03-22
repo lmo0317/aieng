@@ -60,5 +60,15 @@
       "wordCount": 6,
       "source": "초등영어"
     }
+    ,{
+      "id": "puzzle-20260322-004",
+      "file": "puzzle-20260322-004.json",
+      "title": "자유주제 영어 퀴즈",
+      "category": "general",
+      "difficulty": "medium",
+      "date": "2026-03-22",
+      "wordCount": 6,
+      "source": "자유주제"
+    }
   ]
 }
