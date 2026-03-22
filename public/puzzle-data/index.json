@@ -71,6 +71,15 @@
       "source": "자유주제"
     }
     ,{
+      "id": "puzzle-20260323-002",
+      "file": "puzzle-20260323-002.json",
+      "title": "게임 영어 퀴즈",
+      "category": "general",
+      "difficulty": "medium",
+      "date": "2026-03-23",
+      "wordCount": 6,
+      "source": "게임"
+    },{
       "id": "puzzle-20260323-001",
       "file": "puzzle-20260323-001.json",
       "title": "초등영어 퀴즈",
