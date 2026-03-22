@@ -6,8 +6,13 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
-const SERVER_URL = process.env.SERVER_URL || 'http://aieng.cafe24app.com';
+let SERVER_URL = process.env.SERVER_URL || 'http://aieng.cafe24app.com';
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY || '';
+
+// 로컬 환경(localhost)인 경우 운영 서버로 강제 전환 (운영 반영을 위해)
+if (SERVER_URL.includes('localhost') || SERVER_URL.includes('127.0.0.1')) {
+  SERVER_URL = 'http://aieng.cafe24app.com';
+}
 
 if (!ADMIN_API_KEY) {
   console.error('ADMIN_API_KEY not found in .env');

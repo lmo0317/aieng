@@ -22,6 +22,7 @@ const trendsClients = new Map();
 
 app.use(cors());
 app.use(express.json());
+app.set('trust proxy', 1); // reverse proxy 뒤에서 올바른 protocol 감지
 
 // 세션 미들웨어
 app.use(session({
@@ -65,13 +66,16 @@ passport.deserializeUser((id, done) => {
     });
 });
 
-// Google OAuth 라우트
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// Google OAuth 라우트 (요청 host 기반으로 callbackURL 자동 구성)
+const getCallbackURL = (req) => `${req.protocol}://${req.get('host')}/auth/google/callback`;
 
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/?login=failed' }),
-    (req, res) => res.redirect('/')
-);
+app.get('/auth/google', (req, res, next) => {
+    passport.authenticate('google', { scope: ['profile', 'email'], callbackURL: getCallbackURL(req) })(req, res, next);
+});
+
+app.get('/auth/google/callback', (req, res, next) => {
+    passport.authenticate('google', { failureRedirect: '/?login=failed', callbackURL: getCallbackURL(req) })(req, res, next);
+}, (req, res) => res.redirect('/'));
 
 app.get('/auth/logout', (req, res) => {
     req.logout((err) => {
