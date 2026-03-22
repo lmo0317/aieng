@@ -615,16 +615,15 @@ button:active { background: #3e3eb0; }
 .voca-list { display: flex; flex-direction: column; }
 .voca-item {
     display: flex;
-    align-items: baseline;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.2rem;
     padding: 0.75rem 0;
     border-bottom: 1px solid var(--border-2);
-    flex-wrap: wrap;
 }
 .voca-item:first-child { padding-top: 0; }
 .voca-item:last-child  { border-bottom: none; padding-bottom: 0; }
 
-.voca-head { display: flex; align-items: baseline; gap: 6px; flex-shrink: 0; }
+.voca-head { display: flex; align-items: baseline; gap: 6px; }
 .voca-word {
     font-family: var(--font-en);
     font-weight: 700;
@@ -637,8 +636,8 @@ button:active { background: #3e3eb0; }
     font-weight: 600;
     color: #b8820a;
 }
-.voca-mean { color: var(--text-2); font-size: 1rem; flex: 1; min-width: 140px; }
-.voca-tip  { font-size: 0.82rem; color: var(--text-3); width: 100%; margin-top: -0.25rem; }
+.voca-mean { color: var(--text-2); font-size: 1rem; }
+.voca-tip  { font-size: 0.82rem; color: var(--text-3); margin-top: 0.1rem; }
 
 /* ─── Controls ───────────────────────────────────────────────────────── */
 .controls { margin-top: 1.5rem; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }

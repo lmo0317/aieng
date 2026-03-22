@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trend Eng - Data Management</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="/style.css">
     <style>
         .admin-outer { max-width: 1000px; margin: 40px auto; }
         .admin-nav-bar { display: flex; background: #2c3e50; border-radius: 8px 8px 0 0; overflow: hidden; }
@@ -57,11 +57,6 @@
 </head>
 <body>
     <div class="admin-outer">
-        <nav class="admin-nav-bar">
-            <a href="/admin" class="admin-nav-item">📰 뉴스 생성</a>
-            <a href="/admin/data" class="admin-nav-item active">📊 데이터 관리</a>
-            <a href="/admin/songs" class="admin-nav-item">🎵 팝송 추가</a>
-        </nav>
         <div class="admin-container">
             <div class="header-flex">
                 <h1>📊 통합 데이터 관리</h1>
@@ -71,6 +66,7 @@
             <div class="sub-tabs">
                 <div class="sub-tab active" onclick="switchTab('news')">📰 뉴스 데이터</div>
                 <div class="sub-tab" onclick="switchTab('songs')">🎵 팝송 데이터</div>
+                <div class="sub-tab" onclick="switchTab('puzzle')">🧩 퍼즐 데이터</div>
             </div>
 
             <!-- 뉴스 관리 섹션 -->
@@ -85,6 +81,13 @@
                 <div id="songs-loading" class="loading-spinner" style="display:none;">팝송 데이터를 불러오는 중...</div>
                 <div id="songs-content"></div>
                 <div id="songs-empty" class="empty-state" style="display:none;">저장된 팝송 데이터가 없습니다.</div>
+            </div>
+
+            <!-- 퍼즐 관리 섹션 -->
+            <div id="puzzle-section" class="data-section">
+                <div id="puzzle-loading" class="loading-spinner" style="display:none;">퍼즐 데이터를 불러오는 중...</div>
+                <div id="puzzle-content"></div>
+                <div id="puzzle-empty" class="empty-state" style="display:none;">저장된 퍼즐 데이터가 없습니다.</div>
             </div>
         </div>
     </div>
@@ -122,7 +125,8 @@
 
         function refreshCurrentTab() {
             if (currentTab === 'news') fetchNews();
-            else fetchSongs();
+            else if (currentTab === 'songs') fetchSongs();
+            else fetchPuzzles();
         }
 
         async function fetchNews() {
@@ -278,12 +282,75 @@
         async function deleteSong(id) {
             if (!confirm(`팝송 데이터를 삭제하시겠습니까?`)) return;
             try {
-                const response = await fetch(`/api/trends/${id}`, { // 경로 수정
+                const response = await fetch(`/api/trends/${id}`, {
                     method: 'DELETE',
                     headers: { 'x-admin-key': adminApiKey }
                 });
                 const result = await response.json();
                 if (result.success) { alert('팝송 데이터가 삭제되었습니다.'); fetchSongs(); }
+            } catch (err) { alert('삭제 실패'); }
+        }
+
+        async function fetchPuzzles() {
+            const contentEl = document.getElementById('puzzle-content');
+            const loadingEl = document.getElementById('puzzle-loading');
+            const emptyEl = document.getElementById('puzzle-empty');
+
+            contentEl.innerHTML = '';
+            loadingEl.style.display = 'block';
+            emptyEl.style.display = 'none';
+
+            try {
+                const response = await fetch('/puzzle-data/index.json');
+                const data = await response.json();
+                loadingEl.style.display = 'none';
+
+                const puzzles = data.puzzles || [];
+                if (puzzles.length === 0) { emptyEl.style.display = 'block'; return; }
+
+                puzzles.sort((a, b) => b.date.localeCompare(a.date));
+
+                const section = document.createElement('div');
+                section.className = 'item-group';
+                section.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-label">🧩 전체 퍼즐 리스트</span>
+                        <span style="font-size:12px; color:#95a5a6;">총 ${puzzles.length}개</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>제목</th>
+                                <th style="width:100px;">날짜</th>
+                                <th style="width:60px; text-align:center;">작업</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${puzzles.map(p => `
+                                <tr>
+                                    <td style="font-weight:600;">${p.title}</td>
+                                    <td style="color:#888;">${p.date}</td>
+                                    <td style="text-align:center;">
+                                        <button class="btn-delete" onclick="deletePuzzle('${p.id}')">삭제</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                contentEl.appendChild(section);
+            } catch (err) {
+                loadingEl.innerHTML = `<span style="color:red">오류: ${err.message}</span>`;
+            }
+        }
+
+        async function deletePuzzle(id) {
+            if (!confirm('퍼즐을 삭제하시겠습니까?')) return;
+            try {
+                const response = await fetch(`/api/puzzle/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (result.success) fetchPuzzles();
+                else alert('삭제 실패: ' + result.error);
             } catch (err) { alert('삭제 실패'); }
         }
 

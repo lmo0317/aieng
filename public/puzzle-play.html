@@ -461,12 +461,6 @@
 
         /* ── 셀 클릭 ── */
         function onCellClick(x, y, data) {
-            if (data.isHint) {
-                activeCell = { x, y };
-                selectWord(data.words[0], x, y);
-                buildLetterGrid(null);
-                return;
-            }
             if (activeCell && activeCell.x === x && activeCell.y === y && data.words.length > 1) {
                 const other = data.words.find(w => w !== activeWord) || data.words[0];
                 selectWord(other, x, y);
@@ -475,7 +469,7 @@
                 selectWord(keep, x, y);
             }
             activeCell = { x, y };
-            buildLetterGrid(data.ans);
+            buildLetterGrid(data.isHint ? null : data.ans);
         }
 
         /* ── 단어 선택 ── */

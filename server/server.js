@@ -30,6 +30,32 @@ app.get('/chat',  (req, res) => res.sendFile(pub('chat.html')));
 app.get('/puzzle',      (req, res) => res.sendFile(pub('puzzle.html')));
 app.get('/puzzle/play', (req, res) => res.sendFile(pub('puzzle-play.html')));
 
+// 퍼즐 데이터 삭제 API
+const fs = require('fs');
+const puzzleIndexPath = path.join(__dirname, '..', 'public', 'puzzle-data', 'index.json');
+
+app.delete('/api/puzzle/:id', (req, res) => {
+    try {
+        const { id } = req.params;
+        const raw = fs.readFileSync(puzzleIndexPath, 'utf8');
+        const index = JSON.parse(raw);
+        const target = index.puzzles.find(p => p.id === id);
+        if (!target) return res.status(404).json({ success: false, error: 'Not found' });
+
+        // JSON 파일 삭제 (sample.json은 보호)
+        if (target.file && target.file !== 'sample.json') {
+            const filePath = path.join(__dirname, '..', 'public', 'puzzle-data', target.file);
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        }
+
+        index.puzzles = index.puzzles.filter(p => p.id !== id);
+        fs.writeFileSync(puzzleIndexPath, JSON.stringify(index, null, 2));
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
 const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'Trend Eng'의 1타 AI 영어 강사입니다.
 주제: {topic}
 난이도: {difficulty} (level1: 왕초보 / level2: 초보 / level3: 중급 / level4: 고급 / level5: 원어민)

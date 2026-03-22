@@ -24,11 +24,12 @@
 
         .puzzle-card {
             background: #fff;
-            border-radius: 16px;
-            padding: 20px 22px;
+            border-radius: 12px;
+            padding: 14px 18px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            justify-content: space-between;
+            gap: 12px;
             cursor: pointer;
             border: 1.5px solid #f0f0f0;
             transition: all 0.18s;
@@ -41,55 +42,19 @@
             transform: translateY(-2px);
         }
 
-        .puzzle-card-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .puzzle-card-body { flex: 1; min-width: 0; }
         .puzzle-card-title {
             font-size: 15px;
             font-weight: 700;
-            margin: 0 0 6px;
+            margin: 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .puzzle-card-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .badge {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 9px;
-            border-radius: 20px;
-        }
-        .badge-diff-easy   { background: #dcfce7; color: #16a34a; }
-        .badge-diff-medium { background: #dbeafe; color: #1d4ed8; }
-        .badge-diff-hard   { background: #fef3c7; color: #d97706; }
-        .badge-cat { background: #f3f4f6; color: #555; }
-
-        .puzzle-card-info {
+        .puzzle-card-date {
             font-size: 12px;
             color: #aaa;
-            margin-top: 4px;
-        }
-
-        .puzzle-card-arrow {
-            color: #ccc;
-            font-size: 20px;
             flex-shrink: 0;
         }
-        .puzzle-card:hover .puzzle-card-arrow { color: #6366f1; }
 
         .empty-state {
             text-align: center;
@@ -127,17 +92,6 @@
 
     <script src="/js/nav.js"></script>
     <script>
-        const CATEGORY_ICON = {
-            tech:          { icon: '💻', bg: '#ede9fe', color: '#7c3aed' },
-            sports:        { icon: '⚽', bg: '#dcfce7', color: '#16a34a' },
-            entertainment: { icon: '🎬', bg: '#fce7f3', color: '#db2777' },
-            politics:      { icon: '🏛️', bg: '#e0f2fe', color: '#0284c7' },
-            economy:       { icon: '📈', bg: '#fef9c3', color: '#ca8a04' },
-            popsong:       { icon: '🎵', bg: '#fce7f3', color: '#db2777' },
-            general:       { icon: '📰', bg: '#f3f4f6', color: '#555' },
-        };
-        const DIFF_LABEL = { easy: '초급', medium: '중급', hard: '고급' };
-
         async function loadList() {
             const container = document.getElementById('puzzle-list');
             try {
@@ -155,31 +109,15 @@
                 }
 
                 container.innerHTML = '';
-                // 최신순 정렬
                 puzzles.sort((a, b) => b.date.localeCompare(a.date));
 
                 puzzles.forEach(p => {
-                    const cat = CATEGORY_ICON[p.category] || CATEGORY_ICON.general;
-                    const diffClass = `badge-diff-${p.difficulty || 'medium'}`;
-                    const diffLabel = DIFF_LABEL[p.difficulty] || '중급';
-
                     const card = document.createElement('a');
                     card.className = 'puzzle-card';
                     card.href = `/puzzle/play?data=puzzle-data/${p.file}`;
                     card.innerHTML = `
-                        <div class="puzzle-card-icon" style="background:${cat.bg};">${cat.icon}</div>
-                        <div class="puzzle-card-body">
-                            <div class="puzzle-card-title">${p.title}</div>
-                            <div class="puzzle-card-meta">
-                                <span class="badge ${diffClass}">${diffLabel}</span>
-                                <span class="badge badge-cat">${p.category}</span>
-                                ${p.wordCount ? `<span class="badge badge-cat">단어 ${p.wordCount}개</span>` : ''}
-                            </div>
-                            <div class="puzzle-card-info">
-                                ${p.date}${p.source ? ' · ' + p.source : ''}
-                            </div>
-                        </div>
-                        <div class="puzzle-card-arrow">›</div>
+                        <div class="puzzle-card-title">${p.title}</div>
+                        <div class="puzzle-card-date">${p.date}</div>
                     `;
                     container.appendChild(card);
                 });
