@@ -1,0 +1,74 @@
+{
+  "version": "1.0",
+  "meta": {
+    "id": "puzzle-20260322-003",
+    "title": "초등영어 퀴즈",
+    "date": "2026-03-22",
+    "category": "general",
+    "difficulty": "easy",
+    "source": "초등영어"
+  },
+  "grid": { "width": 8, "height": 8 },
+  "words": [
+    {
+      "id": "w1",
+      "number": 1,
+      "answer": "BEST",
+      "clue": "The greatest of all; better than everything else.",
+      "clue_ko": "모든 것 중 가장 뛰어난; 최고의.",
+      "direction": "across",
+      "startX": 1,
+      "startY": 0
+    },
+    {
+      "id": "w2",
+      "number": 2,
+      "answer": "EVER",
+      "clue": "At any time; has it ___ happened to you?",
+      "clue_ko": "언제든지; '지금까지 그런 일이 있었나요?'처럼 쓰이는 단어.",
+      "direction": "down",
+      "startX": 2,
+      "startY": 0
+    },
+    {
+      "id": "w3",
+      "number": 3,
+      "answer": "TOAD",
+      "clue": "A frog-like animal with bumpy skin that lives on land.",
+      "clue_ko": "울퉁불퉁한 피부를 가진 두꺼비.",
+      "direction": "down",
+      "startX": 4,
+      "startY": 0
+    },
+    {
+      "id": "w4",
+      "number": 4,
+      "answer": "BIRD",
+      "clue": "A feathered animal with wings that can fly.",
+      "clue_ko": "날개와 깃털이 있어 하늘을 날 수 있는 동물.",
+      "direction": "across",
+      "startX": 1,
+      "startY": 3
+    },
+    {
+      "id": "w5",
+      "number": 4,
+      "answer": "BEAN",
+      "clue": "A small seed in a pod you can cook and eat.",
+      "clue_ko": "꼬투리 안에 있는 씨앗; 조리해서 먹는 콩.",
+      "direction": "down",
+      "startX": 1,
+      "startY": 3
+    },
+    {
+      "id": "w6",
+      "number": 5,
+      "answer": "SAFE",
+      "clue": "Not in danger; protected from harm.",
+      "clue_ko": "위험하지 않은; 안전한.",
+      "direction": "across",
+      "startX": 0,
+      "startY": 5
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "version": "1.0",
+  "meta": {
+    "id": "puzzle-20260322-002",
+    "title": "초등영어 퀴즈",
+    "date": "2026-03-22",
+    "category": "general",
+    "difficulty": "easy",
+    "source": "초등영어"
+  },
+  "grid": { "width": 8, "height": 8 },
+  "words": [
+    {
+      "id": "w1",
+      "number": 1,
+      "answer": "SAND",
+      "clue": "Tiny grains found at the beach or in a sandbox.",
+      "clue_ko": "해변이나 모래놀이터에서 볼 수 있는 작은 알갱이.",
+      "direction": "down",
+      "startX": 2,
+      "startY": 0
+    },
+    {
+      "id": "w2",
+      "number": 2,
+      "answer": "BELL",
+      "clue": "A metal object that rings and makes a clear sound.",
+      "clue_ko": "딸랑거리는 소리를 내는 금속 물체.",
+      "direction": "down",
+      "startX": 4,
+      "startY": 0
+    },
+    {
+      "id": "w3",
+      "number": 3,
+      "answer": "CAKE",
+      "clue": "A sweet baked dessert, often served at birthday parties.",
+      "clue_ko": "생일 파티에서 즐겨 먹는 달콤한 구운 디저트.",
+      "direction": "across",
+      "startX": 1,
+      "startY": 1
+    },
+    {
+      "id": "w4",
+      "number": 4,
+      "answer": "MEDAL",
+      "clue": "A round flat prize given to a winner in a contest.",
+      "clue_ko": "대회 우승자에게 주는 둥글고 납작한 상.",
+      "direction": "across",
+      "startX": 0,
+      "startY": 3
+    },
+    {
+      "id": "w5",
+      "number": 4,
+      "answer": "MILK",
+      "clue": "A white drink from cows, good for strong bones.",
+      "clue_ko": "소에서 얻는 흰색 음료로 뼈를 튼튼하게 합니다.",
+      "direction": "down",
+      "startX": 0,
+      "startY": 3
+    },
+    {
+      "id": "w6",
+      "number": 5,
+      "answer": "KITE",
+      "clue": "A toy that flies high in the sky on a long string.",
+      "clue_ko": "긴 줄에 달려 하늘 높이 날리는 장난감.",
+      "direction": "across",
+      "startX": 0,
+      "startY": 6
+    }
+  ]
+}
