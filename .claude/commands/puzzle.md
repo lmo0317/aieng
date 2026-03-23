@@ -75,7 +75,7 @@ metadata:
 
 ## 퍼즐 ID 생성
 
-1. `GET /api/puzzles`를 호출해 오늘 날짜(YYYY-MM-DD)의 퍼즐 수 확인
+1. `GET http://aieng.cafe24app.com/api/puzzles`를 호출해 오늘 날짜(YYYY-MM-DD)의 퍼즐 수 확인
 2. 퍼즐 ID 형식: `puzzle-{YYYYMMDD}-{NNN}` (예: `puzzle-20260322-001`)
 3. 오늘 날짜 퍼즐이 없으면 `001`부터 시작
 
@@ -169,7 +169,7 @@ metadata:
 
 ## DB 저장
 
-퍼즐 JSON을 구성한 뒤 `POST /api/puzzles`에 저장합니다.
+퍼즐 JSON을 구성한 뒤 **원격 서버** `http://aieng.cafe24app.com/api/puzzles`에 저장합니다.
 
 요청 바디:
 ```json
@@ -187,7 +187,7 @@ metadata:
 
 Bash로 저장:
 ```bash
-curl -s -X POST http://localhost:8001/api/puzzles \
+curl -s -X POST http://aieng.cafe24app.com/api/puzzles \
   -H "Content-Type: application/json" \
   -d '{...}'
 ```
@@ -207,8 +207,8 @@ ID: {puzzle-id}
   1. WORD - English clue (한국어 힌트)
   2. ...
 
-게임 링크: /puzzle/play?id={puzzle-id}
-퍼즐 목록: /puzzle
+게임 링크: http://aieng.cafe24app.com/puzzle/play?id={puzzle-id}
+퍼즐 목록: http://aieng.cafe24app.com/puzzle
 ```
 
 ---
