@@ -1,9 +1,9 @@
 ---
 name: puzzle
 description: >
-  영어 가로세로 퍼즐(크로스워드)을 AI로 생성하고 Trend Eng 프로젝트에 저장합니다.
+  영어 가로세로 퍼즐(크로스워드)을 AI로 생성하고 Trend Eng 프로젝트 DB에 저장합니다.
   사용자가 /puzzle을 실행하면 주제, 카테고리, 난이도를 파싱하고 크로스워드 레이아웃을
-  설계하여 JSON 파일로 저장한 뒤 게임 URL을 안내합니다.
+  설계하여 POST /api/puzzles로 DB에 저장한 뒤 게임 URL을 안내합니다.
 license: Apache-2.0
 compatibility: Designed for Claude Code - Trend Eng project
 allowed-tools: Read Write Edit Glob Bash
@@ -69,16 +69,13 @@ metadata:
 
 ## 프로젝트 경로 확인
 
-- 퍼즐 데이터 디렉터리: `public/puzzle-data/`
-- 인덱스 파일: `public/puzzle-data/index.json`
-
-`public/puzzle-data/index.json`이 없으면: "Trend Eng 프로젝트 디렉터리에서 실행해 주세요."
+서버가 실행 중인지 확인합니다. API 엔드포인트: `POST /api/puzzles`
 
 ---
 
 ## 퍼즐 ID 생성
 
-1. `public/puzzle-data/index.json`을 읽어 오늘 날짜(YYYY-MM-DD)의 퍼즐 수 확인
+1. `GET /api/puzzles`를 호출해 오늘 날짜(YYYY-MM-DD)의 퍼즐 수 확인
 2. 퍼즐 ID 형식: `puzzle-{YYYYMMDD}-{NNN}` (예: `puzzle-20260322-001`)
 3. 오늘 날짜 퍼즐이 없으면 `001`부터 시작
 
@@ -170,24 +167,32 @@ metadata:
 
 ---
 
-## 파일 저장
+## DB 저장
 
-**퍼즐 JSON**: `public/puzzle-data/{puzzle-id}.json`
+퍼즐 JSON을 구성한 뒤 `POST /api/puzzles`에 저장합니다.
 
-**인덱스 업데이트** (`public/puzzle-data/index.json`의 `puzzles` 배열에 추가):
-
+요청 바디:
 ```json
 {
   "id": "{puzzle-id}",
-  "file": "{puzzle-id}.json",
   "title": "{title}",
   "category": "{category}",
   "difficulty": "{difficulty}",
-  "date": "{date}",
+  "date": "{YYYY-MM-DD}",
   "wordCount": {단어 수},
-  "source": "{topic}"
+  "source": "{topic}",
+  "data": { /* 전체 퍼즐 JSON 객체 */ }
 }
 ```
+
+Bash로 저장:
+```bash
+curl -s -X POST http://localhost:8001/api/puzzles \
+  -H "Content-Type: application/json" \
+  -d '{...}'
+```
+
+응답 `{"success":true,"id":"puzzle-..."}` 확인 후 진행.
 
 ---
 
@@ -202,7 +207,7 @@ ID: {puzzle-id}
   1. WORD - English clue (한국어 힌트)
   2. ...
 
-게임 링크: /puzzle/play?data=puzzle-data/{puzzle-id}.json
+게임 링크: /puzzle/play?id={puzzle-id}
 퍼즐 목록: /puzzle
 ```
 

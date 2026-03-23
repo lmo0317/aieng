@@ -117,30 +117,51 @@ app.get('/chat',  (req, res) => res.sendFile(pub('chat.html')));
 app.get('/puzzle',      (req, res) => res.sendFile(pub('puzzle.html')));
 app.get('/puzzle/play', (req, res) => res.sendFile(pub('puzzle-play.html')));
 
-// 퍼즐 데이터 삭제 API
+// ─── Puzzle API (DB-based) ────────────────────────────────────────────────────
 const fs = require('fs');
-const puzzleIndexPath = path.join(__dirname, '..', 'public', 'puzzle-data', 'index.json');
+const puzzleDataDir = path.join(__dirname, '..', 'public', 'puzzle-data');
 
-app.delete('/api/puzzle/:id', (req, res) => {
-    try {
-        const { id } = req.params;
-        const raw = fs.readFileSync(puzzleIndexPath, 'utf8');
-        const index = JSON.parse(raw);
-        const target = index.puzzles.find(p => p.id === id);
-        if (!target) return res.status(404).json({ success: false, error: 'Not found' });
+// GET /api/puzzles - 퍼즐 목록
+app.get('/api/puzzles', (req, res) => {
+    db.all("SELECT id, title, category, difficulty, date, wordCount, source, createdAt FROM puzzles ORDER BY date DESC, createdAt DESC", (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ puzzles: rows || [] });
+    });
+});
 
-        // JSON 파일 삭제 (sample.json은 보호)
-        if (target.file && target.file !== 'sample.json') {
-            const filePath = path.join(__dirname, '..', 'public', 'puzzle-data', target.file);
-            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+// GET /api/puzzles/:id - 퍼즐 상세 (전체 데이터)
+app.get('/api/puzzles/:id', (req, res) => {
+    db.get("SELECT * FROM puzzles WHERE id = ?", [req.params.id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: 'Not found' });
+        try { row.data = JSON.parse(row.data); } catch (e) {}
+        res.json({ puzzle: row });
+    });
+});
+
+// POST /api/puzzles - 퍼즐 저장 (스킬에서 호출)
+app.post('/api/puzzles', (req, res) => {
+    const { id, title, category, difficulty, date, wordCount, source, data } = req.body;
+    if (!id || !title || !data) return res.status(400).json({ error: 'id, title, data are required' });
+    const dataStr = typeof data === 'string' ? data : JSON.stringify(data);
+    const today = date || new Date().toISOString().split('T')[0];
+    db.run(
+        "INSERT OR REPLACE INTO puzzles (id, title, category, difficulty, date, wordCount, source, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [id, title, category || 'general', difficulty || 'medium', today, wordCount || 0, source || '', dataStr],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ success: true, id });
         }
+    );
+});
 
-        index.puzzles = index.puzzles.filter(p => p.id !== id);
-        fs.writeFileSync(puzzleIndexPath, JSON.stringify(index, null, 2));
+// DELETE /api/puzzles/:id - 퍼즐 삭제
+app.delete('/api/puzzles/:id', (req, res) => {
+    db.run("DELETE FROM puzzles WHERE id = ?", [req.params.id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        if (this.changes === 0) return res.status(404).json({ success: false, error: 'Not found' });
         res.json({ success: true });
-    } catch (e) {
-        res.status(500).json({ success: false, error: e.message });
-    }
+    });
 });
 
 const DEFAULT_PROMPT = `당신은 트렌드 맞춤형 영어 학습 서비스 'Trend Eng'의 1타 AI 영어 강사입니다.
@@ -786,30 +807,30 @@ app.post('/api/sync', async (req, res) => {
         try {
             const remoteIndexRes = await axios.get(`${REMOTE_BASE}/puzzle-data/index.json`, { timeout: 15000 });
             const remoteIndex = remoteIndexRes.data;
-
-            const localIndexRaw = fs.readFileSync(puzzleIndexPath, 'utf8');
-            const localIndex = JSON.parse(localIndexRaw);
-            const localIds = new Set(localIndex.puzzles.map(p => p.id));
+            const localIds = await new Promise((resolve) => {
+                db.all("SELECT id FROM puzzles", (err, rows) => resolve(new Set((rows || []).map(r => r.id))));
+            });
 
             for (const puzzle of (remoteIndex.puzzles || [])) {
                 if (localIds.has(puzzle.id)) { results.skipped++; continue; }
+                if (!puzzle.file) continue;
 
-                if (puzzle.file && puzzle.file !== 'sample.json') {
-                    try {
-                        const fileRes = await axios.get(`${REMOTE_BASE}/puzzle-data/${puzzle.file}`, { timeout: 15000 });
-                        const filePath = path.join(__dirname, '..', 'public', 'puzzle-data', puzzle.file);
-                        fs.writeFileSync(filePath, JSON.stringify(fileRes.data, null, 2));
-                    } catch (e) {
-                        results.errors.push(`퍼즐 파일 실패: ${puzzle.file}`);
-                        continue;
-                    }
+                try {
+                    const fileRes = await axios.get(`${REMOTE_BASE}/puzzle-data/${puzzle.file}`, { timeout: 15000 });
+                    const data = fileRes.data;
+                    const dataStr = JSON.stringify(data);
+                    await new Promise((resolve) => {
+                        db.run(
+                            "INSERT OR IGNORE INTO puzzles (id, title, category, difficulty, date, wordCount, source, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                            [puzzle.id, puzzle.title, puzzle.category || 'general', puzzle.difficulty || 'medium',
+                             puzzle.date || '', puzzle.wordCount || 0, puzzle.source || '', dataStr],
+                            (err) => { if (!err) results.puzzles++; resolve(); }
+                        );
+                    });
+                } catch (e) {
+                    results.errors.push(`퍼즐 파일 실패: ${puzzle.file}`);
                 }
-
-                localIndex.puzzles.push(puzzle);
-                results.puzzles++;
             }
-
-            fs.writeFileSync(puzzleIndexPath, JSON.stringify(localIndex, null, 2));
         } catch (e) { results.errors.push('퍼즐 동기화 실패: ' + e.message); }
 
         res.json({ success: true, results });
@@ -818,10 +839,37 @@ app.post('/api/sync', async (req, res) => {
     }
 });
 
+// ─── Puzzle JSON → DB 마이그레이션 (최초 1회) ────────────────────────────────
+async function migratePuzzleJsonToDB() {
+    const indexPath = path.join(puzzleDataDir, 'index.json');
+    if (!fs.existsSync(indexPath)) return;
+    try {
+        const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+        for (const p of (index.puzzles || [])) {
+            const exists = await new Promise(r => db.get("SELECT id FROM puzzles WHERE id = ?", [p.id], (e, row) => r(!!row)));
+            if (exists) continue;
+            if (!p.file) continue;
+            const filePath = path.join(puzzleDataDir, p.file);
+            if (!fs.existsSync(filePath)) continue;
+            try {
+                const data = fs.readFileSync(filePath, 'utf8');
+                db.run(
+                    "INSERT OR IGNORE INTO puzzles (id, title, category, difficulty, date, wordCount, source, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    [p.id, p.title, p.category || 'general', p.difficulty || 'medium',
+                     p.date || '', p.wordCount || 0, p.source || '', data],
+                    (err) => { if (!err) console.log(`[Puzzle] Migrated: ${p.id}`); }
+                );
+            } catch (e) { console.error(`[Puzzle] Migration failed for ${p.id}:`, e.message); }
+        }
+        console.log('[Puzzle] JSON → DB migration done.');
+    } catch (e) { console.error('[Puzzle] Migration error:', e.message); }
+}
+
 // Start Express Server
 const server = app.listen(PORT, '0.0.0.0', async () => {
     console.log(`Express Server running on http://0.0.0.0:${PORT} (Dynamic Gemini Mode)`);
     console.log(`Service URL: http://aieng.cafe24app.com`);
+    migratePuzzleJsonToDB();
     
     // WebSocket for AI Tutor Chat
     const wss = new WebSocket.Server({ server, path: '/ws/chat' });

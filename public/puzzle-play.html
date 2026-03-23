@@ -337,8 +337,19 @@
         /* ── 로드 ── */
         async function loadPuzzle() {
             const params = new URLSearchParams(location.search);
-            const dataUrl = params.get('data');
-            if (dataUrl) {
+            const puzzleId = params.get('id');
+            const dataUrl = params.get('data'); // 구버전 호환
+            if (puzzleId) {
+                try {
+                    const res = await fetch(`/api/puzzles/${encodeURIComponent(puzzleId)}`);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const { puzzle } = await res.json();
+                    puzzleData = normalizeSchema(puzzle.data);
+                } catch (e) {
+                    showToast('로드 실패: ' + e.message, '#dc2626');
+                    puzzleData = getDefaultPuzzle();
+                }
+            } else if (dataUrl) {
                 try {
                     const url = dataUrl.startsWith('/') ? dataUrl : '/' + dataUrl;
                     const res = await fetch(url);

@@ -4,8 +4,8 @@ const puzzleContainer = document.getElementById('puzzle-container');
 
 async function fetchPuzzles() {
     try {
-        const res = await fetch('/puzzle-data/index.json');
-        if (!res.ok) throw new Error('index.json not found');
+        const res = await fetch('/api/puzzles');
+        if (!res.ok) throw new Error('API error');
         const { puzzles } = await res.json();
         renderPuzzles(puzzles || []);
     } catch (e) {
@@ -38,7 +38,7 @@ function renderPuzzles(puzzles) {
             <button class="trend-start-btn">퍼즐 시작 →</button>`;
 
         card.querySelector('.trend-start-btn').addEventListener('click', () => {
-            window.location.href = `/puzzle/play?data=puzzle-data/${p.file}`;
+            window.location.href = `/puzzle/play?id=${p.id}`;
         });
 
         puzzleContainer.appendChild(card);
