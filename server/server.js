@@ -460,7 +460,7 @@ function broadcastTrendsProgress(status, message, current, total) {
 
 // Trends API
 app.get('/api/trends/saved', (req, res) => {
-    db.all("SELECT * FROM trends WHERE sentences IS NOT NULL AND type = 'news' ORDER BY date DESC, category ASC", (err, rows) => {
+    db.all("SELECT * FROM trends WHERE sentences IS NOT NULL AND type = 'news' ORDER BY date DESC, id DESC", (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ trends: rows || [] });
     });

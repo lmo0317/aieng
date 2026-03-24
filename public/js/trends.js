@@ -87,7 +87,7 @@ function renderNextPage() {
         const dateGrid = document.createElement('div');
         dateGrid.className = 'trends-date-grid';
 
-        const sorted = trendsPagination.groups[date].sort((a, b) => (a.category || '').localeCompare(b.category || ''));
+        const sorted = trendsPagination.groups[date];
         sorted.forEach(item => {
             const card = document.createElement('div');
             card.className = 'realtime-trend-card';
