@@ -275,7 +275,12 @@ function showQuiz() {
         quizOptions.classList.remove('hidden');
         quizInputContainer.classList.add('hidden');
         quizOptions.innerHTML = '';
-        q.options.forEach(opt => {
+        const shuffledOptions = [...q.options];
+        for (let i = shuffledOptions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+        }
+        shuffledOptions.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'quiz-option-btn';
             btn.textContent = opt;

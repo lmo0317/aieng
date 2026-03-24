@@ -112,6 +112,19 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 });
             }
 
+            // Create Puzzles table
+            db.run(`CREATE TABLE IF NOT EXISTS puzzles (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                category TEXT DEFAULT 'general',
+                difficulty TEXT DEFAULT 'medium',
+                date TEXT,
+                wordCount INTEGER DEFAULT 0,
+                source TEXT,
+                data TEXT NOT NULL,
+                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`);
+
             // Create Users table (keep for existing data)
             db.run(`CREATE TABLE IF NOT EXISTS users (
                 id TEXT PRIMARY KEY,
