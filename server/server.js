@@ -771,16 +771,14 @@ app.post('/api/sync', async (req, res) => {
         try {
             const newsRes = await axios.get(`${REMOTE_BASE}/api/trends/saved`, { timeout: 15000 });
             const trends = newsRes.data.trends || [];
+            await new Promise((resolve) => db.run("DELETE FROM trends WHERE type = 'news'", resolve));
             for (const t of trends) {
                 await new Promise((resolve) => {
-                    db.get("SELECT id FROM trends WHERE title = ? AND type = 'news'", [t.title], (err, row) => {
-                        if (row) { results.skipped++; return resolve(); }
-                        db.run(
-                            "INSERT INTO trends (title, category, summary, keywords, sentences, quiz, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'news')",
-                            [t.title, t.category, t.summary, t.keywords, t.sentences, t.quiz || '[]', t.difficulty || 'level3', t.date],
-                            (err) => { if (!err) results.news++; resolve(); }
-                        );
-                    });
+                    db.run(
+                        "INSERT INTO trends (title, category, summary, keywords, sentences, quiz, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'news')",
+                        [t.title, t.category, t.summary, t.keywords, t.sentences, t.quiz || '[]', t.difficulty || 'level3', t.date],
+                        (err) => { if (!err) results.news++; resolve(); }
+                    );
                 });
             }
         } catch (e) { results.errors.push('뉴스 동기화 실패: ' + e.message); }
@@ -789,46 +787,38 @@ app.post('/api/sync', async (req, res) => {
         try {
             const songsRes = await axios.get(`${REMOTE_BASE}/api/songs/saved`, { timeout: 15000 });
             const songs = songsRes.data.songs || [];
+            await new Promise((resolve) => db.run("DELETE FROM trends WHERE type = 'song'", resolve));
             for (const s of songs) {
                 await new Promise((resolve) => {
-                    db.get("SELECT id FROM trends WHERE title = ? AND type = 'song'", [s.title], (err, row) => {
-                        if (row) { results.skipped++; return resolve(); }
-                        db.run(
-                            "INSERT INTO trends (title, summary, difficulty, sentences, quiz, image, type) VALUES (?, ?, ?, ?, ?, ?, 'song')",
-                            [s.title, s.summary, s.difficulty || 'level3', s.sentences, s.quiz || '[]', s.image || null],
-                            (err) => { if (!err) results.songs++; resolve(); }
-                        );
-                    });
+                    db.run(
+                        "INSERT INTO trends (title, summary, difficulty, sentences, quiz, image, type) VALUES (?, ?, ?, ?, ?, ?, 'song')",
+                        [s.title, s.summary, s.difficulty || 'level3', s.sentences, s.quiz || '[]', s.image || null],
+                        (err) => { if (!err) results.songs++; resolve(); }
+                    );
                 });
             }
         } catch (e) { results.errors.push('팝송 동기화 실패: ' + e.message); }
 
         // 3. Sync puzzle data
         try {
-            const remoteIndexRes = await axios.get(`${REMOTE_BASE}/puzzle-data/index.json`, { timeout: 15000 });
-            const remoteIndex = remoteIndexRes.data;
-            const localIds = await new Promise((resolve) => {
-                db.all("SELECT id FROM puzzles", (err, rows) => resolve(new Set((rows || []).map(r => r.id))));
-            });
-
-            for (const puzzle of (remoteIndex.puzzles || [])) {
-                if (localIds.has(puzzle.id)) { results.skipped++; continue; }
-                if (!puzzle.file) continue;
-
+            const remotePuzzlesRes = await axios.get(`${REMOTE_BASE}/api/puzzles`, { timeout: 15000 });
+            const remotePuzzles = remotePuzzlesRes.data.puzzles || [];
+            await new Promise((resolve) => db.run("DELETE FROM puzzles", resolve));
+            for (const puzzle of remotePuzzles) {
                 try {
-                    const fileRes = await axios.get(`${REMOTE_BASE}/puzzle-data/${puzzle.file}`, { timeout: 15000 });
-                    const data = fileRes.data;
-                    const dataStr = JSON.stringify(data);
+                    const detailRes = await axios.get(`${REMOTE_BASE}/api/puzzles/${encodeURIComponent(puzzle.id)}`, { timeout: 15000 });
+                    const detail = detailRes.data.puzzle;
+                    const dataStr = typeof detail.data === 'string' ? detail.data : JSON.stringify(detail.data);
                     await new Promise((resolve) => {
                         db.run(
-                            "INSERT OR IGNORE INTO puzzles (id, title, category, difficulty, date, wordCount, source, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                            [puzzle.id, puzzle.title, puzzle.category || 'general', puzzle.difficulty || 'medium',
-                             puzzle.date || '', puzzle.wordCount || 0, puzzle.source || '', dataStr],
+                            "INSERT INTO puzzles (id, title, category, difficulty, date, wordCount, source, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                            [detail.id, detail.title, detail.category || 'general', detail.difficulty || 'medium',
+                             detail.date || '', detail.wordCount || 0, detail.source || '', dataStr],
                             (err) => { if (!err) results.puzzles++; resolve(); }
                         );
                     });
                 } catch (e) {
-                    results.errors.push(`퍼즐 파일 실패: ${puzzle.file}`);
+                    results.errors.push(`퍼즐 상세 실패: ${puzzle.id}`);
                 }
             }
         } catch (e) { results.errors.push('퍼즐 동기화 실패: ' + e.message); }

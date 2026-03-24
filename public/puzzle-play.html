@@ -413,7 +413,9 @@
             activeWord = null; activeCell = null;
 
             // 셀 크기: 너비/높이 모두 고려
-            const availW = Math.min(window.innerWidth - 36, 460);
+            // container max-width(480) + padding(20) + grid-section padding(16) + border(4) = 40px
+            const containerW = Math.min(window.innerWidth, 480);
+            const availW = containerW - 40;
             // 높이는 topbar(44) + padding(12) + clue(40) + letters(~96) + bottombar(38) + gaps(30) = 260
             const availH = window.innerHeight - 260;
             const maxFromW = Math.floor(availW / puzzleData.gridSize);
