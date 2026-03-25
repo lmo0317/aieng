@@ -7,6 +7,9 @@ cd "$(dirname "$0")"
 PROJECT_ROOT="$(pwd)/.."
 cd "$PROJECT_ROOT"
 
+# 크론잡 실행을 위한 환경 변수 설정 (NVM 노드 경로 추가)
+export PATH="/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin:$PATH"
+
 # .env 파일에서 환경 변수 로드
 if [ -f ".env" ]; then
     export $(grep -v '^#' .env | xargs)

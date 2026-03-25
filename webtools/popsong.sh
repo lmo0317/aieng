@@ -6,6 +6,9 @@
 cd "$(dirname "$0")"
 cd ..
 
+# 크론잡 실행을 위한 환경 변수 설정 (NVM 노드 경로 추가)
+export PATH="/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin:$PATH"
+
 # 인자 처리: $1은 가수 이름, $2는 노래 제목
 ARTIST=${1:-"Artist"}
 SONG=${2:-"Song Title"}
