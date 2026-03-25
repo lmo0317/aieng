@@ -58,6 +58,9 @@ function renderRealtimeTrends(trends) {
         trendsPagination.groups[date].push(item);
     });
     trendsPagination.allDates = Object.keys(trendsPagination.groups).sort((a, b) => b.localeCompare(a));
+    trendsPagination.allDates.forEach(d => {
+        trendsPagination.groups[d].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    });
     trendsPagination.currentPage = 0;
     renderNextPage();
 }
