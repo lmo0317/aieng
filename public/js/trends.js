@@ -96,6 +96,10 @@ function renderNextPage() {
             const kwHtml   = keywords.map(kw => `<span class="trend-keyword">${kw}</span>`).join('');
             const _cat = normCat(item.category);
             const catClass = `cat-${_cat.replace(/\s+/g, '')}`;
+            const timeStr = item.createdAt ? (() => {
+                const d = new Date(item.createdAt.replace(' ', 'T') + 'Z');
+                return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            })() : '';
 
             card.innerHTML = `
                 <div class="trend-card-top">
@@ -106,6 +110,7 @@ function renderNextPage() {
                     ${kwHtml ? `<div class="trend-card-keywords">${kwHtml}</div>` : ''}
                 </div>
                 <div class="trend-card-footer">
+                    ${timeStr ? `<span class="trend-card-time">${timeStr}</span>` : ''}
                     <button class="trend-start-btn">학습 시작 →</button>
                 </div>`;
 

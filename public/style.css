@@ -349,7 +349,16 @@ body .chat-message-text, body .chat-messages {
 .trend-keyword { color: var(--text-3); font-size: 0.7rem; }
 .trend-keyword::before { content: "#"; }
 
-.trend-card-footer { flex-shrink: 0; }
+.trend-card-footer { flex-shrink: 0; display: flex; flex-direction: row; align-items: center; gap: 8px; }
+
+.trend-card-time {
+    font-size: 0.85rem;
+    color: var(--text-2);
+    font-family: var(--font-body);
+    font-weight: 500;
+    margin-right: auto;
+}
+
 
 .trend-start-btn {
     background: var(--surface-2);
@@ -423,8 +432,9 @@ body .chat-message-text, body .chat-messages {
     .realtime-trend-card { flex-direction: column; align-items: flex-start; padding: 16px; gap: 10px; }
     .trend-card-top { width: auto; }
     .trend-card-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-    .trend-card-footer { width: 100%; }
-    .trend-start-btn { width: 100%; text-align: center; padding: 10px; }
+    .trend-card-footer { width: 100%; flex-wrap: wrap; }
+    .trend-card-time { width: 100%; margin-right: 0; }
+    .trend-start-btn { flex: 1; text-align: center; padding: 10px; }
     .trend-card-row { flex-wrap: wrap; }
     .row-date { min-width: unset; }
     .row-title { width: 100%; white-space: normal; }
