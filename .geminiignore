@@ -1,0 +1,2 @@
+# Allow Gemini to read output directory even if ignored by git
+!output/

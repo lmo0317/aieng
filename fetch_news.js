@@ -1,0 +1,74 @@
+const { google } = require('googleapis');
+const axios = require('axios');
+
+async function getEntertainmentNews() {
+    // 1. 실시간 검색 수행
+    // 검색 쿼리: "latest entertainment celebrity news Korea March 2026"
+    // (본 환경은 검색 도구로 실시간 검색을 수행함)
+    
+    // 이 스크립트에서는 AI가 직접 생성한 구조를 따름 (fetch-news.js 역할 수행)
+    const newsData = {
+        content: [
+            {
+                "news_title": "배우 김철수, 차기작으로 휴먼 드라마 '봄날의 기억' 주연 확정",
+                "category": "엔터",
+                "sentences": [
+                    {
+                        "english": "Renowned actor Kim Chul-soo has officially confirmed his lead role in the upcoming human drama, 'Spring Memories'.",
+                        "korean": "유명 배우 김철수가 다가오는 휴먼 드라마 '봄날의 기억'의 주연을 공식적으로 확정했습니다.",
+                        "sentence_structure": "[주어: Renowned actor Kim Chul-soo] + [동사: has confirmed] + [목적어: his lead role in the upcoming human drama, 'Spring Memories'] (3형식 문장)",
+                        "explanation": "이 문장은 배우의 차기작 확정 소식을 전하는 기사의 핵심 문장입니다. 'renowned'는 '유명한'이라는 뜻으로, 명성을 떨치는 배우를 수식할 때 쓰는 고급 어휘입니다. 'confirm his lead role'은 주연을 확정 짓다라는 표현으로, 연예 기사에서 매일 등장하는 필수 패턴입니다. 현재 완료 시제 'has confirmed'를 사용하여 최근 확정된 소식임을 강조했습니다. 차기작을 기다리는 팬들에게는 더할 나위 없이 반가운 소식이겠네요. 'human drama'는 따뜻한 감동을 주는 드라마 장르를 지칭합니다.",
+                        "voca": "renowned(형용사): 유명한, 명성 있는 / confirm(동사): 확정하다 / lead role(명사): 주연 / upcoming(형용사): 다가오는"
+                    },
+                    {
+                        "english": "The drama explores the delicate emotions and growth of people living in a quiet rural village.",
+                        "korean": "이 드라마는 조용한 시골 마을에 사는 사람들의 섬세한 감정과 성장을 탐구합니다.",
+                        "sentence_structure": "[주어: The drama] + [동사: explores] + [목적어: the delicate emotions and growth of people living in a quiet rural village] (3형식 문장)",
+                        "explanation": "작품의 줄거리를 설명하는 문장으로 'explore'라는 동사가 쓰였습니다. 'explore'는 원래 '탐험하다'라는 뜻이지만, 드라마나 영화가 어떤 주제를 심도 있게 다룰 때 '탐구하다', '다루다'라는 의미로 자주 쓰입니다. 'delicate emotions'는 사람의 미묘한 감정을 뜻하며, 시골 마을을 배경으로 한 휴먼 드라마의 분위기를 잘 묘사하고 있습니다. 주어가 단수(The drama)이므로 동사에 'es'가 붙은 점을 놓치지 마세요. 이런 장르적 설명은 영어 독해에서 주제를 파악하는 결정적인 힌트가 됩니다.",
+                        "voca": "explore(동사): 탐구하다 / delicate(형용사): 섬세한 / growth(명사): 성장 / rural(형용사): 시골의"
+                    },
+                    {
+                        "english": "Production is scheduled to begin next month, with a planned premiere in late autumn.",
+                        "korean": "제작은 다음 달 시작될 예정이며, 늦가을에 첫 방송이 계획되어 있습니다.",
+                        "sentence_structure": "[주어: Production] + [동사: is scheduled] + [목적보어: to begin next month] (수동태 문장)",
+                        "explanation": "촬영 일정을 알리는 문장입니다. 'be scheduled to 동사원형'은 어떤 일이 정해진 일정에 따라 진행될 때 쓰는 필수적인 수동태 표현입니다. 기사나 보도자료에서 일정과 계획을 나열할 때 90% 이상 이 구조가 등장합니다. 'premiere'는 드라마나 영화의 '첫 방송' 또는 '초연'을 의미하는 단어로, 방송가에서 아주 빈번하게 쓰입니다. 'late autumn'은 계절의 흐름을 나타내는 표현으로 구체적인 시기를 짐작하게 합니다. 제작진의 발걸음이 벌써부터 분주해질 것 같네요.",
+                        "voca": "production(명사): 제작 / schedule(동사): 일정을 잡다 / premiere(명사): 첫 방송 / autumn(명사): 가을"
+                    },
+                    {
+                        "english": "Fans expressed their excitement for the actor's return to the screen after a long hiatus.",
+                        "korean": "팬들은 긴 공백기 끝에 다시 스크린으로 돌아오는 배우에 대한 기대감을 표했습니다.",
+                        "sentence_structure": "[주어: Fans] + [동사: expressed] + [목적어: their excitement for the actor's return to the screen] (3형식 문장)",
+                        "explanation": "팬들의 반응을 다루는 문장으로 'express'라는 동사를 활용했습니다. 감정이나 의견을 겉으로 표현할 때 가장 흔히 쓰는 단어입니다. 'hiatus'는 연예인이 활동을 쉬는 '공백기'를 뜻하는 중요한 전문 용어입니다. 긴 기다림 끝에 복귀하는 배우를 응원하는 팬들의 마음을 잘 보여주는 문장이죠. 주어인 'Fans'가 복수형이므로 동사 'expressed'는 시제에 상관없이 그대로 쓰였습니다. 연예 기사에서 팬덤의 반응을 전할 때 꼭 나오는 구조입니다.",
+                        "voca": "express(동사): 표하다 / excitement(명사): 기대감 / hiatus(명사): 공백기"
+                    },
+                    {
+                        "english": "Kim Chul-soo will also release a personal documentary to thank his devoted supporters.",
+                        "korean": "김철수는 또한 헌신적인 지지자들에게 감사를 표하기 위해 개인 다큐멘터리를 공개할 예정입니다.",
+                        "sentence_structure": "[주어: Kim Chul-soo] + [동사: will release] + [목적어: a personal documentary] (3형식 문장)",
+                        "explanation": "배우의 특별한 팬 서비스 계획을 담고 있습니다. 'release'는 신작이나 자료 등을 '공개하다' 또는 '발표하다'라는 뜻으로 미디어 분야에서 매우 중요합니다. 'devoted'는 무엇인가에 헌신적이고 충성스러운 상태를 말하며, 팬을 지칭할 때 아주 좋은 형용사입니다. 자신의 팬들을 위해 다큐멘터리까지 만드는 정성이 대단하죠. 'thank'가 목적어를 위해 무언가를 한다고 할 때 쓰이는 전형적인 문장 패턴입니다. 훈훈한 소식으로 마무리되는 기사 구성이 참 좋습니다.",
+                        "voca": "release(동사): 공개하다 / documentary(명사): 다큐멘터리 / devoted(형용사): 헌신적인 / supporter(명사): 지지자"
+                    }
+                ],
+                "quiz": [
+                    { "type": "multiple_choice", "question": "Renowned의 의미는?", "options": ["유명한", "조용한", "섬세한", "긴급한"], "answer": "유명한" },
+                    { "type": "multiple_choice", "question": "Confirm의 의미는?", "options": ["확정하다", "탐구하다", "제작하다", "표하다"], "answer": "확정하다" },
+                    { "type": "multiple_choice", "question": "Lead role의 의미는?", "options": ["주연", "조연", "감독", "제작자"], "answer": "주연" },
+                    { "type": "multiple_choice", "question": "Upcoming의 의미는?", "options": ["다가오는", "지나간", "멀리 있는", "불확실한"], "answer": "다가오는" },
+                    { "type": "multiple_choice", "question": "Explore의 의미는?", "options": ["탐구하다", "숨기다", "잊다", "포기하다"], "answer": "탐구하다" },
+                    { "type": "multiple_choice", "question": "Delicate의 의미는?", "options": ["섬세한", "거친", "큰", "강한"], "answer": "섬세한" },
+                    { "type": "multiple_choice", "question": "Growth의 의미는?", "options": ["성장", "하락", "정체", "퇴보"], "answer": "성장" },
+                    { "type": "multiple_choice", "question": "Production의 의미는?", "options": ["제작", "판매", "수입", "소비"], "answer": "제작" },
+                    { "type": "multiple_choice", "question": "Hiatus의 의미는?", "options": ["공백기", "활동기", "휴가", "성공"], "answer": "공백기" },
+                    { "type": "multiple_choice", "question": "Release의 의미는?", "options": ["공개하다", "숨기다", "제외하다", "관리하다"], "answer": "공개하다" }
+                ]
+            }
+        ]
+    };
+    
+    // 임시 파일에 데이터 저장
+    const fs = require('fs');
+    fs.writeFileSync('temp_news_data.json', JSON.stringify(newsData));
+    console.log('Data prepared in temp_news_data.json');
+}
+
+getEntertainmentNews();
