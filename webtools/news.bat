@@ -24,8 +24,8 @@ echo 📍 설정: %COUNT%개, 주제: %TOPIC%
 
 :: 절대 경로 대신 현재 폴더의 상위(루트)를 기준으로 gemini 실행
 cd ..
-:: 고성능 모델(gemini-3.1-pro-preview)을 사용하여 상세 지침을 완벽하게 수행합니다.
-gemini -m "gemini-3.1-pro-preview" -y "/news 요청한 수량 총합 %COUNT%개만 정확히 생성해줘. 주제: %TOPIC%. 모든 규칙은 /news 스킬 지침(SKILL.md)을 엄격히 준수하여 운영 서버(aieng.cafe24app.com)에 반영해줘."
+:: 고성능 모델(gemini-3.1-flash-lite-preview)을 사용하여 상세 지침을 완벽하게 수행합니다.
+gemini -m "gemini-3.1-flash-lite-preview" -y "/news 요청한 수량 총합 %COUNT%개만 정확히 생성해줘. 주제: %TOPIC%. 모든 규칙은 /news 스킬 지침(SKILL.md)을 엄격히 준수하여 운영 서버(aieng.cafe24app.com)에 반영해줘."
 
 
 if %ERRORLEVEL% equ 0 (
