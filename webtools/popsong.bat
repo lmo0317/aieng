@@ -1,5 +1,5 @@
 @echo off
-:: Trend Eng Popsong Automation (Minimalist)
+:: Trend Eng Popsong Automation (Minimalist - Fixed Path)
 chcp 65001 > nul
 
 :: 인자 처리: 입력된 모든 인자를 노래 정보(가수 - 제목)로 취급
@@ -12,8 +12,10 @@ if "%SONG_INFO%"=="" (
 
 echo 🚀 Trend Eng 팝송 '%SONG_INFO%' 분석 및 생성을 시작합니다... (Auto Mode)
 
-:: 루트 디렉토리로 이동하여 gemini 실행
-cd ..
+:: 배치 파일이 있는 폴더(%~dp0)의 상위 폴더(루트)로 이동
+cd /d "%~dp0.."
+
+:: 이제 루트 디렉토리에서 gemini 실행 (스킬 인식 보장)
 gemini -y "/popsong %SONG_INFO%"
 
 if %ERRORLEVEL% equ 0 (

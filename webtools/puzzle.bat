@@ -1,5 +1,5 @@
 @echo off
-:: Trend Eng Puzzle Automation (Minimalist)
+:: Trend Eng Puzzle Automation (Minimalist - Fixed Path)
 chcp 65001 > nul
 
 :: 인자 처리: 입력된 모든 인자를 퍼즐 주제나 명령어로 취급
@@ -11,8 +11,10 @@ if "%PUZZLE_ARG%"=="" (
     echo 🚀 Trend Eng 퍼즐 '%PUZZLE_ARG%' 생성을 시작합니다... (Auto Mode)
 )
 
-:: 루트 디렉토리로 이동하여 gemini 실행
-cd ..
+:: 배치 파일이 있는 폴더(%~dp0)의 상위 폴더(루트)로 이동
+cd /d "%~dp0.."
+
+:: 이제 루트 디렉토리에서 gemini 실행 (스킬 인식 보장)
 gemini -y "/puzzle %PUZZLE_ARG%"
 
 if %ERRORLEVEL% equ 0 (
