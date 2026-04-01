@@ -61,6 +61,8 @@ app.get('/admin/logout', (req, res) => {
 
 app.get('/settings.html', requireAdminAuth, (req, res) => res.sendFile(pub('settings.html')));
 app.get('/data.html', requireAdminAuth, (req, res) => res.sendFile(pub('data.html')));
+app.get('/admin', requireAdminAuth, (req, res) => res.sendFile(pub('admin.html')));
+app.get('/admin/', requireAdminAuth, (req, res) => res.sendFile(pub('admin.html')));
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -72,7 +74,6 @@ app.get('/learn', (req, res) => res.sendFile(pub('learn.html')));
 app.get('/chat',  (req, res) => res.sendFile(pub('chat.html')));
 app.get('/puzzle',      (req, res) => res.sendFile(pub('puzzle.html')));
 app.get('/puzzle/play', (req, res) => res.sendFile(pub('puzzle-play.html')));
-app.get('/admin',       requireAdminAuth, (req, res) => res.sendFile(pub('admin.html')));
 
 // ─── Puzzle API (DB-based) ────────────────────────────────────────────────────
 const fs = require('fs');
