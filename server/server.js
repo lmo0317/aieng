@@ -6,6 +6,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const WebSocket = require('ws');
 const https = require('https');
+const crypto = require('crypto');
 const db = require('./database');
 
 // Load .env from parent directory
@@ -21,11 +22,45 @@ app.use(cors());
 app.use(express.json());
 app.set('trust proxy', 1); // reverse proxy 뒤에서 올바른 protocol 감지
 
-// 관리자 페이지 접근 허용
-const requireAdmin = (req, res, next) => next();
+// ─── 관리자 인증 ──────────────────────────────────────────────────────────────
+function parseCookies(req) {
+    const cookies = {};
+    (req.headers.cookie || '').split(';').forEach(c => {
+        const [k, ...v] = c.trim().split('=');
+        if (k) cookies[k.trim()] = decodeURIComponent(v.join('=').trim());
+    });
+    return cookies;
+}
 
-app.get('/settings.html', requireAdmin, (req, res) => res.sendFile(pub('settings.html')));
-app.get('/data.html', requireAdmin, (req, res) => res.sendFile(pub('data.html')));
+function getAdminToken() {
+    const pwd = process.env.ADMIN_PASSWORD || '';
+    const secret = process.env.SESSION_SECRET || 'default-secret';
+    return crypto.createHmac('sha256', secret).update(pwd).digest('hex');
+}
+
+const requireAdminAuth = (req, res, next) => {
+    const cookies = parseCookies(req);
+    if (cookies['admin_token'] === getAdminToken()) return next();
+    res.redirect('/admin/login');
+};
+
+app.get('/admin/login', (req, res) => res.sendFile(pub('admin-login.html')));
+app.post('/api/admin/login', express.urlencoded({ extended: false }), (req, res) => {
+    const { password } = req.body;
+    if (password && password === (process.env.ADMIN_PASSWORD || '')) {
+        const token = getAdminToken();
+        res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`);
+        return res.redirect('/admin');
+    }
+    res.redirect('/admin/login?error=1');
+});
+app.get('/admin/logout', (req, res) => {
+    res.setHeader('Set-Cookie', 'admin_token=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict');
+    res.redirect('/admin/login');
+});
+
+app.get('/settings.html', requireAdminAuth, (req, res) => res.sendFile(pub('settings.html')));
+app.get('/data.html', requireAdminAuth, (req, res) => res.sendFile(pub('data.html')));
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -37,6 +72,7 @@ app.get('/learn', (req, res) => res.sendFile(pub('learn.html')));
 app.get('/chat',  (req, res) => res.sendFile(pub('chat.html')));
 app.get('/puzzle',      (req, res) => res.sendFile(pub('puzzle.html')));
 app.get('/puzzle/play', (req, res) => res.sendFile(pub('puzzle-play.html')));
+app.get('/admin',       requireAdminAuth, (req, res) => res.sendFile(pub('admin.html')));
 
 // ─── Puzzle API (DB-based) ────────────────────────────────────────────────────
 const fs = require('fs');

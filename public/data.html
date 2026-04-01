@@ -53,6 +53,23 @@
 
         .loading-spinner { text-align: center; padding: 50px; color: #3498db; font-weight: bold; }
         .empty-state { text-align: center; padding: 60px; color: #bdc3c7; font-size: 15px; }
+
+        .sync-panel { background: #f8f9fa; border: 1px solid #e0e0ee; border-radius: 10px; padding: 18px 20px; margin-bottom: 20px; }
+        .sync-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .sync-panel-title { font-weight: 700; font-size: 15px; color: #2c3e50; }
+        .sync-panel-desc { font-size: 12px; color: #7f8c8d; margin-top: 3px; }
+        .btn-sync { background: #5b5bd6; color: white; border: none; padding: 9px 18px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+        .btn-sync:hover { opacity: 0.88; }
+        .btn-sync:disabled { opacity: 0.5; cursor: not-allowed; }
+        .sync-progress-bar { height: 4px; background: #e0e0ee; border-radius: 4px; margin-top: 12px; overflow: hidden; }
+        .sync-progress-fill { height: 100%; background: #5b5bd6; border-radius: 4px; transition: width 0.4s; width: 0%; }
+        .sync-status-text { font-size: 12px; color: #7f8c8d; margin: 6px 0 0; }
+        .sync-result { margin-top: 10px; font-size: 13px; }
+        .sync-result-success { background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 6px; padding: 12px 14px; color: #3730a3; }
+        .sync-result-error { background: #fff5f5; border: 1px solid #fab1a0; border-radius: 6px; padding: 12px 14px; color: #c0392b; }
+        .sync-counts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .sync-count { background: white; border: 1px solid #c7d2fe; border-radius: 4px; padding: 3px 10px; font-size: 12px; color: #4338ca; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -61,6 +78,22 @@
             <div class="header-flex">
                 <h1>📊 통합 데이터 관리</h1>
                 <button onclick="refreshCurrentTab()" class="btn-refresh">🔄 새로고침</button>
+            </div>
+
+            <!-- 데이터 동기화 패널 -->
+            <div class="sync-panel">
+                <div class="sync-panel-header">
+                    <div>
+                        <div class="sync-panel-title">🔄 원격 데이터 동기화</div>
+                        <div class="sync-panel-desc">aieng.cafe24app.com의 최신 데이터를 가져옵니다. 중복 데이터는 자동으로 건너뜁니다.</div>
+                    </div>
+                    <button id="sync-btn" class="btn-sync">🔄 동기화</button>
+                </div>
+                <div id="sync-status" class="hidden">
+                    <div class="sync-progress-bar"><div id="sync-progress-fill" class="sync-progress-fill"></div></div>
+                    <p id="sync-status-text" class="sync-status-text">연결 중...</p>
+                </div>
+                <div id="sync-result" class="sync-result hidden"></div>
             </div>
 
             <div class="sub-tabs">
@@ -353,6 +386,70 @@
                 else alert('삭제 실패: ' + result.error);
             } catch (err) { alert('삭제 실패'); }
         }
+
+        // 데이터 동기화
+        const syncBtn = document.getElementById('sync-btn');
+        const syncStatus = document.getElementById('sync-status');
+        const syncProgressFill = document.getElementById('sync-progress-fill');
+        const syncStatusText = document.getElementById('sync-status-text');
+        const syncResult = document.getElementById('sync-result');
+
+        syncBtn.addEventListener('click', async () => {
+            syncBtn.disabled = true;
+            syncBtn.textContent = '동기화 중...';
+            syncStatus.classList.remove('hidden');
+            syncResult.classList.add('hidden');
+            syncProgressFill.style.width = '0%';
+            syncStatusText.textContent = 'aieng.cafe24app.com에 연결 중...';
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                if (progress < 85) { progress += 5; syncProgressFill.style.width = progress + '%'; }
+            }, 400);
+
+            try {
+                const response = await fetch('/api/sync', { method: 'POST' });
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    throw new Error(`서버 응답 오류 (${response.status}): 서버를 재시작해주세요.`);
+                }
+                const data = await response.json();
+
+                clearInterval(progressInterval);
+                syncProgressFill.style.width = '100%';
+
+                if (data.success) {
+                    const r = data.results;
+                    const errMsg = r.errors && r.errors.length > 0
+                        ? `<div style="margin-top:6px;font-size:11px;color:#c0392b;">⚠️ 오류: ${r.errors.join(', ')}</div>` : '';
+                    syncResult.innerHTML = `
+                        <div class="sync-result-success">
+                            <strong>✅ 동기화 완료!</strong>
+                            <div class="sync-counts">
+                                <span class="sync-count">📰 뉴스 <b>${r.news}개</b> 추가</span>
+                                <span class="sync-count">🎵 팝송 <b>${r.songs}개</b> 추가</span>
+                                <span class="sync-count">🧩 퍼즐 <b>${r.puzzles}개</b> 추가</span>
+                                <span class="sync-count">⏭️ 중복 <b>${r.skipped}개</b> 건너뜀</span>
+                            </div>
+                            ${errMsg}
+                        </div>`;
+                    syncStatusText.textContent = '동기화 완료!';
+                    refreshCurrentTab();
+                } else {
+                    syncResult.innerHTML = `<div class="sync-result-error">❌ 동기화 실패: ${data.error}</div>`;
+                    syncStatusText.textContent = '동기화 실패';
+                }
+                syncResult.classList.remove('hidden');
+            } catch (error) {
+                clearInterval(progressInterval);
+                syncResult.innerHTML = `<div class="sync-result-error">❌ 오류: ${error.message}</div>`;
+                syncResult.classList.remove('hidden');
+                syncStatusText.textContent = '오류 발생';
+            } finally {
+                syncBtn.disabled = false;
+                syncBtn.textContent = '🔄 동기화';
+            }
+        });
 
         window.onload = refreshCurrentTab;
     </script>
