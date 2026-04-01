@@ -4,19 +4,18 @@ chcp 65001 > nul
 
 :: 인자 처리: 입력된 모든 인자를 노래 정보(가수 - 제목)로 취급
 set "SONG_INFO=%*"
+
 if "%SONG_INFO%"=="" (
-    echo ❌ 노래 정보(가수 - 제목)를 입력해주세요.
-    echo 예: popsong.bat Bruno Mars - Die With A Smile
-    exit /b 1
+    echo 🚀 노래 정보가 입력되지 않았습니다. 영어 공부에 유용한 곡을 자동으로 선정하여 진행합니다...
+    :: 배치 파일이 있는 폴더(%~dp0)의 상위 폴더(루트)로 이동
+    cd /d "%~dp0.."
+    gemini -y "/popsong"
+) else (
+    echo 🚀 Trend Eng 팝송 '%SONG_INFO%' 분석 및 생성을 시작합니다... (Auto Mode)
+    :: 배치 파일이 있는 폴더(%~dp0)의 상위 폴더(루트)로 이동
+    cd /d "%~dp0.."
+    gemini -y "/popsong %SONG_INFO%"
 )
-
-echo 🚀 Trend Eng 팝송 '%SONG_INFO%' 분석 및 생성을 시작합니다... (Auto Mode)
-
-:: 배치 파일이 있는 폴더(%~dp0)의 상위 폴더(루트)로 이동
-cd /d "%~dp0.."
-
-:: 이제 루트 디렉토리에서 gemini 실행 (스킬 인식 보장)
-gemini -y "/popsong %SONG_INFO%"
 
 if %ERRORLEVEL% equ 0 (
     echo ✅ 작업이 완료되었습니다!
