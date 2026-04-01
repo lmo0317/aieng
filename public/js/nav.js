@@ -29,26 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 로그인 상태 확인 후 nav에 반영
-    fetch('/api/auth/status')
-        .then(r => r.json())
-        .then(data => {
-            const authBtn = document.getElementById('nav-auth-btn');
-
-            if (adminToggleBtn) {
-                adminToggleBtn.style.display = data.isAdmin ? '' : 'none';
-            }
-
-            if (!authBtn) return;
-            if (data.loggedIn) {
-                authBtn.innerHTML = `<img src="${data.user.picture}" class="nav-avatar" alt="프로필"> <span>${data.user.name.split(' ')[0]}</span>`;
-                authBtn.href = '/auth/logout';
-                authBtn.title = '로그아웃';
-            } else {
-                authBtn.innerHTML = '🔑 <span>로그인</span>';
-                authBtn.href = '/auth/google';
-                authBtn.title = '구글로 로그인';
-            }
-        })
-        .catch(() => {});
+    if (adminToggleBtn) {
+        adminToggleBtn.style.display = '';
+    }
 });

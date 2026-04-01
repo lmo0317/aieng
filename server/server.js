@@ -6,9 +6,6 @@ const path = require('path');
 const { spawn } = require('child_process');
 const WebSocket = require('ws');
 const https = require('https');
-const session = require('express-session');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('./database');
 
 // Load .env from parent directory
@@ -24,84 +21,8 @@ app.use(cors());
 app.use(express.json());
 app.set('trust proxy', 1); // reverse proxy 뒤에서 올바른 protocol 감지
 
-// 세션 미들웨어
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'trend-eng-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7일
-}));
-
-// Passport 초기화
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Passport Google OAuth 전략
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
-}, (accessToken, refreshToken, profile, done) => {
-    const user = {
-        id: profile.id,
-        name: profile.displayName,
-        email: profile.emails?.[0]?.value || '',
-        picture: profile.photos?.[0]?.value || ''
-    };
-    // DB에 upsert
-    db.run(
-        `INSERT OR REPLACE INTO users (id, name, email, picture) VALUES (?, ?, ?, ?)`,
-        [user.id, user.name, user.email, user.picture],
-        (err) => {
-            if (err) console.error('[Auth] User save error:', err.message);
-        }
-    );
-    return done(null, user);
-}));
-
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser((id, done) => {
-    db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
-        done(err, row || null);
-    });
-});
-
-// Google OAuth 라우트 (요청 host 기반으로 callbackURL 자동 구성)
-const getCallbackURL = (req) => `${req.protocol}://${req.get('host')}/auth/google/callback`;
-
-app.get('/auth/google', (req, res, next) => {
-    passport.authenticate('google', { scope: ['profile', 'email'], callbackURL: getCallbackURL(req) })(req, res, next);
-});
-
-app.get('/auth/google/callback', (req, res, next) => {
-    passport.authenticate('google', { failureRedirect: '/?login=failed', callbackURL: getCallbackURL(req) })(req, res, next);
-}, (req, res) => res.redirect('/'));
-
-app.get('/auth/logout', (req, res) => {
-    req.logout((err) => {
-        if (err) console.error('[Auth] Logout error:', err.message);
-        req.session.destroy(() => res.redirect('/'));
-    });
-});
-
-// 어드민 체크 헬퍼
-const isAdmin = (user) => user && user.email === process.env.ADMIN_EMAIL;
-
-// 인증 상태 API
-app.get('/api/auth/status', (req, res) => {
-    if (req.isAuthenticated() && req.user) {
-        res.json({ loggedIn: true, isAdmin: isAdmin(req.user), user: { name: req.user.name, email: req.user.email, picture: req.user.picture } });
-    } else {
-        res.json({ loggedIn: false, isAdmin: false });
-    }
-});
-
-// 관리자 전용 페이지 보호
-const requireAdmin = (req, res, next) => {
-    if (req.isAuthenticated() && isAdmin(req.user)) return next();
-    if (!req.isAuthenticated()) return res.redirect('/auth/google');
-    return res.status(403).sendFile(path.join(__dirname, '..', 'public', '403.html'));
-};
+// 관리자 페이지 접근 허용
+const requireAdmin = (req, res, next) => next();
 
 app.get('/settings.html', requireAdmin, (req, res) => res.sendFile(pub('settings.html')));
 app.get('/data.html', requireAdmin, (req, res) => res.sendFile(pub('data.html')));
