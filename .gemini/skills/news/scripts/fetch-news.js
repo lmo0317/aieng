@@ -27,7 +27,15 @@ async function fetchNews() {
     while ((match = itemRegex.exec(xml)) !== null && items.length < 15) {
       const itemContent = match[1];
       let title = (itemContent.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/) || [])[1] || '';
-      title = title.split(' - ')[0].trim(); // 매체명 제거
+      
+      // 구글 뉴스 타이틀은 보통 "제목 - 출처" 또는 "제목 - 출처 - 언어" 형식입니다.
+      // 단순히 split(' - ')[0]을 하면 제목 내부에 ' - '가 있을 경우 잘리는 문제가 발생합니다.
+      // 가장 마지막 ' - ' 이후가 출처일 가능성이 높으므로 뒤에서부터 자릅니다.
+      const lastDashIndex = title.lastIndexOf(' - ');
+      if (lastDashIndex !== -1) {
+        title = title.substring(0, lastDashIndex).trim();
+      }
+      
       const link = (itemContent.match(/<link>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/link>/) || [])[1] || '';
       const pubDate = (itemContent.match(/<pubDate>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/pubDate>/) || [])[1] || '';
       

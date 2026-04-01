@@ -32,6 +32,7 @@
         table { width: 100%; border-collapse: collapse; background: white; }
         th { background: #fff; padding: 12px 15px; text-align: left; font-size: 12px; color: #95a5a6; text-transform: uppercase; border-bottom: 2px solid #f1f2f6; }
         td { padding: 12px 15px; border-bottom: 1px solid #f1f2f6; color: #2d3436; font-size: 14px; }
+        td.col-title { white-space: normal !important; word-break: break-word !important; overflow: visible !important; text-overflow: clip !important; -webkit-line-clamp: unset !important; display: table-cell !important; }
         tr:hover { background-color: #f9f9f9; }
 
         .badge { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; display: inline-block; white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
@@ -216,7 +217,7 @@
                                         <td>
                                             <span class="badge badge-date">${news.date || ''}</span>
                                         </td>
-                                        <td style="font-weight:600;">${news.title}</td>
+                                        <td class="col-title" style="font-weight:600;">${news.title}</td>
                                         <td style="text-align: center;">
                                             <button class="btn-delete" onclick="deleteNews(${news.id})">삭제</button>
                                         </td>
@@ -272,7 +273,7 @@
                             ${songs.map(song => `
                                 <tr>
                                     <td style="color:#bdc3c7; font-size:11px;">${song.id}</td>
-                                    <td style="font-weight:600;">${song.title}</td>
+                                    <td class="col-title" style="font-weight:600;">${song.title}</td>
                                     <td style="text-align: center;">
                                         <button class="btn-delete" onclick="deleteSong(${song.id})">삭제</button>
                                     </td>
@@ -334,7 +335,7 @@
             emptyEl.style.display = 'none';
 
             try {
-                const response = await fetch('/puzzle-data/index.json');
+                const response = await fetch('/api/puzzles');
                 const data = await response.json();
                 loadingEl.style.display = 'none';
 
@@ -361,7 +362,7 @@
                         <tbody>
                             ${puzzles.map(p => `
                                 <tr>
-                                    <td style="font-weight:600;">${p.title}</td>
+                                    <td class="col-title" style="font-weight:600;">${p.title}</td>
                                     <td style="color:#888;">${p.date}</td>
                                     <td style="text-align:center;">
                                         <button class="btn-delete" onclick="deletePuzzle('${p.id}')">삭제</button>
@@ -380,7 +381,7 @@
         async function deletePuzzle(id) {
             if (!confirm('퍼즐을 삭제하시겠습니까?')) return;
             try {
-                const response = await fetch(`/api/puzzle/${id}`, { method: 'DELETE' });
+                const response = await fetch(`/api/puzzles/${id}`, { method: 'DELETE' });
                 const result = await response.json();
                 if (result.success) fetchPuzzles();
                 else alert('삭제 실패: ' + result.error);
