@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Trend Eng Logo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0f;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    font-family: -apple-system, sans-serif;
+  }
+  .previews { display: flex; gap: 32px; align-items: flex-end; }
+  .preview-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .preview-wrap span { color: #555; font-size: 11px; letter-spacing: 0.05em; }
+  .btns { display: flex; gap: 10px; }
+  button { background: #5b5bd6; color: #fff; border: none; padding: 10px 22px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  button.dark-btn { background: #1e1e1e; border: 1px solid #333; }
+  button:hover { opacity: 0.8; }
+</style>
+</head>
+<body>
+
+<div class="previews">
+
+  <!-- LIGHT -->
+  <div class="preview-wrap">
+    <svg id="logoLight" width="300" height="300" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+      <rect width="600" height="600" fill="#4B48D6"/>
+      <text
+        x="300" y="360"
+        text-anchor="middle"
+        dominant-baseline="auto"
+        font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+        font-size="196"
+        font-weight="900"
+        fill="white"
+        letter-spacing="-4"
+      >ENG</text>
+    </svg>
+    <span>라이트 · 600×600</span>
+  </div>
+
+  <!-- DARK -->
+  <div class="preview-wrap">
+    <svg id="logoDark" width="300" height="300" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+      <rect width="600" height="600" fill="#17171C"/>
+      <text
+        x="300" y="360"
+        text-anchor="middle"
+        font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+        font-size="196"
+        font-weight="900"
+        fill="#6E6BE8"
+        letter-spacing="-4"
+      >ENG</text>
+    </svg>
+    <span>다크모드 · #17171C</span>
+  </div>
+
+  <!-- SMALL -->
+  <div class="preview-wrap">
+    <svg width="64" height="64" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+      <rect width="600" height="600" fill="#4B48D6"/>
+      <text x="300" y="360" text-anchor="middle" font-family="'Arial Black', Arial, sans-serif" font-size="196" font-weight="900" fill="white" letter-spacing="-4">ENG</text>
+    </svg>
+    <span>64px</span>
+  </div>
+
+</div>
+
+<div class="btns">
+  <button onclick="dl('logoLight','trend-eng-logo-600x600.png')">라이트 PNG 저장</button>
+  <button class="dark-btn" onclick="dl('logoDark','trend-eng-logo-dark-600x600.png')">다크모드 PNG 저장</button>
+</div>
+
+<canvas id="c" width="600" height="600" style="display:none"></canvas>
+<script>
+function dl(id, name) {
+  const svg = document.getElementById(id);
+  const c = document.getElementById('c');
+  const ctx = c.getContext('2d');
+  const blob = new Blob([new XMLSerializer().serializeToString(svg)], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    ctx.clearRect(0,0,600,600);
+    ctx.drawImage(img,0,0,600,600);
+    URL.revokeObjectURL(url);
+    Object.assign(document.createElement('a'),{download:name,href:c.toDataURL('image/png')}).click();
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+</script>
+</body>
+</html>

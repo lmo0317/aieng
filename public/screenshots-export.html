@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Trend Eng Screenshots Export</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #111; min-height: 100vh; padding: 40px 24px; font-family: -apple-system, sans-serif; }
+  h2 { color: #666; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+  .section { margin-bottom: 48px; }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+  .item { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .item span { color: #555; font-size: 11px; }
+  svg { display: block; }
+  button {
+    background: #5b5bd6; color: #fff; border: none;
+    padding: 8px 18px; border-radius: 7px; font-size: 12px; cursor: pointer;
+  }
+  button:hover { opacity: 0.8; }
+  canvas { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     VERTICAL 1: 트렌드 뉴스 목록 (636×1048)
+═══════════════════════════════════════════ -->
+<div class="section">
+  <h2>세로형 1 — 트렌드 뉴스 목록 (636×1048)</h2>
+  <div class="row">
+    <div class="item">
+      <svg id="v1" width="318" height="524" viewBox="0 0 636 1048" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="accentG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#5b5bd6"/><stop offset="100%" stop-color="#7b7bea"/>
+          </linearGradient>
+        </defs>
+        <!-- BG -->
+        <rect width="636" height="1048" fill="#f5f5fa"/>
+
+        <!-- Status bar -->
+        <rect width="636" height="44" fill="#ffffff"/>
+        <text x="24" y="30" font-family="Arial" font-size="15" font-weight="600" fill="#1a1a2e">9:41</text>
+        <text x="590" y="30" text-anchor="end" font-family="Arial" font-size="13" fill="#1a1a2e">●●●</text>
+
+        <!-- Header -->
+        <rect width="636" height="56" y="44" fill="#ffffff"/>
+        <rect width="636" height="1" y="99" fill="#e0e0ee"/>
+        <rect x="24" y="54" width="40" height="40" rx="10" fill="#5b5bd6"/>
+        <text x="44" y="80" text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="white">E</text>
+        <text x="76" y="80" font-family="'Arial Black',Arial" font-size="20" font-weight="900" fill="#1a1a2e">TREND ENG</text>
+
+        <!-- Nav tabs -->
+        <rect width="636" height="48" y="100" fill="#ffffff"/>
+        <rect x="0" y="148" width="636" height="1" fill="#e0e0ee"/>
+        <!-- 트렌드 tab active -->
+        <text x="58" y="130" text-anchor="middle" font-family="Arial" font-size="15" font-weight="700" fill="#5b5bd6">트렌드</text>
+        <rect x="16" y="146" width="84" height="3" rx="2" fill="#5b5bd6"/>
+        <text x="172" y="130" text-anchor="middle" font-family="Arial" font-size="15" fill="#7272a0">팝송</text>
+        <text x="278" y="130" text-anchor="middle" font-family="Arial" font-size="15" fill="#7272a0">퍼즐</text>
+        <text x="380" y="130" text-anchor="middle" font-family="Arial" font-size="15" fill="#7272a0">토픽</text>
+
+        <!-- Section title -->
+        <text x="24" y="192" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="#1a1a2e">오늘의 트렌드 뉴스</text>
+        <text x="24" y="216" font-family="Arial" font-size="13" fill="#7272a0">AI가 분석한 최신 뉴스로 영어 학습</text>
+
+        <!-- Card 1 -->
+        <rect x="16" y="232" width="604" height="140" rx="16" fill="#ffffff"/>
+        <rect x="16" y="232" width="604" height="140" rx="16" fill="none" stroke="#e0e0ee" stroke-width="1.5"/>
+        <rect x="32" y="252" width="54" height="22" rx="11" fill="#ededf5"/>
+        <text x="59" y="267" text-anchor="middle" font-family="Arial" font-size="12" fill="#5b5bd6" font-weight="700">테크</text>
+        <rect x="96" y="252" width="60" height="22" rx="11" fill="rgba(91,91,214,0.1)"/>
+        <text x="126" y="267" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#5b5bd6">AI 생성</text>
+        <text x="32" y="300" font-family="Arial" font-size="17" font-weight="700" fill="#1a1a2e">Apple, 새로운 AI 기능 발표로</text>
+        <text x="32" y="322" font-family="Arial" font-size="17" font-weight="700" fill="#1a1a2e">아이폰 판매량 급등세 전망</text>
+        <text x="32" y="348" font-family="Arial" font-size="13" fill="#7272a0">난이도 Lv.3 · 학습 문장 10개</text>
+        <rect x="464" y="336" width="140" height="36" rx="18" fill="#5b5bd6"/>
+        <text x="534" y="359" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="white">학습 시작 →</text>
+
+        <!-- Card 2 -->
+        <rect x="16" y="388" width="604" height="140" rx="16" fill="#ffffff"/>
+        <rect x="16" y="388" width="604" height="140" rx="16" fill="none" stroke="#e0e0ee" stroke-width="1.5"/>
+        <rect x="32" y="408" width="54" height="22" rx="11" fill="#ededf5"/>
+        <text x="59" y="423" text-anchor="middle" font-family="Arial" font-size="12" fill="#5b5bd6" font-weight="700">스포츠</text>
+        <rect x="96" y="408" width="60" height="22" rx="11" fill="rgba(91,91,214,0.1)"/>
+        <text x="126" y="423" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#5b5bd6">AI 생성</text>
+        <text x="32" y="456" font-family="Arial" font-size="17" font-weight="700" fill="#1a1a2e">손흥민, 프리미어리그 이달의</text>
+        <text x="32" y="478" font-family="Arial" font-size="17" font-weight="700" fill="#1a1a2e">선수상 수상 화제</text>
+        <text x="32" y="504" font-family="Arial" font-size="13" fill="#7272a0">난이도 Lv.3 · 학습 문장 10개</text>
+        <rect x="464" y="492" width="140" height="36" rx="18" fill="#5b5bd6"/>
+        <text x="534" y="515" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="white">학습 시작 →</text>
+
+        <!-- Card 3 -->
+        <rect x="16" y="544" width="604" height="140" rx="16" fill="#ffffff"/>
+        <rect x="16" y="544" width="604" height="140" rx="16" fill="none" stroke="#e0e0ee" stroke-width="1.5"/>
+        <rect x="32" y="564" width="68" height="22" rx="11" fill="#ededf5"/>
+        <text x="66" y="579" text-anchor="middle" font-family="Arial" font-size="12" fill="#5b5bd6" font-weight="700">엔터테인먼트</text>
+        <rect x="110" y="564" width="60" height="22" rx="11" fill="rgba(91,91,214,0.1)"/>
+        <text x="140" y="579" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#5b5bd6">AI 생성</text>
+        <text x="32" y="612" font-family="Arial" font-size="17" font-weight="700" fill="#1a1a2e">BTS 새 앨범 글로벌 차트 1위,</text>
+        <text x="32" y="634" font-family="Arial" font-size="17" font-weight="700" fill="#1a1a2e">빌보드 핫100 진입 성공</text>
+        <text x="32" y="660" font-family="Arial" font-size="13" fill="#7272a0">난이도 Lv.2 · 학습 문장 10개</text>
+        <rect x="464" y="648" width="140" height="36" rx="18" fill="#5b5bd6"/>
+        <text x="534" y="671" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="white">학습 시작 →</text>
+
+        <!-- Card 4 -->
+        <rect x="16" y="700" width="604" height="140" rx="16" fill="#ffffff"/>
+        <rect x="16" y="700" width="604" height="140" rx="16" fill="none" stroke="#e0e0ee" stroke-width="1.5"/>
+        <rect x="32" y="720" width="54" height="22" rx="11" fill="#ededf5"/>
+        <text x="59" y="735" text-anchor="middle" font-family="Arial" font-size="12" fill="#5b5bd6" font-weight="700">경제</text>
+        <rect x="96" y="720" width="60" height="22" rx="11" fill="rgba(91,91,214,0.1)"/>
+        <text x="126" y="735" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#5b5bd6">AI 생성</text>
+        <text x="32" y="768" font-family="Arial" font-size="17" font-weight="700" fill="#1a1a2e">Fed 금리 동결 결정, 글로벌</text>
+        <text x="32" y="790" font-family="Arial" font-size="17" font-weight="700" fill="#1a1a2e">증시 일제히 반등</text>
+        <text x="32" y="816" font-family="Arial" font-size="13" fill="#7272a0">난이도 Lv.4 · 학습 문장 10개</text>
+        <rect x="464" y="804" width="140" height="36" rx="18" fill="#5b5bd6"/>
+        <text x="534" y="827" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="white">학습 시작 →</text>
+
+        <!-- Bottom nav -->
+        <rect y="984" width="636" height="64" fill="#ffffff"/>
+        <rect y="984" width="636" height="1" fill="#e0e0ee"/>
+        <text x="80" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#5b5bd6" font-weight="700">홈</text>
+        <text x="212" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">팝송</text>
+        <text x="318" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">AI 채팅</text>
+        <text x="424" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">퍼즐</text>
+        <text x="556" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">설정</text>
+      </svg>
+      <span>세로 1 — 트렌드 뉴스 목록</span>
+      <button onclick="dl('v1','screenshot-1-trends-636x1048.png',636,1048)">PNG 저장</button>
+    </div>
+
+<!-- ═══════════════════════════════════════════
+     VERTICAL 2: 영어 학습 화면 (636×1048)
+═══════════════════════════════════════════ -->
+    <div class="item">
+      <svg id="v2" width="318" height="524" viewBox="0 0 636 1048" xmlns="http://www.w3.org/2000/svg">
+        <rect width="636" height="1048" fill="#f5f5fa"/>
+        <!-- Status bar -->
+        <rect width="636" height="44" fill="#ffffff"/>
+        <text x="24" y="30" font-family="Arial" font-size="15" font-weight="600" fill="#1a1a2e">9:41</text>
+        <text x="590" y="30" text-anchor="end" font-family="Arial" font-size="13" fill="#1a1a2e">●●●</text>
+
+        <!-- Header -->
+        <rect width="636" height="56" y="44" fill="#ffffff"/>
+        <rect width="636" height="1" y="99" fill="#e0e0ee"/>
+        <text x="24" y="78" font-family="Arial" font-size="22" fill="#5b5bd6">←</text>
+        <text x="318" y="80" text-anchor="middle" font-family="'Arial Black',Arial" font-size="17" font-weight="900" fill="#1a1a2e">Apple AI 뉴스</text>
+
+        <!-- Progress -->
+        <rect x="24" y="112" width="588" height="8" rx="4" fill="#e0e0ee"/>
+        <rect x="24" y="112" width="176" height="8" rx="4" fill="#5b5bd6"/>
+        <text x="24" y="140" font-family="Arial" font-size="14" fill="#7272a0">오늘의 학습</text>
+        <text x="612" y="140" text-anchor="end" font-family="Arial" font-size="14" font-weight="700" fill="#5b5bd6">3 / 10</text>
+
+        <!-- AI label -->
+        <rect x="24" y="155" width="152" height="28" rx="14" fill="rgba(91,91,214,0.08)"/>
+        <rect x="24" y="155" width="152" height="28" rx="14" fill="none" stroke="rgba(91,91,214,0.2)" stroke-width="1"/>
+        <text x="100" y="174" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#5b5bd6">● AI가 생성한 학습 콘텐츠</text>
+
+        <!-- Main learning card -->
+        <rect x="16" y="196" width="604" height="340" rx="20" fill="#ffffff"/>
+        <rect x="16" y="196" width="604" height="340" rx="20" fill="none" stroke="#e0e0ee" stroke-width="1.5"/>
+
+        <!-- English sentence -->
+        <text x="318" y="260" text-anchor="middle" font-family="Arial" font-size="13" fill="#7272a0">영어 문장</text>
+        <text x="318" y="296" text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="700" fill="#1a1a2e">"Apple's new AI features</text>
+        <text x="318" y="326" text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="700" fill="#1a1a2e">are expected to drive</text>
+        <text x="318" y="356" text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="700" fill="#1a1a2e">significant sales growth."</text>
+
+        <!-- TTS button -->
+        <rect x="262" y="372" width="112" height="36" rx="18" fill="rgba(91,91,214,0.1)"/>
+        <text x="318" y="395" text-anchor="middle" font-family="Arial" font-size="14" fill="#5b5bd6">🔊  발음 듣기</text>
+
+        <!-- Divider -->
+        <line x1="40" y1="422" x2="596" y2="422" stroke="#f0f0f8" stroke-width="1.5"/>
+
+        <!-- Korean translation -->
+        <text x="40" y="454" font-family="Arial" font-size="13" fill="#7272a0">한국어 번역</text>
+        <text x="40" y="484" font-family="Arial" font-size="18" fill="#525278">"Apple의 새로운 AI 기능이 상당한</text>
+        <text x="40" y="508" font-family="Arial" font-size="18" fill="#525278">판매 성장을 이끌 것으로 예상됩니다."</text>
+
+        <!-- Structure card -->
+        <rect x="16" y="550" width="604" height="110" rx="16" fill="#ffffff"/>
+        <rect x="16" y="550" width="604" height="110" rx="16" fill="none" stroke="#e0e0ee" stroke-width="1.5"/>
+        <text x="40" y="578" font-family="Arial" font-size="13" font-weight="700" fill="#5b5bd6">문장 구조</text>
+        <rect x="40" y="592" width="104" height="26" rx="8" fill="rgba(91,91,214,0.1)"/>
+        <text x="92" y="609" text-anchor="middle" font-family="Arial" font-size="12" fill="#5b5bd6">주어: Apple's</text>
+        <rect x="156" y="592" width="130" height="26" rx="8" fill="rgba(91,91,214,0.07)"/>
+        <text x="221" y="609" text-anchor="middle" font-family="Arial" font-size="12" fill="#7272a0">동사: are expected</text>
+        <rect x="40" y="628" width="580" height="20" rx="4" fill="#f5f5fa"/>
+        <text x="52" y="642" font-family="Arial" font-size="12" fill="#7272a0">be expected to + 동사원형: ~할 것으로 예상되다</text>
+
+        <!-- Vocabulary card -->
+        <rect x="16" y="674" width="604" height="120" rx="16" fill="#ffffff"/>
+        <rect x="16" y="674" width="604" height="120" rx="16" fill="none" stroke="#e0e0ee" stroke-width="1.5"/>
+        <text x="40" y="702" font-family="Arial" font-size="13" font-weight="700" fill="#5b5bd6">핵심 어휘</text>
+        <text x="40" y="728" font-family="Arial" font-size="15" font-weight="700" fill="#1a1a2e">significant</text>
+        <text x="160" y="728" font-family="Arial" font-size="14" fill="#7272a0">상당한, 중요한</text>
+        <line x1="40" y1="742" x2="596" y2="742" stroke="#f0f0f8" stroke-width="1"/>
+        <text x="40" y="768" font-family="Arial" font-size="15" font-weight="700" fill="#1a1a2e">drive</text>
+        <text x="120" y="768" font-family="Arial" font-size="14" fill="#7272a0">이끌다, 촉진하다</text>
+
+        <!-- Nav buttons -->
+        <rect x="16" y="812" width="288" height="56" rx="16" fill="#ededf5"/>
+        <text x="160" y="845" text-anchor="middle" font-family="Arial" font-size="16" fill="#525278">← 이전</text>
+        <rect x="332" y="812" width="288" height="56" rx="16" fill="#5b5bd6"/>
+        <text x="476" y="845" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="white">다음 →</text>
+
+        <!-- Bottom nav -->
+        <rect y="984" width="636" height="64" fill="#ffffff"/>
+        <rect y="984" width="636" height="1" fill="#e0e0ee"/>
+        <text x="80" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#5b5bd6" font-weight="700">홈</text>
+        <text x="212" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">팝송</text>
+        <text x="318" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">AI 채팅</text>
+        <text x="424" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">퍼즐</text>
+        <text x="556" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">설정</text>
+      </svg>
+      <span>세로 2 — 영어 학습 화면</span>
+      <button onclick="dl('v2','screenshot-2-learn-636x1048.png',636,1048)">PNG 저장</button>
+    </div>
+
+<!-- ═══════════════════════════════════════════
+     VERTICAL 3: AI 튜터 채팅 (636×1048)
+═══════════════════════════════════════════ -->
+    <div class="item">
+      <svg id="v3" width="318" height="524" viewBox="0 0 636 1048" xmlns="http://www.w3.org/2000/svg">
+        <rect width="636" height="1048" fill="#f5f5fa"/>
+        <!-- Status bar -->
+        <rect width="636" height="44" fill="#16163a"/>
+        <text x="24" y="30" font-family="Arial" font-size="15" font-weight="600" fill="white">9:41</text>
+        <text x="590" y="30" text-anchor="end" font-family="Arial" font-size="13" fill="white">●●●</text>
+
+        <!-- Header -->
+        <rect width="636" height="72" y="44" fill="#16163a"/>
+        <text x="24" y="88" font-family="Arial" font-size="22" fill="white">←</text>
+        <text x="318" y="88" text-anchor="middle" font-family="'Arial Black',Arial" font-size="18" font-weight="900" fill="white">AI 튜터</text>
+
+        <!-- Tutor select cards -->
+        <rect x="16" y="128" width="294" height="120" rx="16" fill="#242450"/>
+        <rect x="16" y="128" width="294" height="120" rx="16" fill="none" stroke="#5b5bd6" stroke-width="2"/>
+        <text x="40" y="170" font-family="Arial" font-size="32">🇰🇷</text>
+        <text x="90" y="166" font-family="Arial" font-size="16" font-weight="700" fill="white">Sophie</text>
+        <rect x="90" y="174" width="72" height="20" rx="10" fill="rgba(91,91,214,0.5)"/>
+        <text x="126" y="188" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="white">AI 튜터</text>
+        <text x="40" y="224" font-family="Arial" font-size="13" fill="#8080b0">한국어로 친절하게 설명</text>
+
+        <rect x="326" y="128" width="294" height="120" rx="16" fill="#1e1e3a"/>
+        <rect x="326" y="128" width="294" height="120" rx="16" fill="none" stroke="#333360" stroke-width="1.5"/>
+        <text x="350" y="170" font-family="Arial" font-size="32">🇺🇸</text>
+        <text x="400" y="166" font-family="Arial" font-size="16" font-weight="700" fill="white">Alex</text>
+        <rect x="400" y="174" width="72" height="20" rx="10" fill="rgba(91,91,214,0.3)"/>
+        <text x="436" y="188" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#8080c0">AI 튜터</text>
+        <text x="350" y="224" font-family="Arial" font-size="13" fill="#8080b0">원어민 영어 100% 대화</text>
+
+        <!-- Chat area -->
+        <rect x="0" y="260" width="636" height="660" fill="#0f0f22"/>
+
+        <!-- AI message 1 -->
+        <rect x="16" y="284" width="44" height="44" rx="22" fill="#5b5bd6"/>
+        <text x="38" y="311" text-anchor="middle" font-family="Arial" font-size="20">🇰🇷</text>
+        <rect x="70" y="280" width="320" height="72" rx="16" rx2="4" fill="#242450"/>
+        <text x="88" y="308" font-family="Arial" font-size="14" fill="white">안녕하세요! 저는 Sophie예요.</text>
+        <text x="88" y="330" font-family="Arial" font-size="14" fill="white">오늘 어떤 영어를 배워볼까요?</text>
+        <text x="70" y="364" font-family="Arial" font-size="11" fill="#4040a0">Sophie · AI 튜터</text>
+
+        <!-- User message -->
+        <rect x="256" y="390" width="364" height="52" rx="16" fill="#5b5bd6"/>
+        <text x="438" y="418" text-anchor="middle" font-family="Arial" font-size="14" fill="white">Apple 뉴스 문장 설명해줘!</text>
+
+        <!-- AI message 2 -->
+        <rect x="16" y="460" width="44" height="44" rx="22" fill="#5b5bd6"/>
+        <text x="38" y="487" text-anchor="middle" font-family="Arial" font-size="20">🇰🇷</text>
+        <rect x="70" y="456" width="440" height="140" rx="16" fill="#242450"/>
+        <text x="88" y="482" font-family="Arial" font-size="14" fill="white">물론이죠! 이 문장을 살펴볼게요:</text>
+        <rect x="88" y="494" width="404" height="44" rx="8" fill="#1a1a3a"/>
+        <text x="100" y="512" font-family="Arial" font-size="13" font-style="italic" fill="#a0a0d0">"Apple's AI features are expected</text>
+        <text x="100" y="530" font-family="Arial" font-size="13" font-style="italic" fill="#a0a0d0">to drive significant sales growth."</text>
+        <text x="88" y="562" font-family="Arial" font-size="13" fill="#c0c0e0">be expected to는 '~할 것으로</text>
+        <text x="88" y="582" font-family="Arial" font-size="13" fill="#c0c0e0">예상되다'라는 수동태 표현이에요!</text>
+
+        <!-- User message 2 -->
+        <rect x="296" y="620" width="324" height="52" rx="16" fill="#5b5bd6"/>
+        <text x="458" y="648" text-anchor="middle" font-family="Arial" font-size="14" fill="white">예문 하나 더 만들어줘!</text>
+
+        <!-- AI thinking -->
+        <rect x="70" y="690" width="120" height="48" rx="16" fill="#242450"/>
+        <text x="130" y="720" text-anchor="middle" font-family="Arial" font-size="22" fill="#5b5bd6">···</text>
+
+        <!-- Input bar -->
+        <rect x="0" y="920" width="636" height="80" fill="#16163a"/>
+        <rect x="16" y="934" width="520" height="48" rx="24" fill="#242450"/>
+        <text x="42" y="963" font-family="Arial" font-size="15" fill="#4040a0">궁금한 점을 물어보세요...</text>
+        <rect x="548" y="934" width="72" height="48" rx="24" fill="#5b5bd6"/>
+        <text x="584" y="963" text-anchor="middle" font-family="Arial" font-size="22" fill="white">↑</text>
+
+        <!-- Bottom nav -->
+        <rect y="984" width="636" height="64" fill="#16163a"/>
+        <rect y="984" width="636" height="1" fill="#242450"/>
+        <text x="80" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">홈</text>
+        <text x="212" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">팝송</text>
+        <text x="318" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#5b5bd6" font-weight="700">AI 채팅</text>
+        <text x="424" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">퍼즐</text>
+        <text x="556" y="1020" text-anchor="middle" font-family="Arial" font-size="11" fill="#7272a0">설정</text>
+      </svg>
+      <span>세로 3 — AI 튜터 채팅</span>
+      <button onclick="dl('v3','screenshot-3-chat-636x1048.png',636,1048)">PNG 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     HORIZONTAL: 1504×741
+═══════════════════════════════════════════ -->
+<div class="section">
+  <h2>가로형 — 팝송 & 퍼즐 (1504×741)</h2>
+  <div class="row">
+    <div class="item">
+      <svg id="h1" width="752" height="370" viewBox="0 0 1504 741" xmlns="http://www.w3.org/2000/svg">
+        <rect width="1504" height="741" fill="#f5f5fa"/>
+
+        <!-- Status bar -->
+        <rect width="1504" height="44" fill="#ffffff"/>
+        <text x="24" y="30" font-family="Arial" font-size="15" font-weight="600" fill="#1a1a2e">9:41</text>
+        <text x="1480" y="30" text-anchor="end" font-family="Arial" font-size="13" fill="#1a1a2e">●●●</text>
+
+        <!-- Header -->
+        <rect width="1504" height="56" y="44" fill="#ffffff"/>
+        <rect width="1504" height="1" y="99" fill="#e0e0ee"/>
+        <rect x="24" y="54" width="40" height="40" rx="10" fill="#5b5bd6"/>
+        <text x="44" y="80" text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="white">E</text>
+        <text x="76" y="80" font-family="'Arial Black',Arial" font-size="20" font-weight="900" fill="#1a1a2e">TREND ENG</text>
+
+        <!-- Nav tabs -->
+        <rect width="1504" height="48" y="100" fill="#ffffff"/>
+        <rect x="0" y="148" width="1504" height="1" fill="#e0e0ee"/>
+        <text x="130" y="130" text-anchor="middle" font-family="Arial" font-size="15" fill="#7272a0">트렌드</text>
+        <text x="306" y="130" text-anchor="middle" font-family="Arial" font-size="15" font-weight="700" fill="#5b5bd6">팝송</text>
+        <rect x="258" y="146" width="96" height="3" rx="2" fill="#5b5bd6"/>
+        <text x="478" y="130" text-anchor="middle" font-family="Arial" font-size="15" fill="#7272a0">퍼즐</text>
+        <text x="650" y="130" text-anchor="middle" font-family="Arial" font-size="15" fill="#7272a0">토픽</text>
+
+        <!-- LEFT PANEL: 팝송 -->
+        <rect x="24" y="168" width="700" height="540" rx="20" fill="#ffffff"/>
+        <rect x="24" y="168" width="700" height="540" rx="20" fill="none" stroke="#e0e0ee" stroke-width="1.5"/>
+
+        <text x="56" y="218" font-family="'Arial Black',Arial" font-size="26" font-weight="900" fill="#1a1a2e">🎵  팝송 영어 학습</text>
+        <text x="56" y="248" font-family="Arial" font-size="16" fill="#7272a0">좋아하는 팝송으로 배우는 살아있는 영어</text>
+
+        <!-- Song card 1 -->
+        <rect x="48" y="268" width="652" height="96" rx="14" fill="#f8f8fc"/>
+        <rect x="48" y="268" width="652" height="96" rx="14" fill="none" stroke="#e0e0ee" stroke-width="1"/>
+        <rect x="64" y="284" width="64" height="64" rx="12" fill="#5b5bd6"/>
+        <text x="96" y="324" text-anchor="middle" font-family="Arial" font-size="32">🎵</text>
+        <text x="144" y="310" font-family="Arial" font-size="18" font-weight="700" fill="#1a1a2e">Flowers — Miley Cyrus</text>
+        <rect x="144" y="320" width="60" height="20" rx="10" fill="rgba(91,91,214,0.1)"/>
+        <text x="174" y="334" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#5b5bd6">AI 생성</text>
+        <text x="144" y="352" font-family="Arial" font-size="14" fill="#7272a0">학습 문장 10개 · Lv.3</text>
+        <rect x="576" y="290" width="108" height="36" rx="18" fill="#5b5bd6"/>
+        <text x="630" y="313" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="white">학습 시작 →</text>
+
+        <!-- Song card 2 -->
+        <rect x="48" y="376" width="652" height="96" rx="14" fill="#f8f8fc"/>
+        <rect x="48" y="376" width="652" height="96" rx="14" fill="none" stroke="#e0e0ee" stroke-width="1"/>
+        <rect x="64" y="392" width="64" height="64" rx="12" fill="#3a2a60"/>
+        <text x="96" y="432" text-anchor="middle" font-family="Arial" font-size="32">🎵</text>
+        <text x="144" y="418" font-family="Arial" font-size="18" font-weight="700" fill="#1a1a2e">Blinding Lights — The Weeknd</text>
+        <rect x="144" y="428" width="60" height="20" rx="10" fill="rgba(91,91,214,0.1)"/>
+        <text x="174" y="442" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#5b5bd6">AI 생성</text>
+        <text x="144" y="460" font-family="Arial" font-size="14" fill="#7272a0">학습 문장 10개 · Lv.4</text>
+        <rect x="576" y="398" width="108" height="36" rx="18" fill="#5b5bd6"/>
+        <text x="630" y="421" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="white">학습 시작 →</text>
+
+        <!-- Lyrics preview card -->
+        <rect x="48" y="484" width="652" height="196" rx="14" fill="#16163a"/>
+        <text x="72" y="516" font-family="Arial" font-size="14" fill="#7272a0">📖  가사 학습 미리보기</text>
+        <text x="72" y="548" font-family="'Arial Black',Arial" font-size="18" font-weight="700" fill="white" font-style="italic">"I can buy myself flowers,</text>
+        <text x="72" y="576" font-family="'Arial Black',Arial" font-size="18" font-weight="700" fill="white" font-style="italic">write my name in the sand."</text>
+        <line x1="72" y1="596" x2="684" y2="596" stroke="#2a2a50" stroke-width="1"/>
+        <text x="72" y="622" font-family="Arial" font-size="15" fill="#a0a0c0">나는 스스로 꽃을 살 수 있어,</text>
+        <text x="72" y="644" font-family="Arial" font-size="15" fill="#a0a0c0">모래에 내 이름을 쓸 수 있어.</text>
+        <rect x="72" y="656" width="60" height="20" rx="4" fill="rgba(165,243,252,0.15)"/>
+        <text x="102" y="670" text-anchor="middle" font-family="Arial" font-size="11" fill="#a5f3fc">관용표현</text>
+
+        <!-- RIGHT PANEL: 퍼즐 -->
+        <rect x="780" y="168" width="700" height="540" rx="20" fill="#ffffff"/>
+        <rect x="780" y="168" width="700" height="540" rx="20" fill="none" stroke="#e0e0ee" stroke-width="1.5"/>
+
+        <text x="812" y="218" font-family="'Arial Black',Arial" font-size="26" font-weight="900" fill="#1a1a2e">🧩  영어 크로스워드 퍼즐</text>
+        <text x="812" y="248" font-family="Arial" font-size="16" fill="#7272a0">게임처럼 풀며 어휘력을 키워요</text>
+
+        <!-- Crossword grid -->
+        <g transform="translate(812, 272)">
+          <!-- Grid cells: 9 cols x 8 rows, cell=56x56 -->
+          <!-- Row 0 -->
+          <rect x="0"   y="0"   width="52" height="52" rx="8" fill="#f5f5fa" stroke="#e0e0ee" stroke-width="1"/>
+          <rect x="56"  y="0"   width="52" height="52" rx="8" fill="#5b5bd6"/>
+          <text x="82"  y="33"  text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="white">T</text>
+          <rect x="112" y="0"   width="52" height="52" rx="8" fill="#5b5bd6"/>
+          <text x="138" y="33"  text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="white">R</text>
+          <rect x="168" y="0"   width="52" height="52" rx="8" fill="#5b5bd6"/>
+          <text x="194" y="33"  text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="white">E</text>
+          <rect x="224" y="0"   width="52" height="52" rx="8" fill="#5b5bd6"/>
+          <text x="250" y="33"  text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="white">N</text>
+          <rect x="280" y="0"   width="52" height="52" rx="8" fill="#5b5bd6"/>
+          <text x="306" y="33"  text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="white">D</text>
+
+          <!-- Row 1 -->
+          <rect x="56"  y="56"  width="52" height="52" rx="8" fill="#f8f8fc" stroke="#e0e0ee" stroke-width="1"/>
+          <text x="82"  y="89"  text-anchor="middle" font-family="Arial" font-size="18" fill="#7272a0">R</text>
+
+          <!-- Row 2 -->
+          <rect x="0"   y="112" width="52" height="52" rx="8" fill="#f5f5fa" stroke="#e0e0ee" stroke-width="1"/>
+          <rect x="56"  y="112" width="52" height="52" rx="8" fill="#5b5bd6"/>
+          <text x="82"  y="145" text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="white">A</text>
+          <rect x="112" y="112" width="52" height="52" rx="8" fill="#f8f8fc" stroke="#e0e0ee" stroke-width="1"/>
+          <text x="138" y="145" text-anchor="middle" font-family="Arial" font-size="18" fill="#7272a0">I</text>
+          <rect x="168" y="112" width="52" height="52" rx="8" fill="#f8f8fc" stroke="#e0e0ee" stroke-width="1"/>
+          <text x="194" y="145" text-anchor="middle" font-family="Arial" font-size="18" fill="#7272a0">N</text>
+
+          <!-- Row 3 -->
+          <rect x="56"  y="168" width="52" height="52" rx="8" fill="#f8f8fc" stroke="#e0e0ee" stroke-width="1"/>
+          <text x="82"  y="201" text-anchor="middle" font-family="Arial" font-size="18" fill="#7272a0">N</text>
+
+          <!-- Row 4 -->
+          <rect x="56"  y="224" width="52" height="52" rx="8" fill="#5b5bd6"/>
+          <text x="82"  y="257" text-anchor="middle" font-family="'Arial Black',Arial" font-size="22" font-weight="900" fill="white">D</text>
+
+          <!-- Selected cell highlight -->
+          <rect x="168" y="0" width="52" height="52" rx="8" fill="none" stroke="#a0a0ff" stroke-width="3"/>
+
+          <!-- Clue number -->
+          <text x="58" y="14" font-family="Arial" font-size="11" fill="white" font-weight="700">1</text>
+          <text x="2" y="126" font-family="Arial" font-size="11" fill="white" font-weight="700">2</text>
+        </g>
+
+        <!-- Clues -->
+        <rect x="812" y="544" width="652" height="140" rx="14" fill="#f8f8fc"/>
+        <rect x="812" y="544" width="652" height="140" rx="14" fill="none" stroke="#e0e0ee" stroke-width="1"/>
+        <text x="836" y="572" font-family="Arial" font-size="14" font-weight="700" fill="#5b5bd6">가로 힌트</text>
+        <text x="836" y="596" font-family="Arial" font-size="15" fill="#1a1a2e">1.  현재 유행하는, 인기 있는 (6)</text>
+        <text x="836" y="620" font-family="Arial" font-size="15" fill="#7272a0">2.  폭우, 내리쏟아지는 비 (4)</text>
+        <text x="1060" y="572" font-family="Arial" font-size="14" font-weight="700" fill="#5b5bd6">세로 힌트</text>
+        <text x="1060" y="596" font-family="Arial" font-size="15" fill="#7272a0">1.  개최하다, 훈련 (5)</text>
+        <text x="1060" y="620" font-family="Arial" font-size="15" fill="#7272a0">2.  인공지능 (2)</text>
+
+        <!-- Progress -->
+        <text x="836" y="660" font-family="Arial" font-size="14" fill="#7272a0">진행률</text>
+        <rect x="836" y="666" width="600" height="8" rx="4" fill="#e0e0ee"/>
+        <rect x="836" y="666" width="240" height="8" rx="4" fill="#5b5bd6"/>
+        <text x="1436" y="676" text-anchor="end" font-family="Arial" font-size="13" font-weight="700" fill="#5b5bd6">40%</text>
+      </svg>
+      <span>가로형 — 팝송 + 퍼즐 화면 (1504×741)</span>
+      <button onclick="dl('h1','screenshot-4-landscape-1504x741.png',1504,741)">PNG 저장</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="c" style="display:none"></canvas>
+<script>
+function dl(id, name, w, h) {
+  const svg = document.getElementById(id);
+  const c = document.getElementById('c');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  const clone = svg.cloneNode(true);
+  clone.setAttribute('width', w);
+  clone.setAttribute('height', h);
+  const blob = new Blob([new XMLSerializer().serializeToString(clone)], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    ctx.clearRect(0,0,w,h);
+    ctx.drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);
+    Object.assign(document.createElement('a'),{download:name,href:c.toDataURL('image/png')}).click();
+  };
+  img.src = url;
+}
+</script>
+</body>
+</html>
