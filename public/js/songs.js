@@ -32,6 +32,7 @@ function renderSavedSongs(songs) {
         card.innerHTML = `
             <span class="row-date">${song.date || (song.createdAt ? song.createdAt.slice(0, 10) : '')}</span>
             <span class="row-title">${song.title}</span>
+            <span class="ai-badge">AI 생성</span>
             <button class="trend-start-btn">학습 시작 →</button>`;
 
         card.querySelector('.trend-start-btn').addEventListener('click', () => {

@@ -35,6 +35,7 @@ function renderPuzzles(puzzles) {
         card.innerHTML = `
             <span class="row-date">${p.date || ''}</span>
             <span class="row-title">${p.title}</span>
+            <span class="ai-badge">AI 생성</span>
             <button class="trend-start-btn">퍼즐 시작 →</button>`;
 
         card.querySelector('.trend-start-btn').addEventListener('click', () => {

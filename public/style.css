@@ -921,6 +921,72 @@ button:active { background: #3e3eb0; }
 
 .delete-history-btn:hover { background: var(--red-dim); color: var(--red); }
 
+/* ─── AI 공시 (Toss Apps in Toss 정책) ──────────────────────────────── */
+.ai-notice-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(91,91,214,0.06);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--r-md);
+    padding: 10px 14px;
+    margin-bottom: 1rem;
+    font-size: 0.82rem;
+    color: var(--text-2);
+    line-height: 1.45;
+    animation: fadeIn 0.25s ease-out;
+}
+.ai-notice-text { flex: 1; }
+.ai-notice-close {
+    flex-shrink: 0;
+    background: none !important;
+    border: none !important;
+    color: var(--text-3) !important;
+    cursor: pointer;
+    padding: 2px 6px !important;
+    font-size: 0.8rem !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    min-width: unset;
+}
+.ai-notice-close:hover { background: var(--border-2) !important; color: var(--text-2) !important; box-shadow: none !important; }
+
+/* AI 생성 콘텐츠 뱃지 */
+.ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--r-full);
+    padding: 2px 7px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* 학습 카드 AI 라벨 */
+.ai-content-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-3);
+    margin-bottom: 1rem;
+}
+.ai-content-label::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
 .history-loading, .history-empty { padding: 40px; text-align: center; color: var(--text-3); font-size: 0.88rem; }
 .history-empty { background: var(--surface); border-radius: var(--r-lg); border: 1.5px dashed var(--border); }
 

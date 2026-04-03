@@ -114,6 +114,7 @@ function renderNextPage() {
                 </div>
                 <div class="trend-card-footer">
                     ${timeStr ? `<span class="trend-card-time">${timeStr}</span>` : ''}
+                    <span class="ai-badge">AI 생성</span>
                     <button class="trend-start-btn">학습 시작 →</button>
                 </div>`;
 
