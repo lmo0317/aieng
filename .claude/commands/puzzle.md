@@ -126,7 +126,7 @@ metadata:
   "version": "1.0",
   "meta": {
     "id": "puzzle-{YYYYMMDD}-{NNN}",
-    "title": "{주제} 영어 퀴즈",
+    "title": "[Main Topic]: [Sub-topic]",
     "date": "YYYY-MM-DD",
     "category": "{category}",
     "difficulty": "{difficulty}",
@@ -149,6 +149,7 @@ metadata:
 ```
 
 필드 규칙:
+- `title`: 반드시 `[대주제]: [소주제]` 형식을 따름 (예: `Travel: Airport Essentials`). `Vocabulary Challenge`, `영어 퀴즈`, `Lesson 1` 등 모호한 표현 사용 절대 금지.
 - `answer`: 대문자 영문자만 (A-Z), 2~15글자
 - `clue`: **게임 기본 표시** — 짧고 명확한 영어 (15단어 이내)
 - `clue_ko`: 한국어 번역 (플레이어가 토글 버튼으로 확인)
