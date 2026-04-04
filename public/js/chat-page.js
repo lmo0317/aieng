@@ -194,7 +194,7 @@ function connectWebSocket() {
                 State.aiTextBuffer = '';
 
             } else if (data.type === 'error') {
-                alert('서버 오류: ' + data.message);
+                window.showAlert('서버 오류: ' + data.message);
             }
         } catch (e) {
             console.error('[Chat] Message parse error:', e);

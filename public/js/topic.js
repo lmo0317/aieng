@@ -5,7 +5,7 @@ document.getElementById('start-btn').addEventListener('click', () => {
     const difficulty = document.getElementById('difficulty').value;
 
     if (!topic) {
-        alert('학습할 주제를 입력해 주세요.');
+        window.showAlert('학습할 주제를 입력해 주세요.');
         return;
     }
 

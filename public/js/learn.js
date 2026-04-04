@@ -83,11 +83,11 @@ async function loadFromId(id) {
                 return;
             }
         }
-        alert('학습 데이터가 없거나 형식이 올바르지 않습니다.');
+        window.showAlert('학습 데이터가 없거나 형식이 올바르지 않습니다.');
         window.location.href = backUrl;
     } catch (e) {
         console.error(e);
-        alert('학습 데이터를 불러오는 중 오류가 발생했습니다.');
+        window.showAlert('학습 데이터를 불러오는 중 오류가 발생했습니다.');
         window.location.href = backUrl;
     }
 }
@@ -197,7 +197,7 @@ revealBtn.addEventListener('click', () => {
 nextBtn.addEventListener('click', () => { currentCount++; showSentence(); });
 
 finishBtn.addEventListener('click', () => {
-    alert('오늘의 트레이닝 완료! 고생하셨습니다. 🔥');
+    window.showAlert('오늘의 트레이닝 완료! 고생하셨습니다. 🔥');
     window.location.href = backUrl;
 });
 
@@ -248,7 +248,7 @@ function speakWithBestVoice(text) {
 // ── 퀴즈 ──────────────────────────────────────────────────
 if (startQuizBtn) {
     startQuizBtn.addEventListener('click', () => {
-        if (!quizData || quizData.length === 0) { alert('이 학습 세션에는 퀴즈가 없습니다.'); return; }
+        if (!quizData || quizData.length === 0) { window.showAlert('이 학습 세션에는 퀴즈가 없습니다.'); return; }
         learningSection.classList.add('hidden');
         quizSection.classList.remove('hidden');
         quizLoading.classList.add('hidden');
@@ -379,7 +379,7 @@ if (quizNextBtn) {
 
 if (quizFinishBtn) {
     quizFinishBtn.addEventListener('click', () => {
-        alert(`퀴즈 완료! 최종 점수: ${quizScore} / ${quizData.length * 10}점`);
+        window.showAlert(`퀴즈 완료! 최종 점수: ${quizScore} / ${quizData.length * 10}점`);
         window.location.href = backUrl;
     });
 }

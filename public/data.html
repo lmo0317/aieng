@@ -297,8 +297,8 @@
                     body: JSON.stringify({ date: date.trim() })
                 });
                 const result = await response.json();
-                if (result.success) { alert(`${date} 데이터가 삭제되었습니다.`); fetchNews(); }
-            } catch (err) { alert('통신 오류: ' + err.message); }
+                if (result.success) { window.showAlert(`${date} 데이터가 삭제되었습니다.`); fetchNews(); }
+            } catch (err) { window.showAlert('통신 오류: ' + err.message); }
         }
 
         async function deleteNews(id) {
@@ -310,7 +310,7 @@
                 });
                 const result = await response.json();
                 if (result.success) fetchNews();
-            } catch (err) { alert('삭제 실패'); }
+            } catch (err) { window.showAlert('삭제 실패'); }
         }
 
         async function deleteSong(id) {
@@ -321,8 +321,8 @@
                     headers: { 'x-admin-key': adminApiKey }
                 });
                 const result = await response.json();
-                if (result.success) { alert('팝송 데이터가 삭제되었습니다.'); fetchSongs(); }
-            } catch (err) { alert('삭제 실패'); }
+                if (result.success) { window.showAlert('팝송 데이터가 삭제되었습니다.'); fetchSongs(); }
+            } catch (err) { window.showAlert('삭제 실패'); }
         }
 
         async function fetchPuzzles() {
@@ -384,8 +384,8 @@
                 const response = await fetch(`/api/puzzles/${id}`, { method: 'DELETE' });
                 const result = await response.json();
                 if (result.success) fetchPuzzles();
-                else alert('삭제 실패: ' + result.error);
-            } catch (err) { alert('삭제 실패'); }
+                else window.showAlert('삭제 실패: ' + result.error);
+            } catch (err) { window.showAlert('삭제 실패'); }
         }
 
         // 데이터 동기화

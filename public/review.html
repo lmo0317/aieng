@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>복습 - 트렌드 잉글리시</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://static.toss.im/tds/bridge/bridge.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 토스 표준 헤더 -->
+        <div class="toss-header">
+            <div class="toss-header-center">
+                <img src="/logo/trend-eng-logo-600x600.png" alt="Logo" class="toss-header-logo">
+                <h1 class="toss-header-title">트렌드 잉글리시</h1>
+            </div>
+        </div>
+
+        <div id="review-section">
+            <div class="section-header">
+                <h2>📝 학습 히스토리</h2>
+            </div>
+            <div id="history-container">
+                <!-- 히스토리 목록이 여기에 로드됩니다 -->
+                <div class="history-loading">불러오는 중...</div>
+            </div>
+        </div>
+
+        <!-- 하단 플로팅 탭바 -->
+        <div class="floating-tabbar">
+            <div class="nav-links">
+                <a href="/" class="nav-link">🔥 <span>트렌드</span></a>
+                <a href="/songs" class="nav-link">🎶 <span>팝송</span></a>
+                <a href="/puzzle" class="nav-link">🧩 <span>퍼즐</span></a>
+                <a href="/review" class="nav-link">📝 <span>복습</span></a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/nav.js"></script>
+    <script>
+        async function loadHistory() {
+            const container = document.getElementById('history-container');
+            try {
+                const res = await fetch('/api/history');
+                const data = await res.json();
+                
+                if (!data.history || data.history.length === 0) {
+                    container.innerHTML = '<div class="history-empty">아직 학습 히스토리가 없습니다.</div>';
+                    return;
+                }
+
+                container.innerHTML = '<div class="history-list"></div>';
+                const list = container.querySelector('.history-list');
+
+                data.history.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'history-item';
+                    el.onclick = () => window.location.href = `/learn.html?historyId=${item.id}`;
+                    
+                    const date = new Date(item.createdAt).toLocaleDateString();
+                    el.innerHTML = `
+                        <div class="history-info">
+                            <div class="history-topic">${item.topic}</div>
+                            <div class="history-meta">
+                                <span class="history-date">📅 ${date}</span>
+                                <span class="history-difficulty">${item.difficulty.toUpperCase()}</span>
+                            </div>
+                        </div>
+                        <button class="delete-history-btn" onclick="deleteHistory(event, ${item.id})">✕</button>
+                    `;
+                    list.appendChild(el);
+                });
+            } catch (e) {
+                container.innerHTML = '<div class="history-empty">히스토리를 불러오지 못했습니다.</div>';
+            }
+        }
+
+        async function deleteHistory(event, id) {
+            event.stopPropagation();
+            if (!(await window.showConfirm('정말 삭제하시겠습니까?'))) return;
+            
+            try {
+                const res = await fetch(`/api/history/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    loadHistory();
+                } else {
+                    window.showAlert('삭제 실패');
+                }
+            } catch (e) {
+                window.showAlert('삭제 실패');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadHistory);
+    </script>
+</body>
+</html>

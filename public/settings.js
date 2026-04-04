@@ -90,7 +90,7 @@ saveGeminiBtn.addEventListener('click', async () => {
 });
 
 deleteGeminiBtn.addEventListener('click', async () => {
-    if (!confirm('Gemini API Key를 삭제하시겠습니까?')) return;
+    if (!await window.showConfirm('Gemini API Key를 삭제하시겠습니까?')) return;
     try {
         const response = await fetch('/api/settings', { method: 'DELETE' });
         if (response.ok) {
@@ -124,7 +124,7 @@ promptForm.addEventListener('submit', async (e) => {
 
 // 프롬프트 초기화 핸들러
 resetPromptBtn.addEventListener('click', async () => {
-    if (!confirm('프롬프트를 초기화하시겠습니까?')) return;
+    if (!await window.showConfirm('프롬프트를 초기화하시겠습니까?')) return;
     try {
         await fetch('/api/settings', {
             method: 'POST',

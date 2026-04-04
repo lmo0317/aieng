@@ -59,6 +59,41 @@ app.get('/admin/logout', (req, res) => {
     res.redirect('/admin/login');
 });
 
+// ─── Toss Auth (Phase 3) ──────────────────────────────────────────────────
+app.get('/api/user/session', (req, res) => {
+    const cookies = parseCookies(req);
+    const userId = cookies['user_id'];
+    if (!userId) return res.json({ authenticated: false });
+    
+    db.get("SELECT id, name, picture FROM users WHERE id = ?", [userId], (err, row) => {
+        if (err || !row) return res.json({ authenticated: false });
+        res.json({ authenticated: true, user: row });
+    });
+});
+
+app.post('/api/toss/auth', (req, res) => {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: 'Token is required' });
+
+    // [Mock] 토스 인증 서버와 통신하여 토큰 검증 로직 시뮬레이션
+    // 실제로는 axios.post('https://api.toss.im/v1/bridge/auth/verify', ...) 등을 호출해야 함
+    const mockUser = {
+        id: `toss_${token.substring(0, 8)}`,
+        name: `토스사용자_${token.substring(0, 4)}`,
+        picture: 'https://static.toss.im/assets/homepage/safety/icn-security-check.png'
+    };
+
+    db.run("INSERT OR REPLACE INTO users (id, name, picture) VALUES (?, ?, ?)", 
+        [mockUser.id, mockUser.name, mockUser.picture], 
+        (err) => {
+            if (err) return res.status(500).json({ error: 'DB Error' });
+            
+            res.setHeader('Set-Cookie', `user_id=${mockUser.id}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`);
+            res.json({ success: true, user: mockUser });
+        }
+    );
+});
+
 app.get('/settings.html', requireAdminAuth, (req, res) => res.sendFile(pub('settings.html')));
 app.get('/data.html', requireAdminAuth, (req, res) => res.sendFile(pub('data.html')));
 app.get('/admin', requireAdminAuth, (req, res) => res.sendFile(pub('admin.html')));
