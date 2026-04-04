@@ -1,5 +1,16 @@
 # 🧩 Crossword Puzzle - Automated Integrity Pipeline
 
+## 🚨 CRITICAL: Title Formatting Rule (제목 형식 엄격 준수)
+퍼즐의 제목은 반드시 다음 형식을 따라야 하며, 이를 어기는 것은 중대한 규칙 위반입니다.
+- **형식**: `[대주제]: [소주제] Vocabulary Challenge`
+- **예시**: 
+  - `Travel: Airport Vocabulary Challenge`
+  - `School Life: Classroom Vocabulary Challenge`
+  - `Daily Life: General Expressions Vocabulary Challenge`
+- **주의**: 한글 제목이나 `N강 - {주제}` 같은 임의 형식을 사용하지 마십시오.
+
+---
+
 ## 🚀 Overview
 이 스킬은 사용자가 입력한 **'단어의 개수'**만으로 무작위 테마의 가로세로 퍼즐을 생성합니다. AI가 직접 좌표를 계산하지 않고 전용 엔진을 통해 무결성이 검증된 데이터만 산출합니다.
 
