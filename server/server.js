@@ -861,12 +861,7 @@ async function migratePuzzleJsonToDB() {
 const server = app.listen(PORT, '0.0.0.0', async () => {
     console.log(`Express Server running on http://0.0.0.0:${PORT} (Dynamic Gemini Mode)`);
     console.log(`Service URL: http://aieng.cafe24app.com`);
-    // DB 준비 완료 후 migration 실행
-    const waitForDB = () => new Promise(resolve => {
-        if (db.isReady) return resolve();
-        db.resolveReady = resolve;
-    });
-    waitForDB().then(() => migratePuzzleJsonToDB());
+    // puzzle JSON → DB migration 비활성화 (puzzle-data 폴더 JSON 파일로 인한 재시작 시 데이터 복원 방지)
     
     // WebSocket for AI Tutor Chat
     const wss = new WebSocket.Server({ server, path: '/ws/chat' });
