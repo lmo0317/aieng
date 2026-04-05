@@ -28,7 +28,18 @@ app.use(cors({
     ],
     credentials: true,
 }));
-app.use(express.json());
+
+// HTTPS Redirect for Cafe24 Proxy
+app.use((req, res, next) => {
+    const proto = req.headers['x-forwarded-proto'];
+    if (proto === 'http') {
+        return res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
+});
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.set('trust proxy', 1); // reverse proxy 뒤에서 올바른 protocol 감지
 
 // ─── 관리자 인증 ──────────────────────────────────────────────────────────────
@@ -867,9 +878,9 @@ async function migratePuzzleJsonToDB() {
 }
 
 // Start Express Server
-const server = app.listen(PORT, '0.0.0.0', async () => {
-    console.log(`Express Server running on http://0.0.0.0:${PORT} (Dynamic Gemini Mode)`);
-    console.log(`Service URL: http://aieng.cafe24app.com`);
+const server = app.listen(PORT, async () => {
+    console.log(`Express Server running on port ${PORT}`);
+    console.log(`Service URL: https://aieng.cafe24app.com`);
     // puzzle JSON → DB migration 비활성화 (puzzle-data 폴더 JSON 파일로 인한 재시작 시 데이터 복원 방지)
     
     // WebSocket for AI Tutor Chat
