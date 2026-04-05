@@ -58,7 +58,19 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:techchat-apps-in-toss.toss.im)",
       "Bash(grep:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "WebFetch(domain:cafe24.zendesk.com)",
+      "WebFetch(domain:littlemobs.com)",
+      "WebFetch(domain:support.cafe24.com)",
+      "WebFetch(domain:blog.koreassl.com)",
+      "WebFetch(domain:jour.co.kr)",
+      "WebFetch(domain:kimyongjin.com)",
+      "WebFetch(domain:help.cafe24.com)",
+      "WebFetch(domain:hosting.cafe24.com)",
+      "WebFetch(domain:velog.io)",
+      "WebFetch(domain:utilgosu.co.kr)",
+      "WebFetch(domain:hayo-today.tistory.com)",
+      "WebFetch(domain:zerossl.com)"
     ]
   },
   "enabledPlugins": {

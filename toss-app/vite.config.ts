@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 const API_BASE = process.env.NODE_ENV === 'production'
-  ? 'http://aieng.cafe24app.com'
+  ? 'https://aieng.cafe24app.com'
   : '';
 
 export default defineConfig({
