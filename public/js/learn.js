@@ -292,7 +292,16 @@ function showQuiz() {
         quizOptions.classList.add('hidden');
         quizInputContainer.classList.remove('hidden');
         quizSubmitBtn.disabled = false;
-        const word = q.word.trim();
+        
+        // Defensive check for missing word or answer
+        const word = (q.word || q.answer || "").trim();
+        if (!word) {
+            console.error('Quiz data missing word/answer:', q);
+            quizQuestion.innerHTML = "데이터 오류: 퀴즈를 표시할 수 없습니다.";
+            quizSubmitBtn.disabled = true;
+            return;
+        }
+
         const hint = q.question.match(/\(힌트: (.*?)\)/);
         const hintPattern = hint ? hint[1] : '_'.repeat(word.length);
         quizQuestion.innerHTML = q.question.split(' (힌트:')[0];
