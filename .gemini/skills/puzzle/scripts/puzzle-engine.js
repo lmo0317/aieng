@@ -98,12 +98,19 @@ class CrosswordGenerator {
             return false;
         };
 
-        for (let sy = 2; sy < 8; sy++) {
-            for (let sx = 2; sx < 8; sx++) {
+        // First word placement: try more positions but respect boundaries
+        const maxSx = this.width - first.length;
+        const maxSy = this.height - first.length;
+
+        for (let sy = 2; sy < Math.min(8, maxSy + 1); sy++) {
+            for (let sx = 2; sx < Math.min(8, maxSx + 1); sx++) {
                 this.grid = Array.from({ length: this.height }, () => Array(this.width).fill(null));
                 this.words = [];
-                this.placeWord(first, sx, sy, 'across');
-                if (solve(sorted)) return true;
+                // Check if fits across (which is the loop assumption)
+                if (sx + first.length <= this.width) {
+                    this.placeWord(first, sx, sy, 'across');
+                    if (solve(sorted)) return true;
+                }
             }
         }
         return false;
