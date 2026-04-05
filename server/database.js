@@ -125,6 +125,13 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
             )`);
 
+            // Migration flags table (1회성 작업 추적)
+            db.run(`CREATE TABLE IF NOT EXISTS migration_flags (
+                key TEXT PRIMARY KEY,
+                value TEXT,
+                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`);
+
             // Create Users table (keep for existing data)
             db.run(`CREATE TABLE IF NOT EXISTS users (
                 id TEXT PRIMARY KEY,

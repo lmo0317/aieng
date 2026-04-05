@@ -818,8 +818,21 @@ app.post('/api/sync', async (req, res) => {
 
 // ─── Puzzle JSON → DB 마이그레이션 (최초 1회) ────────────────────────────────
 async function migratePuzzleJsonToDB() {
+    // 이미 마이그레이션 완료된 경우 재실행 방지
+    const alreadyDone = await new Promise(r =>
+        db.get("SELECT value FROM migration_flags WHERE key = 'puzzle_json_migrated'", (e, row) => r(!!row))
+    );
+    if (alreadyDone) {
+        console.log('[Puzzle] Migration already done, skipping.');
+        return;
+    }
+
     const indexPath = path.join(puzzleDataDir, 'index.json');
-    if (!fs.existsSync(indexPath)) return;
+    if (!fs.existsSync(indexPath)) {
+        // JSON 파일 없어도 플래그 기록해서 다음 재시작에도 스킵
+        db.run("INSERT OR IGNORE INTO migration_flags (key, value) VALUES ('puzzle_json_migrated', '1')");
+        return;
+    }
     try {
         const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
         for (const p of (index.puzzles || [])) {
@@ -838,6 +851,8 @@ async function migratePuzzleJsonToDB() {
                 );
             } catch (e) { console.error(`[Puzzle] Migration failed for ${p.id}:`, e.message); }
         }
+        // 완료 플래그 기록
+        db.run("INSERT OR IGNORE INTO migration_flags (key, value) VALUES ('puzzle_json_migrated', '1')");
         console.log('[Puzzle] JSON → DB migration done.');
     } catch (e) { console.error('[Puzzle] Migration error:', e.message); }
 }
