@@ -19,17 +19,11 @@ const PORT = process.env.PORT || 8001;
 const trendsClients = new Map();
 
 app.use(cors({
-    origin: [
-        /\.tossmini\.com$/,
-        /\.private-apps\.tossmini\.com$/,
-        'http://localhost:5173',
-        'http://localhost:80',
-        'http://127.0.0.1:5173',
-    ],
+    origin: true,
     credentials: true,
 }));
 
-// HTTPS Redirect for Cafe24 Proxy
+/* Temporarily disabled HTTPS redirect
 app.use((req, res, next) => {
     const proto = req.headers['x-forwarded-proto'];
     if (proto === 'http') {
@@ -37,6 +31,7 @@ app.use((req, res, next) => {
     }
     next();
 });
+*/
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
