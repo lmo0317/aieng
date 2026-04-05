@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>window.API_BASE = "https://aieng.cafe24app.com";</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>주제 입력 - Trend Eng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://static.toss.im/tds/bridge/bridge.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/style-Bsj0GGIa.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 토스 표준 헤더 -->
+        <div class="toss-header">
+            <div class="toss-header-center">
+                <img src="/assets/trend-eng-logo-600x600-4Gb91DD2.png" alt="Logo" class="toss-header-logo">
+                <h1 class="toss-header-title">트렌드 잉글리시</h1>
+            </div>
+        </div>
+
+        <div id="topic-section">
+            <div class="topic-page-header">
+                <div class="page-header-icon">✏️</div>
+                <div class="header-text">
+                    <h2>주제 입력 학습</h2>
+                    <p class="topic-subtitle">원하는 주제로 맞춤 학습</p>
+                </div>
+            </div>
+            <div class="setup-container">
+                <div class="setup-left">
+                    <div class="input-group topic-group">
+                        <label for="topic">학습 주제 및 세부 내용</label>
+                        <textarea id="topic" placeholder="학습하고 싶은 주제나 관련 기사 전문을 입력하세요. 상세할수록 더 정확한 문장이 생성됩니다." rows="8"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="difficulty">학습 난이도 선택</label>
+                        <select id="difficulty">
+                            <option value="level1">Level 1 (입문)</option>
+                            <option value="level2">Level 2 (초급)</option>
+                            <option value="level3" selected>Level 3 (중급)</option>
+                            <option value="level4">Level 4 (고급)</option>
+                            <option value="level5">Level 5 (심화)</option>
+                        </select>
+                    </div>
+                    <button id="start-btn" class="start-btn">학습 시작 🚀</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 플로팅 탭바 -->
+        <div class="floating-tabbar">
+            <div class="nav-links">
+                <a href="/" class="nav-link"><span>트렌드</span></a>
+                <a href="/songs" class="nav-link"><span>팝송</span></a>
+                <a href="/puzzle" class="nav-link"><span>퍼즐</span></a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/nav.js"></script>
+    <script src="/js/topic.js"></script>
+</body>
+</html>

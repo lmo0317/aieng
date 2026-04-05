@@ -53,7 +53,12 @@
       "Bash(SSH_ASKPASS=/tmp/ssh_pass.sh DISPLAY=:0 ssh -o StrictHostKeyChecking=no lmo0317aieng@aieng.cafe24app.com \"cat ~/.env 2>/dev/null || cat ~/apps/lmo0317aieng_aieng/.env 2>/dev/null || find ~/apps -name '.env' 2>/dev/null | head -5\")",
       "Bash(SSH_ASKPASS=/tmp/ssh_pass.sh DISPLAY=:0 ssh -o StrictHostKeyChecking=no lmo0317aieng@aieng.cafe24app.com \"ls\")",
       "WebFetch(domain:www.speak.com)",
-      "WebFetch(domain:developers-apps-in-toss.toss.im)"
+      "WebFetch(domain:developers-apps-in-toss.toss.im)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:techchat-apps-in-toss.toss.im)",
+      "Bash(grep:*)",
+      "Bash(npm run:*)"
     ]
   },
   "enabledPlugins": {

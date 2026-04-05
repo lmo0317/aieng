@@ -1,0 +1,16 @@
+{
+  "name": "trend-english-toss",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "ait build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@apps-in-toss/web-framework": "latest"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

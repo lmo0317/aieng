@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>window.API_BASE = "https://aieng.cafe24app.com";</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>팝송 학습 - Trend Eng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://static.toss.im/tds/bridge/bridge.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/style-Bsj0GGIa.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 토스 표준 헤더 -->
+        <div class="toss-header">
+            <div class="toss-header-center">
+                <img src="/assets/trend-eng-logo-600x600-4Gb91DD2.png" alt="Logo" class="toss-header-logo">
+                <h1 class="toss-header-title">트렌드 잉글리시</h1>
+            </div>
+        </div>
+
+        <div id="songs-section">
+            <div class="trends-page-header">
+                <div class="header-text">
+                    <h2>팝송 가사 학습</h2>
+                    <p class="trends-subtitle">노래로 즐겁게 공부</p>
+                </div>
+            </div>
+            <div id="songs-container" class="realtime-trends-container">
+                <div class="trends-empty-state">
+                    <div class="empty-icon">🎵</div>
+                    <h3>저장된 팝송이 없습니다</h3>
+                    <p>데이터 관리 페이지에서 새로운 팝송을 추가해보세요!</p>
+                    <button class="go-settings-btn" onclick="window.location.href='/data.html'">팝송 추가하러 가기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 플로팅 탭바 -->
+        <div class="floating-tabbar">
+            <div class="nav-links">
+                <a href="/" class="nav-link"><span>트렌드</span></a>
+                <a href="/songs" class="nav-link"><span>팝송</span></a>
+                <a href="/puzzle" class="nav-link"><span>퍼즐</span></a>
+            </div>
+        </div>
+    </div>
+
+<script src="/js/nav.js"></script>
+    <script src="/js/songs.js"></script>
+</body>
+</html>
