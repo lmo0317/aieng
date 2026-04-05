@@ -37,6 +37,11 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.set('trust proxy', 1); // reverse proxy 뒤에서 올바른 protocol 감지
 
+// ─── SSL 인증 파일 ─────────────────────────────────────────────────────────────
+app.get('/.well-known/pki-validation/:file', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', '.well-known', 'pki-validation', req.params.file));
+});
+
 // ─── 관리자 인증 ──────────────────────────────────────────────────────────────
 function parseCookies(req) {
     const cookies = {};
