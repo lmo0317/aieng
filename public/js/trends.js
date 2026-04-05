@@ -4,17 +4,23 @@ const realtimeTrendsContainer = document.getElementById('realtime-trends-contain
 
 // 카테고리 정규화: DB에 이미 저장된 영어 카테고리도 한글로 표시
 const _CAT_MAP = {
-    'ENTERTAINMENT':'연애','Entertainment':'연애','entertainment':'연애',
+    'ENTERTAINMENT':'연예','Entertainment':'연예','entertainment':'연예',
     'SPORTS':'스포츠','Sports':'스포츠','sports':'스포츠',
     'TECHNOLOGY':'테크','Technology':'테크','technology':'테크','TECH':'테크','Tech':'테크','tech':'테크',
     'POLITICS':'정치','Politics':'정치','politics':'정치',
-    'FINANCE':'금융','Finance':'금융','finance':'금융','BUSINESS':'금융','Business':'금융',
+    'FINANCE':'금융','Finance':'금융','finance':'금융',
+    'BUSINESS':'경제','Business':'경제','business':'경제',
+    'ECONOMY':'경제','Economy':'경제','economy':'경제',
+    'HEALTH':'건강','Health':'건강','health':'건강',
+    'SCIENCE':'과학','Science':'과학','science':'과학',
+    'WORLD':'세계','World':'세계','world':'세계',
+    'NATION':'국내','Nation':'국내','nation':'국내',
     'GENERAL':'일반','General':'일반','general':'일반',
 };
 function normCat(cat) {
     if (!cat) return '일반';
     const p = String(cat).split('/')[0].trim();
-    return _CAT_MAP[p] || _CAT_MAP[cat] || cat;
+    return _CAT_MAP[p] || _CAT_MAP[p.toUpperCase()] || _CAT_MAP[cat] || '일반';
 }
 
 let trendsPagination = {

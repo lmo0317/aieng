@@ -20,24 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // AI 사용 공시 — Toss Apps in Toss 정책: 첫 진입 시 AI 사용 고지
-    const NOTICE_KEY = 'trendeng_ai_notice_v1';
+    // AI 사용 공시 — Toss Apps in Toss 정책: AI 사용 고지
+    // 최초 1회 바텀시트 고지 (사전 고지 의무)
+    const NOTICE_KEY = 'trendeng_ai_notice_v2';
     if (!localStorage.getItem(NOTICE_KEY)) {
-        const header = document.querySelector('.toss-header');
-        if (header) {
-            const bar = document.createElement('div');
-            bar.className = 'ai-notice-bar';
-            bar.style.marginTop = '10px';
-            bar.innerHTML = `
-                <span>🤖</span>
-                <span class="ai-notice-text">이 서비스는 <strong>AI(인공지능)</strong>를 활용하여 콘텐츠를 자동 생성합니다.</span>
-                <button class="ai-notice-close" aria-label="닫기">✕</button>`;
-            bar.querySelector('.ai-notice-close').addEventListener('click', () => {
-                bar.remove();
-                localStorage.setItem(NOTICE_KEY, '1');
-            });
-            header.insertAdjacentElement('afterend', bar);
-        }
+        const overlay = document.createElement('div');
+        overlay.className = 'ai-notice-overlay';
+        overlay.innerHTML = `
+            <div class="ai-notice-sheet">
+                <div class="ai-notice-sheet-icon">🤖</div>
+                <h2>AI 생성 콘텐츠 안내</h2>
+                <p>이 서비스는 <strong>생성형 AI(인공지능)</strong>를 활용하여 영어 학습 콘텐츠를 자동 생성합니다.<br>AI가 생성한 내용은 부정확할 수 있으니 참고용으로 활용해 주세요.</p>
+                <button class="ai-notice-sheet-btn">확인</button>
+            </div>`;
+        overlay.querySelector('.ai-notice-sheet-btn').addEventListener('click', () => {
+            overlay.remove();
+            localStorage.setItem(NOTICE_KEY, '1');
+        });
+        document.body.appendChild(overlay);
     }
 
     // 토스 브리지 연동: 하드웨어 뒤로가기 버튼 대응
