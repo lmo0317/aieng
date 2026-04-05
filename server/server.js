@@ -114,7 +114,7 @@ app.get('/data.html', requireAdminAuth, (req, res) => res.sendFile(pub('data.htm
 app.get('/admin', requireAdminAuth, (req, res) => res.sendFile(pub('admin.html')));
 app.get('/admin/', requireAdminAuth, (req, res) => res.sendFile(pub('admin.html')));
 
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public'), { dotfiles: 'allow' }));
 
 // 페이지 라우트 (URL 기반 네비게이션)
 const pub = p => path.join(__dirname, '..', 'public', p);
