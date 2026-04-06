@@ -125,7 +125,7 @@ function renderNextPage() {
                 </div>`;
 
             card.querySelector('.trend-start-btn').addEventListener('click', () => {
-                window.location.href = `/learn?id=${item.id}&source=trends`;
+                window.location.href = `/learn.html?id=${item.id}&source=trends`;
             });
 
             dateGrid.appendChild(card);

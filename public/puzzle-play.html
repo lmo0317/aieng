@@ -302,7 +302,7 @@
 <body>
 
     <div class="top-bar">
-        <button class="back-btn" onclick="location.href='/puzzle'">‹</button>
+        <button class="back-btn" onclick="location.href='/puzzle.html'">‹</button>
         <div class="title">
             가로세로 영어퀴즈
             <span class="badge">QUIZ</span>
@@ -361,7 +361,7 @@
             const dataUrl = params.get('data'); // 구버전 호환
             if (puzzleId) {
                 try {
-                    const res = await fetch(`/api/puzzles/${encodeURIComponent(puzzleId)}`);
+                    const res = await fetch((window.API_BASE || '') + `/api/puzzles/${encodeURIComponent(puzzleId)}`);
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
                     const { puzzle } = await res.json();
                     puzzleData = normalizeSchema(puzzle.data);

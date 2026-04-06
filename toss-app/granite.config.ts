@@ -5,7 +5,7 @@ export default defineConfig({
   brand: {
     displayName: '트렌드 잉글리시',
     primaryColor: '#5b5bd6',
-    icon: 'https://aieng.cafe24app.com/logo/trend-eng-logo-600x600.png',
+    icon: 'https://aieng.duckdns.org/logo/trend-eng-logo-600x600.png',
   },
   web: {
     host: 'localhost',

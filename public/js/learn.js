@@ -123,7 +123,11 @@ async function generateFromTopic(topic, diff) {
 function showSentence() {
     if (currentCount >= sentences.length) { finishLearning(); return; }
 
-    window.speechSynthesis.cancel();
+    try {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+    } catch (e) {
+        console.warn('SpeechSynthesis cancel failed:', e);
+    }
     const cur = sentences[currentCount];
 
     sentenceEn.textContent = cur.en;
@@ -226,7 +230,11 @@ ttsBtn.addEventListener('click', async () => {
 function speakWithBestVoice(text) {
     return new Promise((resolve, reject) => {
         if (!window.speechSynthesis) { reject(new Error('TTS 미지원')); return; }
-        window.speechSynthesis.cancel();
+        try {
+            window.speechSynthesis.cancel();
+        } catch (e) {
+            console.warn('SpeechSynthesis cancel failed:', e);
+        }
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang   = 'en-US';
         utterance.rate   = 0.85;

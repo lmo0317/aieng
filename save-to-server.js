@@ -7,7 +7,7 @@ async function saveToServer() {
         const newsData = JSON.parse(rawData);
         
         // 운영 서버 주소
-        const SERVER_URL = 'http://aieng.cafe24app.com/api/trends/save';
+        const SERVER_URL = 'https://aieng.duckdns.org/api/trends/save';
         
         console.log('Sending data to server...');
         

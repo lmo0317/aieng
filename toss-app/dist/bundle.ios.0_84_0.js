@@ -9,10 +9,10 @@ var global = typeof globalThis !== 'undefined' ? globalThis : typeof global !== 
     host: ''
   };
   global.__appsInToss = {
-    deploymentId: "019d5de5-0a22-73c2-a198-199182c76080",
+    deploymentId: "019d638e-77c1-7178-a1df-bab6563dcba3",
     brandDisplayName: "\uD2B8\uB80C\uB4DC \uC789\uAE00\uB9AC\uC2DC",
     brandPrimaryColor: "#5b5bd6",
-    brandIcon: "https://aieng.cafe24app.com/logo/trend-eng-logo-600x600.png",
+    brandIcon: "https://aieng.duckdns.org/logo/trend-eng-logo-600x600.png",
     webViewType: "partner",
     navigationBar: "{\"withBackButton\":true,\"withHomeButton\":false}"
   };
@@ -132,10 +132,10 @@ if (global.__MICRO_FRONTEND__ == null) {
     host: ''
   };
   global.__appsInToss = {
-    deploymentId: "019d5de5-0a22-73c2-a198-199182c76080",
+    deploymentId: "019d638e-77c1-7178-a1df-bab6563dcba3",
     brandDisplayName: "\uD2B8\uB80C\uB4DC \uC789\uAE00\uB9AC\uC2DC",
     brandPrimaryColor: "#5b5bd6",
-    brandIcon: "https://aieng.cafe24app.com/logo/trend-eng-logo-600x600.png",
+    brandIcon: "https://aieng.duckdns.org/logo/trend-eng-logo-600x600.png",
     webViewType: "partner",
     navigationBar: "{\"withBackButton\":true,\"withHomeButton\":false}"
   };

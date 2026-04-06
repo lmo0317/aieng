@@ -25,7 +25,7 @@ echo "📍 대상 주제: ${TOPIC}"
 
 # 상세 프롬프트와 함께 Gemini 실행 (-y: 자동 승인 모드)
 # /puzzle 스킬을 사용하여 무결성이 검증된 퍼즐을 생성하고 서버에 저장합니다.
-/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin/gemini -m "gemini-3.1-flash-lite-preview" -y "/puzzle ${TOPIC} ${COUNT}개 생성해서 운영 서버(aieng.cafe24app.com)에 반영해줘. 모든 결과 보고는 텔레그램으로 전송해줘."
+/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin/gemini -m "gemini-3.1-flash-lite-preview" -y "/puzzle ${TOPIC} ${COUNT}개 생성해서 운영 서버(https://aieng.duckdns.org)에 반영해줘. 모든 결과 보고는 텔레그램으로 전송해줘."
 
 if [ $? -eq 0 ]; then
     echo "✅ 퍼즐 생성 작업이 성공적으로 완료되었습니다."

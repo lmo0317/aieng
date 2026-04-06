@@ -11,5 +11,5 @@ document.getElementById('start-btn').addEventListener('click', () => {
 
     // learn 페이지로 이동 (topic + difficulty 파라미터)
     const params = new URLSearchParams({ topic, difficulty, source: 'topic' });
-    window.location.href = `/learn?${params.toString()}`;
+    window.location.href = `/learn.html?${params.toString()}`;
 });

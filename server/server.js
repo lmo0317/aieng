@@ -768,7 +768,7 @@ app.delete('/api/trends/:id', requireAdminKey, (req, res) => {
 });
 
 // ─── Data Sync from Remote Server ────────────────────────────────────────────
-const REMOTE_BASE = 'http://aieng.cafe24app.com';
+const REMOTE_BASE = 'https://aieng.duckdns.org';
 
 app.post('/api/sync', async (req, res) => {
     const results = { news: 0, songs: 0, puzzles: 0, skipped: 0, errors: [] };
@@ -880,7 +880,7 @@ async function migratePuzzleJsonToDB() {
 // Start Express Server
 const server = app.listen(PORT, async () => {
     console.log(`Express Server running on port ${PORT}`);
-    console.log(`Service URL: https://aieng.cafe24app.com`);
+    console.log(`Service URL: https://aieng.duckdns.org`);
     // puzzle JSON → DB migration 비활성화 (puzzle-data 폴더 JSON 파일로 인한 재시작 시 데이터 복원 방지)
     
     // WebSocket for AI Tutor Chat

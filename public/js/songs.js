@@ -36,7 +36,7 @@ function renderSavedSongs(songs) {
             <button class="trend-start-btn">학습 시작 →</button>`;
 
         card.querySelector('.trend-start-btn').addEventListener('click', () => {
-            window.location.href = `/learn?id=${song.id}&source=songs`;
+            window.location.href = `/learn.html?id=${song.id}&source=songs`;
         });
 
         songsContainer.appendChild(card);

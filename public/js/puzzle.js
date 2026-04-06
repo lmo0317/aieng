@@ -39,7 +39,7 @@ function renderPuzzles(puzzles) {
             <button class="trend-start-btn">퍼즐 시작 →</button>`;
 
         card.querySelector('.trend-start-btn').addEventListener('click', () => {
-            window.location.href = `/puzzle/play?id=${p.id}`;
+            window.location.href = `/puzzle-play.html?id=${p.id}`;
         });
 
         puzzleContainer.appendChild(card);
