@@ -3,15 +3,16 @@ const path = require('path');
 const http = require('http');
 const dotenv = require('dotenv');
 
-// Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
+// Load environment variables with override: true to ensure .env values take precedence
+const envPath = path.resolve(__dirname, '../../../../.env');
+dotenv.config({ path: envPath, override: true });
 
-let SERVER_URL = process.env.SERVER_URL || 'http://aieng.cafe24app.com';
+let SERVER_URL = process.env.SERVER_URL || 'https://aieng.duckdns.org';
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY || '';
 
 // 로컬 환경(localhost)인 경우 운영 서버로 강제 전환 (운영 반영을 위해)
 if (SERVER_URL.includes('localhost') || SERVER_URL.includes('127.0.0.1')) {
-  SERVER_URL = 'http://aieng.cafe24app.com';
+  SERVER_URL = 'https://aieng.duckdns.org';
 }
 
 if (!ADMIN_API_KEY) {
@@ -43,7 +44,7 @@ try {
       summary: "",
       keywords: [],
       sentences: item.sentences.map(s => {
-        // Map fields correctly as per tech-implementer
+        // Map fields correctly
         const rawVoca = s.voca || s.vocabulary || "";
         let vocaArray = [];
         if (typeof rawVoca === 'string') {
@@ -73,7 +74,7 @@ try {
   const options = {
     hostname: url.hostname,
     port: url.port || (url.protocol === 'https:' ? 443 : 80),
-    path: '/api/trends/save',
+    path: '/api/trends/save/',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
