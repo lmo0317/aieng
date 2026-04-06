@@ -59,7 +59,7 @@ body {
     background: var(--bg);
     color: var(--text-1);
     margin: 0;
-    padding: var(--sat) var(--sar) var(--sab) var(--sal);
+    padding: 0 var(--sar) var(--sab) var(--sal);
     min-height: 100vh;
     min-height: 100dvh;
     overflow-x: hidden;
@@ -86,7 +86,7 @@ body .chat-message-text, body .chat-messages {
 
 /* ─── Container ──────────────────────────────────────────────────────── */
 .container {
-    padding: calc(var(--sat) + 60px) 1.25rem calc(var(--sab) + 80px);
+    padding: calc(var(--sat) + 8px) 1.25rem calc(var(--sab) + 80px);
     width: 100%;
     max-width: 860px;
     margin: 0 auto;
@@ -96,70 +96,7 @@ body .chat-message-text, body .chat-messages {
 }
 
 @media (max-width: 768px) {
-    .container { max-width: 100%; margin: 0; padding: calc(var(--sat) + 50px) 0.9rem calc(var(--sab) + 75px); }
-}
-
-/* ─── Toss Header ────────────────────────────────────────────────────── */
-.toss-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: calc(var(--sat) + 56px);
-    background: var(--surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: var(--sat);
-    z-index: 1000;
-    border-bottom: 1px solid var(--border-2);
-}
-
-.toss-header-left {
-    position: absolute;
-    left: 12px;
-    bottom: 0;
-    height: 56px;
-    display: flex;
-    align-items: center;
-}
-
-.back-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-1);
-    font-size: 1.5rem;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s;
-    line-height: 1;
-}
-
-.back-btn:hover { background: var(--surface-hover); }
-
-.toss-header-center {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.toss-header-logo {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    object-fit: cover;
-}
-
-.toss-header-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--text-1);
-    margin: 0;
-    font-family: var(--font-body);
+    .container { max-width: 100%; margin: 0; padding: calc(var(--sat) + 8px) 0.9rem calc(var(--sab) + 75px); }
 }
 
 /* ─── Floating Tabbar ───────────────────────────────────────────────── */
