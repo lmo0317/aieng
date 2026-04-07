@@ -9,8 +9,8 @@ var global = typeof globalThis !== 'undefined' ? globalThis : typeof global !== 
     host: ''
   };
   global.__appsInToss = {
-    deploymentId: "019d63b6-12f1-72f4-b8b8-3c4b6bea1618",
-    brandDisplayName: "\uD2B8\uB80C\uB4DC \uC789\uAE00\uB9AC\uC2DC",
+    deploymentId: "019d6865-254a-7692-90e2-86e294a73850",
+    brandDisplayName: "\uD2B8\uB80C\uB4DC\uC789\uAE00\uB9AC\uC26C",
     brandPrimaryColor: "#5b5bd6",
     brandIcon: "https://aieng.duckdns.org/logo/trend-eng-logo-600x600.png",
     webViewType: "partner",
@@ -132,8 +132,8 @@ if (global.__MICRO_FRONTEND__ == null) {
     host: ''
   };
   global.__appsInToss = {
-    deploymentId: "019d63b6-12f1-72f4-b8b8-3c4b6bea1618",
-    brandDisplayName: "\uD2B8\uB80C\uB4DC \uC789\uAE00\uB9AC\uC2DC",
+    deploymentId: "019d6865-254a-7692-90e2-86e294a73850",
+    brandDisplayName: "\uD2B8\uB80C\uB4DC\uC789\uAE00\uB9AC\uC26C",
     brandPrimaryColor: "#5b5bd6",
     brandIcon: "https://aieng.duckdns.org/logo/trend-eng-logo-600x600.png",
     webViewType: "partner",

@@ -55,9 +55,13 @@ function showEmptyState() {
         </div>`;
 }
 
+let _newBadgeShown = false;
+
 function renderRealtimeTrends(trends) {
     realtimeTrendsContainer.innerHTML = '';
     trendsPagination.groups = {};
+    _newBadgeShown = false;
+
     trends.forEach(item => {
         const date = item.date || '기타';
         if (!trendsPagination.groups[date]) trendsPagination.groups[date] = [];
@@ -110,6 +114,8 @@ function renderNextPage() {
                 return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
             })() : '';
 
+            const isNew = !_newBadgeShown;
+            _newBadgeShown = true;
             card.innerHTML = `
                 <div class="trend-card-top">
                     <span class="trend-category ${catClass}">${_cat}</span>
@@ -120,6 +126,7 @@ function renderNextPage() {
                 </div>
                 <div class="trend-card-footer">
                     ${timeStr ? `<span class="trend-card-time">${timeStr}</span>` : ''}
+                    ${isNew ? '<span class="new-badge">NEW</span>' : ''}
                     <span class="ai-badge">AI 생성</span>
                     <button class="trend-start-btn">학습 시작 →</button>
                 </div>`;

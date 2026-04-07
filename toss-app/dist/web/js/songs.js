@@ -26,12 +26,17 @@ function renderSavedSongs(songs) {
         return;
     }
 
+    // API가 createdAt DESC 정렬이므로 첫 번째가 최신
+    const newestSongId = songs[0].id;
+
     songs.forEach(song => {
+        const isNew = song.id === newestSongId;
         const card = document.createElement('div');
         card.className = 'realtime-trend-card trend-card-row';
         card.innerHTML = `
             <span class="row-date">${song.date || (song.createdAt ? song.createdAt.slice(0, 10) : '')}</span>
             <span class="row-title">${song.title}</span>
+            ${isNew ? '<span class="new-badge">NEW</span>' : ''}
             <span class="ai-badge">AI 생성</span>
             <button class="trend-start-btn">학습 시작 →</button>`;
 

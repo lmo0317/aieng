@@ -3,7 +3,7 @@ import { defineConfig } from '@apps-in-toss/web-framework/config';
 export default defineConfig({
   appName: 'trend-english',
   brand: {
-    displayName: '트렌드 잉글리시',
+    displayName: '트렌드잉글리쉬',
     primaryColor: '#5b5bd6',
     icon: 'https://aieng.duckdns.org/logo/trend-eng-logo-600x600.png',
   },

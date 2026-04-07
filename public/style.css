@@ -1029,6 +1029,21 @@ button, .btn-primary, .start-btn, .go-settings-btn {
     flex-shrink: 0;
 }
 
+/* 로딩 스켈레톤 */
+@keyframes skeleton-shimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+.skeleton-list { display: flex; flex-direction: column; gap: 8px; }
+.skeleton-card, .skeleton-row {
+    border-radius: var(--r-lg);
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface) 50%, var(--surface-2) 75%);
+    background-size: 800px 100%;
+    animation: skeleton-shimmer 1.4s infinite linear;
+}
+.skeleton-card { height: 100px; }
+.skeleton-row  { height: 56px; }
+
 /* NEW 배지 */
 .new-badge {
     display: inline-flex;

@@ -29,12 +29,17 @@ function renderPuzzles(puzzles) {
 
     puzzles.sort((a, b) => b.date.localeCompare(a.date));
 
+    // sort 후 첫 번째가 최신
+    const newestPuzzleId = puzzles[0].id;
+
     puzzles.forEach(p => {
+        const isNew = p.id === newestPuzzleId;
         const card = document.createElement('div');
         card.className = 'realtime-trend-card trend-card-row';
         card.innerHTML = `
             <span class="row-date">${p.date || ''}</span>
             <span class="row-title">${p.title}</span>
+            ${isNew ? '<span class="new-badge">NEW</span>' : ''}
             <span class="ai-badge">AI 생성</span>
             <button class="trend-start-btn">퍼즐 시작 →</button>`;
 
