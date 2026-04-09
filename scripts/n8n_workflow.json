@@ -1,0 +1,63 @@
+{
+  "name": "Trend Eng - Shorts Auto Upload",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 24 }]
+        }
+      },
+      "name": "Schedule (매일 실행)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "command": "node -e \"const db=require('D:/work/dev/web/aieng/server/database');db.all('SELECT id,title,type,category FROM trends WHERE type IN (\\\"news\\\",\\\"song\\\") ORDER BY createdAt DESC LIMIT 3',(e,r)=>{console.log(JSON.stringify(r));process.exit();})\"",
+        "options": {}
+      },
+      "name": "DB에서 최신 트렌드 조회",
+      "type": "n8n-nodes-base.executeCommand",
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.stdout;\nconst trends = JSON.parse(raw);\nreturn trends.map(t => ({ json: t }));"
+      },
+      "name": "트렌드 목록 파싱",
+      "type": "n8n-nodes-base.code",
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "command": "=python D:/work/dev/web/aieng/scripts/generate_shorts.py {{ $json.id }} --upload",
+        "options": {}
+      },
+      "name": "숏츠 생성 + YouTube 업로드",
+      "type": "n8n-nodes-base.executeCommand",
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $input.first().json.stdout || '';\nconst lines = output.split('\\n').filter(Boolean);\nlet uploaded = null;\nfor (const line of lines) {\n  try {\n    const parsed = JSON.parse(line);\n    if (parsed.step === 'uploaded') uploaded = parsed;\n  } catch {}\n}\nif (!uploaded) throw new Error('Upload failed: ' + output.slice(-200));\nreturn [{ json: uploaded }];"
+      },
+      "name": "업로드 결과 파싱",
+      "type": "n8n-nodes-base.code",
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Schedule (매일 실행)": {
+      "main": [[{ "node": "DB에서 최신 트렌드 조회", "type": "main", "index": 0 }]]
+    },
+    "DB에서 최신 트렌드 조회": {
+      "main": [[{ "node": "트렌드 목록 파싱", "type": "main", "index": 0 }]]
+    },
+    "트렌드 목록 파싱": {
+      "main": [[{ "node": "숏츠 생성 + YouTube 업로드", "type": "main", "index": 0 }]]
+    },
+    "숏츠 생성 + YouTube 업로드": {
+      "main": [[{ "node": "업로드 결과 파싱", "type": "main", "index": 0 }]]
+    }
+  }
+}
