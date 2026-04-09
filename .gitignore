@@ -14,3 +14,6 @@ tunnel_url.txt
 # SSH keys (배포용 키는 로컬에만 보관)
 webtools/keys/cafe24_deploy
 webtools/keys/cafe24_deploy.pub
+scripts/client_secret*.json
+scripts/youtube_token.pickle
+scripts/*.pickle
