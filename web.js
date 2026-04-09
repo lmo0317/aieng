@@ -1,4 +1,4 @@
 /**
- * Cafe24 Node.js Hosting Entry Point
+ * Node.js Entry Point
  */
 require('./server/server.js');

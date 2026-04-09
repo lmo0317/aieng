@@ -10,7 +10,7 @@
 **AI**: Google Gemini, Groq, GLM (Zhipu AI)
 **Frontend**: Vanilla JS, Web Speech API, SSE
 **DB**: SQLite3 (`db/database.sqlite`)
-**배포**: Cafe24 (`git push cafe24 master`)
+**배포**: GitHub (`git push origin master`)
 
 ---
 
@@ -19,7 +19,7 @@
 ```bash
 npm start                        # 서버 시작 (port 80)
 npm run fetch-trends             # 뉴스 트렌드 수집 CLI
-git push cafe24 master           # 운영 배포
+git push origin master           # 운영 배포
 ```
 
 ---
