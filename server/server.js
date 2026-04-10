@@ -136,9 +136,20 @@ const puzzleDataDir = path.join(__dirname, '..', 'public', 'puzzle-data');
 
 // GET /api/puzzles - 퍼즐 목록
 app.get('/api/puzzles', (req, res) => {
-    db.all("SELECT id, title, category, difficulty, date, wordCount, source, createdAt FROM puzzles ORDER BY date DESC, createdAt DESC", (err, rows) => {
+    const limit = req.query.limit !== undefined ? parseInt(req.query.limit) : null;
+    const offset = parseInt(req.query.offset) || 0;
+
+    db.get("SELECT COUNT(*) as total FROM puzzles", (err, countRow) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ puzzles: rows || [] });
+        const total = countRow ? countRow.total : 0;
+        const query = limit !== null
+            ? "SELECT id, title, category, difficulty, date, wordCount, source, createdAt FROM puzzles ORDER BY date DESC, createdAt DESC LIMIT ? OFFSET ?"
+            : "SELECT id, title, category, difficulty, date, wordCount, source, createdAt FROM puzzles ORDER BY date DESC, createdAt DESC";
+        const params = limit !== null ? [limit, offset] : [];
+        db.all(query, params, (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ puzzles: rows || [], total, limit, offset });
+        });
     });
 });
 
@@ -467,9 +478,20 @@ function broadcastTrendsProgress(status, message, current, total) {
 
 // Trends API
 app.get('/api/trends/saved', (req, res) => {
-    db.all("SELECT * FROM trends WHERE sentences IS NOT NULL AND type = 'news' ORDER BY createdAt DESC", (err, rows) => {
+    const limit = req.query.limit !== undefined ? parseInt(req.query.limit) : null;
+    const offset = parseInt(req.query.offset) || 0;
+
+    db.get("SELECT COUNT(*) as total FROM trends WHERE sentences IS NOT NULL AND type = 'news'", (err, countRow) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ trends: rows || [] });
+        const total = countRow ? countRow.total : 0;
+        const query = limit !== null
+            ? "SELECT * FROM trends WHERE sentences IS NOT NULL AND type = 'news' ORDER BY createdAt DESC LIMIT ? OFFSET ?"
+            : "SELECT * FROM trends WHERE sentences IS NOT NULL AND type = 'news' ORDER BY createdAt DESC";
+        const params = limit !== null ? [limit, offset] : [];
+        db.all(query, params, (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ trends: rows || [], total, limit, offset });
+        });
     });
 });
 
@@ -695,9 +717,20 @@ app.get('/api/trends/by-title', (req, res) => {
 
 // Saved Songs API
 app.get('/api/songs/saved', (req, res) => {
-    db.all("SELECT * FROM trends WHERE type = 'song' ORDER BY createdAt DESC", (err, rows) => {
+    const limit = req.query.limit !== undefined ? parseInt(req.query.limit) : null;
+    const offset = parseInt(req.query.offset) || 0;
+
+    db.get("SELECT COUNT(*) as total FROM trends WHERE type = 'song'", (err, countRow) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ songs: rows || [] });
+        const total = countRow ? countRow.total : 0;
+        const query = limit !== null
+            ? "SELECT * FROM trends WHERE type = 'song' ORDER BY createdAt DESC LIMIT ? OFFSET ?"
+            : "SELECT * FROM trends WHERE type = 'song' ORDER BY createdAt DESC";
+        const params = limit !== null ? [limit, offset] : [];
+        db.all(query, params, (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ songs: rows || [], total, limit, offset });
+        });
     });
 });
 
