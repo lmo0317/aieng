@@ -23,25 +23,54 @@ function normCat(cat) {
     return _CAT_MAP[p] || _CAT_MAP[p.toUpperCase()] || _CAT_MAP[cat] || '일반';
 }
 
-let trendsPagination = {
-    allDates: [],
-    groups: {},
-    currentPage: 0,
-    itemsPerPage: 3
+const PAGE_SIZE = 4;
+
+let state = {
+    offset: 0,
+    total: 0,
+    isLoading: false,
+    hasRendered: false,
 };
 
-async function fetchRealtimeTrends() {
+let _newBadgeShown = false;
+
+async function fetchRealtimeTrends(offset = 0) {
+    if (state.isLoading) return;
+    state.isLoading = true;
+
+    // 첫 로드면 로딩 스피너 표시
+    if (offset === 0) {
+        realtimeTrendsContainer.innerHTML = '<div class="loading-state">불러오는 중...</div>';
+        _newBadgeShown = false;
+    } else {
+        const oldMoreBtn = document.getElementById('load-more-trends-btn');
+        if (oldMoreBtn) oldMoreBtn.closest('.load-more-container').remove();
+    }
+
     try {
-        const resp = await fetch((window.API_BASE || '') + '/api/trends/saved');
+        const url = `${window.API_BASE || ''}/api/trends/saved?limit=${PAGE_SIZE}&offset=${offset}`;
+        const resp = await fetch(url);
         const data = await resp.json();
-        if (data.trends && Array.isArray(data.trends) && data.trends.length > 0) {
-            renderRealtimeTrends(data.trends);
-        } else {
+
+        if (offset === 0 && (!data.trends || data.trends.length === 0)) {
             showEmptyState();
+            return;
         }
+
+        state.total = data.total || 0;
+        state.offset = offset + (data.trends ? data.trends.length : 0);
+
+        if (offset === 0) {
+            realtimeTrendsContainer.innerHTML = '';
+        }
+
+        renderTrends(data.trends || []);
+        renderMoreButton();
     } catch (e) {
         console.error('Error fetching trends:', e);
-        showEmptyState();
+        if (offset === 0) showEmptyState();
+    } finally {
+        state.isLoading = false;
     }
 }
 
@@ -55,53 +84,35 @@ function showEmptyState() {
         </div>`;
 }
 
-let _newBadgeShown = false;
-
-function renderRealtimeTrends(trends) {
-    realtimeTrendsContainer.innerHTML = '';
-    trendsPagination.groups = {};
-    _newBadgeShown = false;
-
-    trends.forEach(item => {
-        const date = item.date || '기타';
-        if (!trendsPagination.groups[date]) trendsPagination.groups[date] = [];
-        trendsPagination.groups[date].push(item);
-    });
-    trendsPagination.allDates = Object.keys(trendsPagination.groups).sort((a, b) => b.localeCompare(a));
-    trendsPagination.allDates.forEach(d => {
-        trendsPagination.groups[d].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    });
-    trendsPagination.currentPage = 0;
-    renderNextPage();
-}
-
-function renderNextPage() {
-    const start = trendsPagination.currentPage * trendsPagination.itemsPerPage;
-    const end   = start + trendsPagination.itemsPerPage;
-    const dates = trendsPagination.allDates.slice(start, end);
-
-    if (dates.length === 0 && trendsPagination.currentPage === 0) {
-        realtimeTrendsContainer.innerHTML = '<div class="trends-empty-state">트렌드가 없습니다.</div>';
-        return;
-    }
-
-    const oldMoreBtn = document.getElementById('load-more-trends-btn');
-    if (oldMoreBtn) oldMoreBtn.remove();
-
+function renderTrends(trends) {
     const today = new Date().toISOString().split('T')[0];
 
+    // 날짜별 그룹핑
+    const groups = {};
+    trends.forEach(item => {
+        const date = item.date || '기타';
+        if (!groups[date]) groups[date] = [];
+        groups[date].push(item);
+    });
+    const dates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+
     dates.forEach(date => {
-        const dateHeader = document.createElement('div');
-        dateHeader.className = 'trends-date-header';
-        const displayDate = date === today ? `오늘 (${date})` : date;
-        dateHeader.innerHTML = `<h3>📅 ${displayDate}</h3>`;
-        realtimeTrendsContainer.appendChild(dateHeader);
+        // 이미 해당 날짜 헤더가 있으면 그 dateGrid에 추가
+        let dateGrid = realtimeTrendsContainer.querySelector(`[data-date-grid="${date}"]`);
+        if (!dateGrid) {
+            const dateHeader = document.createElement('div');
+            dateHeader.className = 'trends-date-header';
+            const displayDate = date === today ? `오늘 (${date})` : date;
+            dateHeader.innerHTML = `<h3>📅 ${displayDate}</h3>`;
+            realtimeTrendsContainer.appendChild(dateHeader);
 
-        const dateGrid = document.createElement('div');
-        dateGrid.className = 'trends-date-grid';
+            dateGrid = document.createElement('div');
+            dateGrid.className = 'trends-date-grid';
+            dateGrid.dataset.dateGrid = date;
+            realtimeTrendsContainer.appendChild(dateGrid);
+        }
 
-        const sorted = trendsPagination.groups[date];
-        sorted.forEach(item => {
+        groups[date].forEach(item => {
             const card = document.createElement('div');
             card.className = 'realtime-trend-card';
 
@@ -137,24 +148,24 @@ function renderNextPage() {
 
             dateGrid.appendChild(card);
         });
-
-        realtimeTrendsContainer.appendChild(dateGrid);
     });
-
-    if (end < trendsPagination.allDates.length) {
-        const moreBtnContainer = document.createElement('div');
-        moreBtnContainer.className = 'load-more-container';
-        moreBtnContainer.innerHTML = `
-            <button id="load-more-trends-btn" class="load-more-btn">
-                <span>이전 트렌드 더보기</span>
-                <span class="more-count">(${trendsPagination.allDates.length - end}일치 더 있음)</span>
-            </button>`;
-        realtimeTrendsContainer.appendChild(moreBtnContainer);
-        document.getElementById('load-more-trends-btn').addEventListener('click', () => {
-            trendsPagination.currentPage++;
-            renderNextPage();
-        });
-    }
 }
 
-fetchRealtimeTrends();
+function renderMoreButton() {
+    if (state.offset >= state.total) return;
+
+    const remaining = state.total - state.offset;
+    const moreBtnContainer = document.createElement('div');
+    moreBtnContainer.className = 'load-more-container';
+    moreBtnContainer.innerHTML = `
+        <button id="load-more-trends-btn" class="load-more-btn">
+            <span>이전 트렌드 더보기</span>
+            <span class="more-count">(${remaining}개 더 있음)</span>
+        </button>`;
+    realtimeTrendsContainer.appendChild(moreBtnContainer);
+    document.getElementById('load-more-trends-btn').addEventListener('click', () => {
+        fetchRealtimeTrends(state.offset);
+    });
+}
+
+fetchRealtimeTrends(0);
