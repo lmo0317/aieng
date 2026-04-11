@@ -129,6 +129,7 @@ app.get('/learn', (req, res) => res.sendFile(pub('learn.html')));
 app.get('/chat',  (req, res) => res.sendFile(pub('chat.html')));
 app.get('/puzzle',      (req, res) => res.sendFile(pub('puzzle.html')));
 app.get('/puzzle/play', (req, res) => res.sendFile(pub('puzzle-play.html')));
+app.get('/punchline',   (req, res) => res.sendFile(pub('punchline.html')));
 
 // ─── Puzzle API (DB-based) ────────────────────────────────────────────────────
 const fs = require('fs');
@@ -730,6 +731,26 @@ app.get('/api/songs/saved', (req, res) => {
         db.all(query, params, (err, rows) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ songs: rows || [], total, limit, offset });
+        });
+    });
+});
+
+// Punchline API - Movie/Animation/Drama/Song: 패턴 제목으로 구분
+app.get('/api/punchline/saved', (req, res) => {
+    const limit = req.query.limit !== undefined ? parseInt(req.query.limit) : null;
+    const offset = parseInt(req.query.offset) || 0;
+    const pattern = "type = 'song' AND (title LIKE 'Movie:%' OR title LIKE 'Animation:%' OR title LIKE 'Drama:%' OR title LIKE 'Song:%')";
+
+    db.get(`SELECT COUNT(*) as total FROM trends WHERE ${pattern}`, (err, countRow) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const total = countRow ? countRow.total : 0;
+        const query = limit !== null
+            ? `SELECT * FROM trends WHERE ${pattern} ORDER BY createdAt DESC LIMIT ? OFFSET ?`
+            : `SELECT * FROM trends WHERE ${pattern} ORDER BY createdAt DESC`;
+        const params = limit !== null ? [limit, offset] : [];
+        db.all(query, params, (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ items: rows || [], total, limit, offset });
         });
     });
 });

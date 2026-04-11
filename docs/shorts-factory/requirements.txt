@@ -1,0 +1,27 @@
+# Shorts Factory Python 의존성
+
+# AI 모델
+torch>=2.1.0
+diffusers>=0.30.0
+transformers>=4.40.0
+accelerate>=0.30.0
+imageio[ffmpeg]>=2.34.0
+
+# ComfyUI 통신
+websocket-client>=1.7.0
+
+# Ollama
+ollama>=0.2.0
+
+# TTS 폴백
+edge-tts>=6.1.0
+
+# YouTube API
+google-api-python-client>=2.120.0
+google-auth>=2.28.0
+google-auth-oauthlib>=1.2.0
+
+# 유틸
+PyYAML>=6.0
+Pillow>=10.0.0
+torchaudio>=2.1.0
