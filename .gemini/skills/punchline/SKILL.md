@@ -34,7 +34,11 @@ description: >
     2.  **학습 가치**: 원어민의 자연스러운 표현, 유용한 관용구, 중고급 어휘가 포함된 문장.
     3.  **길이**: 학습 효과를 위해 너무 짧은 문장(3단어 이하)보다는 구조 분석이 가능한 적절한 길이의 문장을 선호합니다.
 - **원문 확인**: `google_web_search`로 실제 대사 원문을 검색·확인하십시오. (검색어 예: 'Top 10 quotes from [Movie Name]')
-- **제목 설정 (HARD RULE)**: `title` 필드는 반드시 **'[Type]: Title'** 형식으로만 작성합니다.
+- **디테일한 제목 설정 (HARD RULE)**: `title` 필드는 반드시 **'[Type]: Title (Sub-title/Episode/Volume)'** 형식으로 작성하여 학습 테마를 명확히 합니다.
+    - 예: `Animation: One Piece (Legendary Quotes from the Summit War)`
+    - 예: `Movie: About Time (The Magic of Ordinary Days)`
+    - 예: `Drama: Friends (Season 1 Iconic Lines)`
+    - 예: `Song: My Heart Will Go On (Titanic OST Special)`
 
 ### Phase 2: Star English Tutor (초정밀 1타 강사 교육)
 - 추출된 **5개 명대사 전부**에 대해 다음 정보를 생성합니다.

@@ -30,7 +30,7 @@ const revealBtn    = document.getElementById('reveal-btn');
 const nextBtn      = document.getElementById('next-btn');
 const finishBtn    = document.getElementById('finish-btn');
 const startQuizBtn = document.getElementById('start-quiz-btn');
-const skipToQuizBtn = document.getElementById('skip-to-quiz-btn');
+
 const currentCountSpan = document.getElementById('current-count');
 
 const learningSection = document.getElementById('learning-section');
@@ -76,10 +76,6 @@ async function loadFromId(id) {
                 sessionStorage.setItem('currentTopic', data.trend.title || '');
                 showSentence();
                 sendTopicToChat(data.trend.title || '');
-                if (quizData.length > 0 && skipToQuizBtn) {
-                    skipToQuizBtn.classList.remove('hidden');
-                    skipToQuizBtn.onclick = () => startQuizBtn.click();
-                }
                 return;
             }
         }
