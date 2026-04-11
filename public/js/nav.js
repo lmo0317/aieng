@@ -12,9 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (href === '/review' && path === '/review.html') {
             link.classList.add('active');
         }
-        if (href === '/songs' && path === '/songs.html') {
-            link.classList.add('active');
-        }
+
         if (href === '/puzzle' && path === '/puzzle.html') {
             link.classList.add('active');
         }

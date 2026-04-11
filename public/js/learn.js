@@ -16,7 +16,7 @@ const difficulty = params.get('difficulty') || 'level3';
 const source     = params.get('source') || 'trends';  // 뒤로 갈 섹션
 
 // 출처 섹션 URL 맵
-const SOURCE_URL = { trends: '/', songs: '/songs', topic: '/topic' };
+const SOURCE_URL = { trends: '/', songs: '/punchline', punchline: '/punchline', topic: '/topic' };
 const backUrl = SOURCE_URL[source] || '/';
 
 // DOM

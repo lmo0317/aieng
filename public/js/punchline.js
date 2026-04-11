@@ -105,7 +105,7 @@ function renderPunchlines(items, isFirstPage) {
             <button class="trend-start-btn">학습 시작 →</button>`;
 
         card.querySelector('.trend-start-btn').addEventListener('click', () => {
-            window.location.href = `/learn.html?id=${item.id}&source=songs`;
+            window.location.href = `/learn.html?id=${item.id}&source=punchline`;
         });
 
         punchlineContainer.appendChild(card);
