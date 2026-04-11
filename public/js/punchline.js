@@ -80,18 +80,28 @@ function renderPunchlines(items, isFirstPage) {
     items.forEach((item, idx) => {
         const isNew = isFirstPage && idx === 0;
         const { icon, label } = getTypeInfo(item.title);
-
-        // title에서 type prefix 제거해서 깔끔하게 표시
         const displayTitle = item.title.replace(/^(Movie|Animation|Drama|Song):\s*/, '');
 
+        const dateTimeStr = item.createdAt ? (() => {
+            const d = new Date(item.createdAt.replace(' ', 'T') + 'Z');
+            const yyyy = d.getFullYear();
+            const mm   = String(d.getMonth() + 1).padStart(2, '0');
+            const dd   = String(d.getDate()).padStart(2, '0');
+            const hh   = String(d.getHours()).padStart(2, '0');
+            const mi   = String(d.getMinutes()).padStart(2, '0');
+            return `${yyyy}.${mm}.${dd} ${hh}:${mi}`;
+        })() : (item.date || '');
+
         const card = document.createElement('div');
-        card.className = 'realtime-trend-card trend-card-row punchline-card';
+        card.className = 'realtime-trend-card';
         card.innerHTML = `
-            <span class="row-date">${item.date || (item.createdAt ? item.createdAt.slice(0, 10) : '')}</span>
-            <span class="punchline-type-badge">${icon} ${label}</span>
-            <span class="row-title">${displayTitle}</span>
-            ${isNew ? '<span class="new-badge">NEW</span>' : ''}
-            <span class="ai-badge">AI 생성</span>
+            <div class="trend-card-meta">
+                <span class="punchline-type-badge">${icon} ${label}</span>
+                ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+                <span class="ai-badge">AI 생성</span>
+                <span class="trend-card-time">${dateTimeStr}</span>
+            </div>
+            <h4 class="trend-card-title">${displayTitle}</h4>
             <button class="trend-start-btn">학습 시작 →</button>`;
 
         card.querySelector('.trend-start-btn').addEventListener('click', () => {

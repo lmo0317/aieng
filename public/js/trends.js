@@ -116,31 +116,29 @@ function renderTrends(trends) {
             const card = document.createElement('div');
             card.className = 'realtime-trend-card';
 
-            const keywords = item.keywords ? JSON.parse(item.keywords) : [];
-            const kwHtml   = keywords.map(kw => `<span class="trend-keyword">${kw}</span>`).join('');
             const _cat = normCat(item.category);
             const catClass = `cat-${_cat.replace(/\s+/g, '')}`;
-            const timeStr = item.createdAt ? (() => {
+            const dateTimeStr = item.createdAt ? (() => {
                 const d = new Date(item.createdAt.replace(' ', 'T') + 'Z');
-                return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
+                const yyyy = d.getFullYear();
+                const mm   = String(d.getMonth() + 1).padStart(2, '0');
+                const dd   = String(d.getDate()).padStart(2, '0');
+                const hh   = String(d.getHours()).padStart(2, '0');
+                const mi   = String(d.getMinutes()).padStart(2, '0');
+                return `${yyyy}.${mm}.${dd} ${hh}:${mi}`;
             })() : '';
 
             const isNew = !_newBadgeShown;
             _newBadgeShown = true;
             card.innerHTML = `
-                <div class="trend-card-top">
+                <div class="trend-card-meta">
                     <span class="trend-category ${catClass}">${_cat}</span>
-                </div>
-                <div class="trend-card-body">
-                    <h4 class="trend-card-title">${item.title}</h4>
-                    ${kwHtml ? `<div class="trend-card-keywords">${kwHtml}</div>` : ''}
-                </div>
-                <div class="trend-card-footer">
-                    ${timeStr ? `<span class="trend-card-time">${timeStr}</span>` : ''}
                     ${isNew ? '<span class="new-badge">NEW</span>' : ''}
                     <span class="ai-badge">AI 생성</span>
-                    <button class="trend-start-btn">학습 시작 →</button>
-                </div>`;
+                    ${dateTimeStr ? `<span class="trend-card-time">${dateTimeStr}</span>` : ''}
+                </div>
+                <h4 class="trend-card-title">${item.title}</h4>
+                <button class="trend-start-btn">학습 시작 →</button>`;
 
             card.querySelector('.trend-start-btn').addEventListener('click', () => {
                 window.location.href = `/learn.html?id=${item.id}&source=trends`;
