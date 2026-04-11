@@ -54,16 +54,34 @@ async function fetchPuzzles(offset = 0) {
     }
 }
 
+let _newBadgeShown = false;
+
 function renderPuzzles(puzzles, isFirstPage) {
-    puzzles.forEach((p, idx) => {
-        const isNew = isFirstPage && idx === 0;
+    if (isFirstPage) _newBadgeShown = false;
+
+    puzzles.forEach((p) => {
+        const isNew = !_newBadgeShown;
+        _newBadgeShown = true;
+
+        const dateTimeStr = p.createdAt ? (() => {
+            const d = new Date(p.createdAt.replace(' ', 'T') + 'Z');
+            const yyyy = d.getFullYear();
+            const mm   = String(d.getMonth() + 1).padStart(2, '0');
+            const dd   = String(d.getDate()).padStart(2, '0');
+            const hh   = String(d.getHours()).padStart(2, '0');
+            const mi   = String(d.getMinutes()).padStart(2, '0');
+            return `${yyyy}.${mm}.${dd} ${hh}:${mi}`;
+        })() : (p.date || '');
+
         const card = document.createElement('div');
-        card.className = 'realtime-trend-card trend-card-row';
+        card.className = 'realtime-trend-card';
         card.innerHTML = `
-            <span class="row-date">${p.date || ''}</span>
-            <span class="row-title">${p.title}</span>
-            ${isNew ? '<span class="new-badge">NEW</span>' : ''}
-            <span class="ai-badge">AI 생성</span>
+            <div class="trend-card-meta">
+                <span class="ai-badge">AI 생성</span>
+                ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+                ${dateTimeStr ? `<span class="trend-card-time">${dateTimeStr}</span>` : ''}
+            </div>
+            <h4 class="trend-card-title">${p.title}</h4>
             <button class="trend-start-btn">퍼즐 시작 →</button>`;
 
         card.querySelector('.trend-start-btn').addEventListener('click', () => {
