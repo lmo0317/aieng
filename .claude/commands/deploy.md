@@ -11,7 +11,7 @@ metadata:
   version: "1.2.0"
   category: "devops"
   status: "active"
-  updated: "2026-04-10"
+  updated: "2026-04-12"
   tags: "deploy, ssh, git, restart, server"
   author: "Trend Eng Team"
 ---
@@ -57,7 +57,23 @@ ssh -o StrictHostKeyChecking=no root@43.106.114.167 "
 
 `SERVER_RUNNING` 확인 시 성공.
 
-### 3단계: 결과 출력
+### 3단계: 토스 앱 배포 (toss-app 변경사항이 있을 때)
+
+toss-app 관련 파일이 변경된 경우 빌드 후 토스 콘솔에 배포:
+
+```bash
+cd D:/work/dev/web/aieng/toss-app && npm run build 2>&1
+```
+
+빌드 성공 후 배포:
+
+```bash
+cd D:/work/dev/web/aieng/toss-app && npx ait deploy --api-key S2d-th8Vv7YDzR38e6UN_aUOCvbd3LRYJUMSwDajs9M 2>&1
+```
+
+배포 완료 시 `intoss-private://trend-english?_deploymentId=...` scheme 출력됨.
+
+### 4단계: 결과 출력
 
 성공 시:
 ```
@@ -68,6 +84,7 @@ ssh -o StrictHostKeyChecking=no root@43.106.114.167 "
 상태: 서버 재시작 완료
 
 사이트: https://aieng.duckdns.org
+토스 앱: 배포 완료 (해당 시)
 ```
 
 실패 시: `server.log` 마지막 10줄과 오류 원인 출력
