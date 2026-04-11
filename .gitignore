@@ -9,6 +9,10 @@ db/database.sqlite
 # Generated output files
 output/
 temp/
+
+# Toss 앱 빌드 산출물 (배포 시 자동 생성)
+toss-app/dist/
+toss-app/node_modules/
 tunnel_url.txt
 
 # SSH keys (배포용 키는 로컬에만 보관)
