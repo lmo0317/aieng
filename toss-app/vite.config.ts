@@ -40,6 +40,7 @@ export default defineConfig({
         index: resolve(__dirname, '../public/index.html'),
         songs: resolve(__dirname, '../public/songs.html'),
         puzzle: resolve(__dirname, '../public/puzzle.html'),
+        punchline: resolve(__dirname, '../public/punchline.html'),
         learn: resolve(__dirname, '../public/learn.html'),
         'puzzle-play': resolve(__dirname, '../public/puzzle-play.html'),
         review: resolve(__dirname, '../public/review.html'),
