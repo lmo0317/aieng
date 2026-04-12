@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 class CrosswordGenerator {
-    constructor(width = 15, height = 15) {
+    constructor(width = 10, height = 10) {
         this.width = width;
         this.height = height;
         this.grid = Array.from({ length: height }, () => Array(width).fill(null));
@@ -102,8 +102,8 @@ class CrosswordGenerator {
         const maxSx = this.width - first.length;
         const maxSy = this.height - first.length;
 
-        for (let sy = 2; sy < Math.min(8, maxSy + 1); sy++) {
-            for (let sx = 2; sx < Math.min(8, maxSx + 1); sx++) {
+        for (let sy = 0; sy <= maxSy; sy++) {
+            for (let sx = 0; sx <= maxSx; sx++) {
                 this.grid = Array.from({ length: this.height }, () => Array(this.width).fill(null));
                 this.words = [];
                 // Check if fits across (which is the loop assumption)
@@ -118,6 +118,11 @@ class CrosswordGenerator {
 }
 
 const input = process.argv.slice(2);
-const gen = new CrosswordGenerator(15, 15);
+// 가장 긴 단어 길이 확인
+const maxWordLen = Math.max(...input.map(w => w.length));
+// 가장 긴 단어 길이보다 1~2칸 더 여유를 주되, 최소 10칸은 유지
+const dynamicSize = Math.max(maxWordLen + 1, 10);
+
+const gen = new CrosswordGenerator(dynamicSize, dynamicSize);
 if (gen.generate(input)) console.log(JSON.stringify(gen.words, null, 2));
 else process.exit(1);

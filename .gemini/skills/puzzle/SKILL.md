@@ -37,7 +37,7 @@
 ### Phase 1: Topic & Word Selection
 1. 주제(`topic`)를 분석하여 대주제와 구체적인 소주제를 도출합니다.
 2. 도출된 대주제와 소주제를 조합하여 **`[Main Topic]: [Sub-topic]`** 형식의 제목을 먼저 확정합니다.
-3. 주제에 맞는 신규 단어 6~8개를 선정합니다.
+3. 주제에 맞는 신규 단어 **정확히 6개**를 선정합니다. (가독성과 몰입도를 위해 6개로 제한)
 4. **중복 체크**: `node .gemini/skills/puzzle/scripts/check-duplicates.js [단어1] [단어2] ...` 명령을 실행하여 기존 퍼즐과 중복되는 단어가 있는지 확인합니다.
 
 ### Phase 2: Engine Execution
