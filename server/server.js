@@ -130,6 +130,8 @@ app.get('/chat',  (req, res) => res.sendFile(pub('chat.html')));
 app.get('/puzzle',      (req, res) => res.sendFile(pub('puzzle.html')));
 app.get('/puzzle/play', (req, res) => res.sendFile(pub('puzzle-play.html')));
 app.get('/punchline',   (req, res) => res.sendFile(pub('punchline.html')));
+app.get('/tech',  (req, res) => res.sendFile(pub('tech.html')));
+app.get('/enter', (req, res) => res.sendFile(pub('enter.html')));
 
 // ─── Puzzle API (DB-based) ────────────────────────────────────────────────────
 const fs = require('fs');
@@ -481,14 +483,26 @@ function broadcastTrendsProgress(status, message, current, total) {
 app.get('/api/trends/saved', (req, res) => {
     const limit = req.query.limit !== undefined ? parseInt(req.query.limit) : null;
     const offset = parseInt(req.query.offset) || 0;
+    const category = req.query.category || null;
 
-    db.get("SELECT COUNT(*) as total FROM trends WHERE sentences IS NOT NULL AND type = 'news'", (err, countRow) => {
+    // category 필터: 엔터는 연애+스포츠 합산
+    let catWhere = '';
+    let catParams = [];
+    if (category === '엔터') {
+        catWhere = " AND (category = '연애' OR category = '스포츠')";
+    } else if (category) {
+        catWhere = " AND category = ?";
+        catParams = [category];
+    }
+
+    const baseWhere = `WHERE sentences IS NOT NULL AND type = 'news'${catWhere}`;
+    db.get(`SELECT COUNT(*) as total FROM trends ${baseWhere}`, catParams, (err, countRow) => {
         if (err) return res.status(500).json({ error: err.message });
         const total = countRow ? countRow.total : 0;
         const query = limit !== null
-            ? "SELECT * FROM trends WHERE sentences IS NOT NULL AND type = 'news' ORDER BY createdAt DESC LIMIT ? OFFSET ?"
-            : "SELECT * FROM trends WHERE sentences IS NOT NULL AND type = 'news' ORDER BY createdAt DESC";
-        const params = limit !== null ? [limit, offset] : [];
+            ? `SELECT * FROM trends ${baseWhere} ORDER BY createdAt DESC LIMIT ? OFFSET ?`
+            : `SELECT * FROM trends ${baseWhere} ORDER BY createdAt DESC`;
+        const params = limit !== null ? [...catParams, limit, offset] : [...catParams];
         db.all(query, params, (err, rows) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ trends: rows || [], total, limit, offset });
@@ -501,10 +515,10 @@ app.post('/api/trends/fetch', async (req, res) => {
     if (!s.geminiApiKey) return res.status(400).json({ error: 'Gemini API Key가 필요합니다.' });
 
     const categories = [
-        { name: 'TOP', label: '전체', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'POL', label: '정치', url: 'https://news.google.com/rss/headlines/section/topic/POLITICS?hl=ko&gl=KR&ceid=KR:ko' },
         { name: 'TEC', label: '테크', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko' },
+        { name: 'ENT', label: '연애', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ko&gl=KR&ceid=KR:ko' },
         { name: 'SPO', label: '스포츠', url: 'https://news.google.com/rss/headlines/section/topic/SPORTS?hl=ko&gl=KR&ceid=KR:ko' },
-        { name: 'ENT', label: '연애', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ko&gl=KR&ceid=KR:ko' }
     ];
 
     try {
@@ -515,7 +529,7 @@ app.post('/api/trends/fetch', async (req, res) => {
             try {
                 const result = await axios.get(cat.url, { timeout: 8000 });
                 const matches = result.data.match(/<title>(.*?)<\/title>/g) || [];
-                matches.slice(1, 6).forEach(m => {
+                matches.slice(1, 4).forEach(m => {
                     let title = m.replace(/<title>(.*?)<\/title>/, '$1').split(' - ')[0];
                     title = title.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
                     allTrends.push({ category: cat.label, title: title.trim() });
@@ -523,7 +537,7 @@ app.post('/api/trends/fetch', async (req, res) => {
             } catch (err) { console.warn(`RSS failed for ${cat.label}`); }
         }
 
-        const uniqueTrends = allTrends.slice(0, 10);
+        const uniqueTrends = allTrends.slice(0, 12);
         let processed = [];
 
         for (let i = 0; i < uniqueTrends.length; i++) {

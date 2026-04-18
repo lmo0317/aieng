@@ -19,6 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (href === '/punchline' && path === '/punchline.html') {
             link.classList.add('active');
         }
+        if (href === '/tech' && path === '/tech.html') {
+            link.classList.add('active');
+        }
+        if (href === '/enter' && path === '/enter.html') {
+            link.classList.add('active');
+        }
     });
 
     // AI 사용 공시 — Toss Apps in Toss 정책: AI 사용 고지

@@ -24,6 +24,7 @@ function normCat(cat) {
 }
 
 const PAGE_SIZE = 4;
+const TREND_CATEGORY = window.TREND_CATEGORY || null;
 
 let state = {
     offset: 0,
@@ -48,7 +49,8 @@ async function fetchRealtimeTrends(offset = 0) {
     }
 
     try {
-        const url = `${window.API_BASE || ''}/api/trends/saved?limit=${PAGE_SIZE}&offset=${offset}`;
+        const catParam = TREND_CATEGORY ? `&category=${encodeURIComponent(TREND_CATEGORY)}` : '';
+        const url = `${window.API_BASE || ''}/api/trends/saved?limit=${PAGE_SIZE}&offset=${offset}${catParam}`;
         const resp = await fetch(url);
         const data = await resp.json();
 

@@ -22,9 +22,18 @@
 - **새로운 주제 선정**: 서버에 없는 **완전히 새로운 소식**만 선별하여 다음 단계로 넘어갑니다.
 
 ### Phase 2: News Scout (신규 주제 수집)
-- **주제 다양화**: 선별된 주제들 중 사용자가 요청한 COUNT만큼의 기사를 선정하되, 가능한 한 서로 다른 카테고리가 섞이도록 배분하십시오.
+- **카테고리 파라미터 파싱**: 사용자 명령에서 카테고리를 추출하십시오.
+  - `/news 정치 2개` → CATEGORY=정치, COUNT=2
+  - `/news 테크 1개` → CATEGORY=테크, COUNT=1
+  - `/news 엔터 2개` → CATEGORY=엔터, COUNT=2 (연애+스포츠 혼합)
+  - `/news 2개` (카테고리 없음) → CATEGORY=전체, COUNT=2
+- **카테고리별 fetch-news.js 실행**: 반드시 해당 카테고리 인자를 전달하여 실행하십시오.
+  - `node .gemini/skills/news/scripts/fetch-news.js 정치`
+  - `node .gemini/skills/news/scripts/fetch-news.js 테크`
+  - `node .gemini/skills/news/scripts/fetch-news.js 엔터`
+- **카테고리 고정**: 생성하는 모든 기사의 `category` 필드는 반드시 명령에서 지정된 카테고리로 설정하십시오. (예: 엔터 요청 시 → '연애' 또는 '스포츠' 중 실제 내용에 맞는 것으로)
 - **실시간 팩트 체크 (Full Title 확보)**: 
-  - 선정된 주제를 `google_web_search`로 검색하여 오늘(2026-03-24) 기준 최신 상세 내용을 직접 확인하십시오.
+  - 선정된 주제를 `google_web_search`로 검색하여 오늘 기준 최신 상세 내용을 직접 확인하십시오.
   - **중요**: 만약 `fetch-news.js`에서 가져온 제목이 `...`으로 끝나는 등 생략되어 있다면, 반드시 검색을 통해 **원문의 전체 제목(Full Title)**을 찾아 `news_title`로 사용하십시오. 축약된 제목을 그대로 사용하는 것은 금지입니다.
 
 
