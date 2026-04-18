@@ -485,14 +485,14 @@ app.get('/api/trends/saved', (req, res) => {
     const offset = parseInt(req.query.offset) || 0;
     const category = req.query.category || null;
 
-    // category 필터: 엔터는 연애+스포츠 합산
+    // category 필터: LIKE로 서브카테고리(정치/국제 등) 포함, 엔터=연애+스포츠+엔터
     let catWhere = '';
     let catParams = [];
     if (category === '엔터') {
-        catWhere = " AND (category = '연애' OR category = '스포츠')";
+        catWhere = " AND (category = '엔터' OR category = '연애' OR category = '스포츠' OR category LIKE '연애/%' OR category LIKE '스포츠/%')";
     } else if (category) {
-        catWhere = " AND category = ?";
-        catParams = [category];
+        catWhere = " AND (category = ? OR category LIKE ?)";
+        catParams = [category, category + '/%'];
     }
 
     const baseWhere = `WHERE sentences IS NOT NULL AND type = 'news'${catWhere}`;

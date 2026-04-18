@@ -31,7 +31,10 @@
   - `node .gemini/skills/news/scripts/fetch-news.js 정치`
   - `node .gemini/skills/news/scripts/fetch-news.js 테크`
   - `node .gemini/skills/news/scripts/fetch-news.js 엔터`
-- **카테고리 고정**: 생성하는 모든 기사의 `category` 필드는 반드시 명령에서 지정된 카테고리로 설정하십시오. (예: 엔터 요청 시 → '연애' 또는 '스포츠' 중 실제 내용에 맞는 것으로)
+- **카테고리 고정 (DB 저장 규칙)**: 생성하는 기사의 `category` 필드는 아래 값 중 하나만 사용하십시오. **'엔터' 사용 절대 금지.**
+  - 정치 요청 → `"정치"`
+  - 테크 요청 → `"테크"`
+  - 엔터 요청 → 스포츠 기사면 `"스포츠"`, 연예/엔터테인먼트 기사면 `"연애"`
 - **실시간 팩트 체크 (Full Title 확보)**: 
   - 선정된 주제를 `google_web_search`로 검색하여 오늘 기준 최신 상세 내용을 직접 확인하십시오.
   - **중요**: 만약 `fetch-news.js`에서 가져온 제목이 `...`으로 끝나는 등 생략되어 있다면, 반드시 검색을 통해 **원문의 전체 제목(Full Title)**을 찾아 `news_title`로 사용하십시오. 축약된 제목을 그대로 사용하는 것은 금지입니다.
