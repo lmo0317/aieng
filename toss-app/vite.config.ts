@@ -38,6 +38,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: resolve(__dirname, '../public/index.html'),
+        tech: resolve(__dirname, '../public/tech.html'),
+        enter: resolve(__dirname, '../public/enter.html'),
         songs: resolve(__dirname, '../public/songs.html'),
         puzzle: resolve(__dirname, '../public/puzzle.html'),
         punchline: resolve(__dirname, '../public/punchline.html'),
