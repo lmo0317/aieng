@@ -83,7 +83,7 @@ cd D:/work/dev/web/aieng/toss-app && npx ait deploy --api-key S2d-th8Vv7YDzR38e6
 브랜치: master
 상태: 서버 재시작 완료
 
-사이트: https://aieng.duckdns.org
+사이트: https://minohlee.mooo.com
 토스 앱: 배포 완료 (해당 시)
 ```
 

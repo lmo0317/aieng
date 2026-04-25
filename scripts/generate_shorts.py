@@ -425,7 +425,7 @@ def upload_to_youtube(video_path: str, trend: dict) -> str:
 
 
 # ── API에서 트렌드 데이터 읽기 ────────────────────────────────────────────────
-BASE_URL = "https://aieng.duckdns.org"
+BASE_URL = "https://minohlee.mooo.com"
 
 
 def api_get(path: str) -> dict:

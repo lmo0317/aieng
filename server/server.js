@@ -13,7 +13,7 @@ const db = require('./database');
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const app = express();
-const PORT = process.env.PORT || 8001;
+const PORT = process.env.PORT || 3000;
 
 // SSE 클라이언트 저장
 const trendsClients = new Map();
@@ -836,7 +836,7 @@ app.delete('/api/trends/:id', requireAdminKey, (req, res) => {
 });
 
 // ─── Data Sync from Remote Server ────────────────────────────────────────────
-const REMOTE_BASE = 'https://aieng.duckdns.org';
+const REMOTE_BASE = 'https://minohlee.mooo.com';
 
 app.post('/api/sync', async (req, res) => {
     const results = { news: 0, songs: 0, puzzles: 0, skipped: 0, errors: [] };
@@ -948,7 +948,7 @@ async function migratePuzzleJsonToDB() {
 // Start Express Server
 const server = app.listen(PORT, async () => {
     console.log(`Express Server running on port ${PORT}`);
-    console.log(`Service URL: https://aieng.duckdns.org`);
+    console.log(`Service URL: https://minohlee.mooo.com`);
     // puzzle JSON → DB migration 비활성화 (puzzle-data 폴더 JSON 파일로 인한 재시작 시 데이터 복원 방지)
     
     // WebSocket for AI Tutor Chat

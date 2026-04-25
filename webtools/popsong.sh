@@ -24,7 +24,7 @@ echo "📍 대상: ${ARTIST} - ${SONG}"
 
 # 상세 프롬프트와 함께 Gemini 실행 (-y: 자동 승인 모드)
 # 모델을 특정하지 않고 시스템 기본 모델(Auto)을 사용하도록 변경
-/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin/gemini -y "/popsong ${ARTIST} - ${SONG}. 가사 전체를 분석해서 SKILL.md 지침에 따라 1타 강사 스타일로 아주 자세하고 꼼꼼하게 만들어줘. 문장 구조 분석과 뉘앙스 설명(4문장 이상)을 완벽하게 넣고, https://aieng.duckdns.org 서버 저장과 텔레그램 결과 보고까지 완벽하게 마쳐줘."
+/home/lmo0317ea/.nvm/versions/node/v22.22.1/bin/gemini -y "/popsong ${ARTIST} - ${SONG}. 가사 전체를 분석해서 SKILL.md 지침에 따라 1타 강사 스타일로 아주 자세하고 꼼꼼하게 만들어줘. 문장 구조 분석과 뉘앙스 설명(4문장 이상)을 완벽하게 넣고, https://minohlee.mooo.com 서버 저장과 텔레그램 결과 보고까지 완벽하게 마쳐줘."
 
 if [ $? -eq 0 ]; then
     echo "✅ 모든 작업이 성공적으로 완료되었습니다."

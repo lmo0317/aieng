@@ -164,7 +164,7 @@ try {
 **Endpoint**: `POST {SERVER_URL}/api/trends/save`
 
 서버 URL과 API 키는 `.env` 파일에서 읽습니다:
-- `SERVER_URL`: 배포 서버 URL (기본값: `https://aieng.duckdns.org`)
+- `SERVER_URL`: 배포 서버 URL (기본값: `https://minohlee.mooo.com`)
 - `ADMIN_API_KEY`: 관리 API 키 (필수)
 
 **Request Format**:
@@ -177,7 +177,7 @@ const path = require('path');
 // Load .env from project root
 dotenv.config({ path: path.resolve(__dirname, '..', '..', '..', '.env') });
 
-const SERVER_URL = process.env.SERVER_URL || 'https://aieng.duckdns.org';
+const SERVER_URL = process.env.SERVER_URL || 'https://minohlee.mooo.com';
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY || '';
 
 // Parse URL to determine http vs https

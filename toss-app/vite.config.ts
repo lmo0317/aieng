@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 const API_BASE = process.env.NODE_ENV === 'production'
-  ? 'https://aieng.duckdns.org'
+  ? 'https://minohlee.mooo.com'
   : '';
 
 export default defineConfig({

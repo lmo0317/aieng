@@ -119,7 +119,7 @@ def upload_all_shorts(output_dir: str, movie_title: str) -> list:
         description = (
             f"🎬 {movie_title}\n"
             f"명대사로 배우는 영어! Trend Eng와 함께 학습해보세요.\n\n"
-            f"🔗 전체 학습: https://aieng.duckdns.org/punchline"
+            f"🔗 전체 학습: https://minohlee.mooo.com/punchline"
         )
         result = upload_short(str(mp4), title, description)
         urls.append(result['url'])
