@@ -116,6 +116,7 @@ app.post('/api/toss/auth', (req, res) => {
 
 app.get('/settings.html', requireAdminAuth, (req, res) => res.sendFile(pub('settings.html')));
 app.get('/data.html', requireAdminAuth, (req, res) => res.sendFile(pub('data.html')));
+app.get('/automation.html', requireAdminAuth, (req, res) => res.sendFile(pub('automation.html')));
 app.get('/admin', requireAdminAuth, (req, res) => res.sendFile(pub('admin.html')));
 app.get('/admin/', requireAdminAuth, (req, res) => res.sendFile(pub('admin.html')));
 
@@ -691,21 +692,34 @@ app.post('/api/trends/save', requireAdminKey, async (req, res) => {
 
         const today = new Date().toISOString().split('T')[0];
 
-        db.serialize(() => {
-            const stmt = db.prepare("INSERT INTO trends (title, category, summary, keywords, sentences, quiz, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            trends.forEach(t => {
-                const keywords = t.keywords ? JSON.stringify(t.keywords) : '[]';
-                const sentences = typeof t.sentences === 'object' ? JSON.stringify(t.sentences) : t.sentences;
-                const quiz = t.quiz ? (typeof t.quiz === 'object' ? JSON.stringify(t.quiz) : t.quiz) : '[]';
-                const cleanTitle = String(t.title || '').trim();
-                const category = normalizeCategory(t.category);
-
-                stmt.run(cleanTitle, category, t.summary || '', keywords, sentences, quiz, t.difficulty || 'level3', today, 'news');
+        let saved = 0, skipped = 0;
+        await new Promise((resolve, reject) => {
+            db.serialize(() => {
+                const stmt = db.prepare(
+                    "INSERT INTO trends (title, category, summary, keywords, sentences, quiz, difficulty, date, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                );
+                let pending = trends.length;
+                trends.forEach(t => {
+                    const cleanTitle = String(t.title || '').trim();
+                    const category = normalizeCategory(t.category);
+                    // 같은 날 같은 제목 중복 방지
+                    db.get("SELECT id FROM trends WHERE title = ? AND date = ?", [cleanTitle, today], (err, row) => {
+                        if (row) {
+                            skipped++;
+                        } else {
+                            const keywords  = t.keywords  ? JSON.stringify(t.keywords)  : '[]';
+                            const sentences = typeof t.sentences === 'object' ? JSON.stringify(t.sentences) : t.sentences;
+                            const quiz      = t.quiz ? (typeof t.quiz === 'object' ? JSON.stringify(t.quiz) : t.quiz) : '[]';
+                            stmt.run(cleanTitle, category, t.summary || '', keywords, sentences, quiz, t.difficulty || 'level3', today, 'news');
+                            saved++;
+                        }
+                        if (--pending === 0) { stmt.finalize(); resolve(); }
+                    });
+                });
             });
-            stmt.finalize();
         });
 
-        res.json({ success: true, message: `${trends.length} trends saved successfully.` });
+        res.json({ success: true, message: `${saved} saved, ${skipped} skipped (duplicate).` });
     } catch (error) {
         console.error('Trends save error:', error.message);
         res.status(500).json({ error: `실패: ${error.message}` });
@@ -835,8 +849,116 @@ app.delete('/api/trends/:id', requireAdminKey, (req, res) => {
     });
 });
 
+// ─── Automation: Cron & Script Management ────────────────────────────────────
+const { exec } = require('child_process');
+const os = require('os');
+
+const SSH_HOST = process.env.AUTO_SSH_HOST || '192.168.219.112';
+const SSH_USER = process.env.AUTO_SSH_USER || 'lmo0317';
+const SSH_KEY  = process.env.AUTO_SSH_KEY  || path.join(os.homedir(), '.ssh', 'id_ed25519');
+const REMOTE_PROJECT = process.env.AUTO_PROJECT_PATH || '/home/lmo0317/work/aieng';
+
+const SSH_ARGS = ['-o', 'StrictHostKeyChecking=no', '-o', 'BatchMode=yes', '-i', SSH_KEY, `${SSH_USER}@${SSH_HOST}`];
+
+const ALLOWED_SCRIPTS = {
+    'news-daily': { path: 'scripts/news-daily.sh', label: '뉴스 자동 생성 (정치/테크/엔터)' },
+    'news':       { path: 'webtools/news.sh',       label: '뉴스 수동 생성' },
+    'popsong':    { path: 'webtools/popsong.sh',    label: '팝송 데이터 생성' },
+    'puzzle':     { path: 'webtools/puzzle.sh',     label: '퍼즐 데이터 생성' },
+};
+
+function sshExec(cmd) {
+    return new Promise((resolve, reject) => {
+        const proc = spawn('ssh', [...SSH_ARGS, cmd]);
+        let stdout = '', stderr = '';
+        proc.stdout.on('data', d => stdout += d.toString());
+        proc.stderr.on('data', d => stderr += d.toString());
+        proc.on('close', code => {
+            if (code !== 0) reject(new Error(stderr || `exit ${code}`));
+            else resolve(stdout);
+        });
+        proc.on('error', e => reject(e));
+    });
+}
+
+// 크론 목록 조회
+app.get('/api/admin/cron', requireAdminKey, async (req, res) => {
+    try {
+        const stdout = await sshExec('crontab -l 2>/dev/null || true');
+        const lines = stdout.split('\n');
+        const jobs = lines
+            .map((line, i) => ({ id: i, raw: line }))
+            .filter(j => j.raw.trim() && !j.raw.trim().startsWith('#'));
+        res.json({ success: true, raw: stdout, jobs });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
+// 크론 저장 (전체 crontab 교체)
+app.post('/api/admin/cron', requireAdminKey, (req, res) => {
+    const { raw } = req.body;
+    if (typeof raw !== 'string') return res.status(400).json({ error: 'raw required' });
+    const content = raw.endsWith('\n') ? raw : raw + '\n';
+    const proc = spawn('ssh', [...SSH_ARGS, 'crontab -']);
+    let stderr = '';
+    proc.stderr.on('data', d => stderr += d.toString());
+    proc.on('close', code => {
+        if (code !== 0) return res.status(500).json({ success: false, error: stderr || 'crontab 저장 실패' });
+        res.json({ success: true });
+    });
+    proc.on('error', e => res.status(500).json({ success: false, error: e.message }));
+    proc.stdin.write(content);
+    proc.stdin.end();
+});
+
+// 스크립트 목록
+app.get('/api/admin/scripts', requireAdminKey, (req, res) => {
+    res.json({ success: true, scripts: Object.entries(ALLOWED_SCRIPTS).map(([id, s]) => ({ id, label: s.label, path: s.path })) });
+});
+
+// 스크립트 실행 (SSE 스트리밍 via SSH)
+app.get('/api/admin/run/:scriptId', requireAdminKey, (req, res) => {
+    const script = ALLOWED_SCRIPTS[req.params.scriptId];
+    if (!script) return res.status(404).json({ error: '허용되지 않은 스크립트' });
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const send = (type, data) => res.write(`data: ${JSON.stringify({ type, data })}\n\n`);
+    send('start', `▶ ${script.label} 실행 시작\n`);
+
+    const argsStr = req.query.args ? ' ' + req.query.args.replace(/[;&|`$]/g, '') : '';
+    const remoteCmd = `cd ${REMOTE_PROJECT} && bash ${script.path}${argsStr}`;
+
+    const sshArgs = [
+        '-o', 'StrictHostKeyChecking=no',
+        '-o', 'BatchMode=yes',
+        '-i', SSH_KEY,
+        `${SSH_USER}@${SSH_HOST}`,
+        remoteCmd
+    ];
+
+    const proc = spawn('ssh', sshArgs);
+
+    proc.stdout.on('data', d => send('stdout', d.toString()));
+    proc.stderr.on('data', d => send('stderr', d.toString()));
+    proc.on('close', code => {
+        send('done', `\n✅ 종료 (exit ${code})`);
+        res.end();
+    });
+    proc.on('error', e => {
+        send('error', e.message);
+        res.end();
+    });
+
+    req.on('close', () => proc.kill());
+});
+
 // ─── Data Sync from Remote Server ────────────────────────────────────────────
-const REMOTE_BASE = 'https://aieng.duckdns.org';
+const REMOTE_BASE = process.env.SYNC_URL || 'https://minohlee.mooo.com';
 
 app.post('/api/sync', async (req, res) => {
     const results = { news: 0, songs: 0, puzzles: 0, skipped: 0, errors: [] };
@@ -948,7 +1070,7 @@ async function migratePuzzleJsonToDB() {
 // Start Express Server
 const server = app.listen(PORT, async () => {
     console.log(`Express Server running on port ${PORT}`);
-    console.log(`Service URL: https://aieng.duckdns.org`);
+    console.log(`Service URL: https://minohlee.mooo.com`);
     // puzzle JSON → DB migration 비활성화 (puzzle-data 폴더 JSON 파일로 인한 재시작 시 데이터 복원 방지)
     
     // WebSocket for AI Tutor Chat

@@ -86,7 +86,7 @@
                 <div class="sync-panel-header">
                     <div>
                         <div class="sync-panel-title">🔄 원격 데이터 동기화</div>
-                        <div class="sync-panel-desc">https://aieng.duckdns.org의 최신 데이터를 가져옵니다. 중복 데이터는 자동으로 건너뜁니다.</div>
+                        <div class="sync-panel-desc">https://minohlee.mooo.com의 최신 데이터를 가져옵니다. 중복 데이터는 자동으로 건너뜁니다.</div>
                     </div>
                     <button id="sync-btn" class="btn-sync">🔄 동기화</button>
                 </div>
@@ -98,44 +98,42 @@
             </div>
 
             <div class="sub-tabs">
-                <div class="sub-tab active" onclick="switchTab('news')">📰 뉴스 데이터</div>
-                <div class="sub-tab" onclick="switchTab('songs')">🎵 팝송 데이터</div>
-                <div class="sub-tab" onclick="switchTab('puzzle')">🧩 퍼즐 데이터</div>
+                <div class="sub-tab active" onclick="switchTab('politics')">🏛️ 정치</div>
+                <div class="sub-tab" onclick="switchTab('tech')">💻 테크</div>
+                <div class="sub-tab" onclick="switchTab('ent')">🎭 엔터</div>
             </div>
 
-            <!-- 뉴스 관리 섹션 -->
-            <div id="news-section" class="data-section active">
-                <div id="news-loading" class="loading-spinner" style="display:none;">뉴스 데이터를 불러오는 중...</div>
-                <div id="news-content"></div>
-                <div id="news-empty" class="empty-state" style="display:none;">저장된 뉴스 데이터가 없습니다.</div>
+            <!-- 정치 섹션 -->
+            <div id="politics-section" class="data-section active">
+                <div id="politics-loading" class="loading-spinner" style="display:none;">정치 데이터를 불러오는 중...</div>
+                <div id="politics-content"></div>
+                <div id="politics-empty" class="empty-state" style="display:none;">저장된 정치 데이터가 없습니다.</div>
             </div>
 
-            <!-- 팝송 관리 섹션 -->
-            <div id="songs-section" class="data-section">
-                <div id="songs-loading" class="loading-spinner" style="display:none;">팝송 데이터를 불러오는 중...</div>
-                <div id="songs-content"></div>
-                <div id="songs-empty" class="empty-state" style="display:none;">저장된 팝송 데이터가 없습니다.</div>
+            <!-- 테크 섹션 -->
+            <div id="tech-section" class="data-section">
+                <div id="tech-loading" class="loading-spinner" style="display:none;">테크 데이터를 불러오는 중...</div>
+                <div id="tech-content"></div>
+                <div id="tech-empty" class="empty-state" style="display:none;">저장된 테크 데이터가 없습니다.</div>
             </div>
 
-            <!-- 퍼즐 관리 섹션 -->
-            <div id="puzzle-section" class="data-section">
-                <div id="puzzle-loading" class="loading-spinner" style="display:none;">퍼즐 데이터를 불러오는 중...</div>
-                <div id="puzzle-content"></div>
-                <div id="puzzle-empty" class="empty-state" style="display:none;">저장된 퍼즐 데이터가 없습니다.</div>
+            <!-- 엔터 섹션 -->
+            <div id="ent-section" class="data-section">
+                <div id="ent-loading" class="loading-spinner" style="display:none;">엔터 데이터를 불러오는 중...</div>
+                <div id="ent-content"></div>
+                <div id="ent-empty" class="empty-state" style="display:none;">저장된 엔터 데이터가 없습니다.</div>
             </div>
         </div>
     </div>
 
     <script>
         let adminApiKey = '';
-        let currentTab = 'news';
+        let currentTab = 'politics';
 
-        const catClassMap = {
-            '테크': 'badge-tech', 'Tech': 'badge-tech',
-            '스포츠': 'badge-sports', 'Sports': 'badge-sports',
-            '엔터': 'badge-ent', 'Entertainment': 'badge-ent', '연애': 'badge-ent',
-            '경제': 'badge-economy', 'Economy': 'badge-economy',
-            '정치': 'badge-politics', 'Politics': 'badge-politics'
+        const CATEGORY_MAP = {
+            politics: { label: '🏛️ 정치', keywords: ['정치', 'Politics'] },
+            tech:     { label: '💻 테크',  keywords: ['테크', 'Tech', '기술'] },
+            ent:      { label: '🎭 엔터',  keywords: ['엔터', 'Entertainment', '연예', '문화'] }
         };
 
         async function getAdminKey() {
@@ -150,23 +148,24 @@
             currentTab = tab;
             document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
             document.querySelector(`.sub-tab[onclick="switchTab('${tab}')"]`).classList.add('active');
-            
             document.querySelectorAll('.data-section').forEach(s => s.classList.remove('active'));
             document.getElementById(`${tab}-section`).classList.add('active');
-            
             refreshCurrentTab();
         }
 
         function refreshCurrentTab() {
-            if (currentTab === 'news') fetchNews();
-            else if (currentTab === 'songs') fetchSongs();
-            else fetchPuzzles();
+            fetchByCategory(currentTab);
         }
 
-        async function fetchNews() {
-            const contentEl = document.getElementById('news-content');
-            const loadingEl = document.getElementById('news-loading');
-            const emptyEl = document.getElementById('news-empty');
+        function matchCategory(itemCategory, tabKey) {
+            const keywords = CATEGORY_MAP[tabKey].keywords;
+            return keywords.some(k => (itemCategory || '').includes(k));
+        }
+
+        async function fetchByCategory(tabKey) {
+            const contentEl = document.getElementById(`${tabKey}-content`);
+            const loadingEl = document.getElementById(`${tabKey}-loading`);
+            const emptyEl   = document.getElementById(`${tabKey}-empty`);
 
             contentEl.innerHTML = '';
             loadingEl.style.display = 'block';
@@ -178,48 +177,45 @@
                 const data = await response.json();
                 loadingEl.style.display = 'none';
 
-                const trends = data.trends || [];
-                if (trends.length === 0) {
+                const all = data.trends || [];
+                const filtered = all.filter(item => matchCategory(item.category, tabKey));
+
+                if (filtered.length === 0) {
                     emptyEl.style.display = 'block';
                     return;
                 }
 
                 const groups = {};
-                trends.forEach(item => {
+                filtered.forEach(item => {
                     const date = item.date || '날짜 미지정';
                     if (!groups[date]) groups[date] = [];
                     groups[date].push(item);
                 });
 
                 const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
-
                 sortedDates.forEach(date => {
                     const section = document.createElement('div');
                     section.className = 'item-group';
                     section.innerHTML = `
                         <div class="item-header">
                             <span class="item-label">📅 ${date}</span>
-                            <button class="btn-clear-all" onclick="clearDateData('${date}')">이 날짜 일괄 삭제</button>
+                            <button class="btn-clear-all" onclick="clearDateCategoryData('${date}', '${tabKey}')">이 날짜 일괄 삭제</button>
                         </div>
                         <table>
                             <thead>
                                 <tr>
-                                    <th style="width: 50px;">ID</th>
-                                    <th style="width: 90px;">주제</th>
+                                    <th style="width:50px;">ID</th>
                                     <th>기사 제목</th>
-                                    <th style="width: 60px; text-align: center;">작업</th>
+                                    <th style="width:60px; text-align:center;">작업</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${groups[date].map(news => `
+                                ${groups[date].map(item => `
                                     <tr>
-                                        <td style="color:#bdc3c7; font-size:11px;">${news.id}</td>
-                                        <td>
-                                            <span class="badge badge-date">${news.date || ''}</span>
-                                        </td>
-                                        <td class="col-title" style="font-weight:600;">${news.title}</td>
-                                        <td style="text-align: center;">
-                                            <button class="btn-delete" onclick="deleteNews(${news.id})">삭제</button>
+                                        <td style="color:#bdc3c7; font-size:11px;">${item.id}</td>
+                                        <td class="col-title" style="font-weight:600;">${item.title}</td>
+                                        <td style="text-align:center;">
+                                            <button class="btn-delete" onclick="deleteItem(${item.id}, '${tabKey}')">삭제</button>
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -233,159 +229,32 @@
             }
         }
 
-        async function fetchSongs() {
-            const contentEl = document.getElementById('songs-content');
-            const loadingEl = document.getElementById('songs-loading');
-            const emptyEl = document.getElementById('songs-empty');
-
-            contentEl.innerHTML = '';
-            loadingEl.style.display = 'block';
-            emptyEl.style.display = 'none';
-
+        async function deleteItem(id, tabKey) {
+            if (!confirm('삭제하시겠습니까?')) return;
             try {
-                if (!adminApiKey) await getAdminKey();
-                const response = await fetch('/api/songs/saved'); // 경로 수정
-                const data = await response.json();
-                loadingEl.style.display = 'none';
-
-                const songs = data.songs || [];
-                if (songs.length === 0) {
-                    emptyEl.style.display = 'block';
-                    return;
-                }
-
-                const section = document.createElement('div');
-                section.className = 'item-group';
-                section.innerHTML = `
-                    <div class="item-header">
-                        <span class="item-label">🎵 전체 팝송 리스트</span>
-                        <span style="font-size:12px; color:#95a5a6;">총 ${songs.length}곡</span>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;">ID</th>
-                                <th>아티스트 - 곡 제목</th>
-                                <th style="width: 60px; text-align: center;">작업</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${songs.map(song => `
-                                <tr>
-                                    <td style="color:#bdc3c7; font-size:11px;">${song.id}</td>
-                                    <td class="col-title" style="font-weight:600;">${song.title}</td>
-                                    <td style="text-align: center;">
-                                        <button class="btn-delete" onclick="deleteSong(${song.id})">삭제</button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-                contentEl.appendChild(section);
-            } catch (err) {
-                loadingEl.innerHTML = `<span style="color:red">오류: ${err.message}</span>`;
-            }
-        }
-
-        async function clearDateData(date) {
-            if (!confirm(`[경고] ${date}의 모든 뉴스 데이터를 삭제하시겠습니까?`)) return;
-            try {
-                const response = await fetch('/api/trends/clear-today', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-admin-key': adminApiKey },
-                    body: JSON.stringify({ date: date.trim() })
+                const response = await fetch(`/api/trends/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'x-admin-key': adminApiKey }
                 });
                 const result = await response.json();
-                if (result.success) { window.showAlert(`${date} 데이터가 삭제되었습니다.`); fetchNews(); }
+                if (result.success) fetchByCategory(tabKey);
+            } catch (err) { window.showAlert('삭제 실패'); }
+        }
+
+        async function clearDateCategoryData(date, tabKey) {
+            if (!confirm(`[경고] ${date}의 ${CATEGORY_MAP[tabKey].label} 데이터를 모두 삭제하시겠습니까?`)) return;
+            try {
+                const response = await fetch('/api/trends/saved');
+                const data = await response.json();
+                const targets = (data.trends || []).filter(item =>
+                    (item.date || '날짜 미지정') === date && matchCategory(item.category, tabKey)
+                );
+                await Promise.all(targets.map(item =>
+                    fetch(`/api/trends/${item.id}`, { method: 'DELETE', headers: { 'x-admin-key': adminApiKey } })
+                ));
+                window.showAlert(`${date} ${CATEGORY_MAP[tabKey].label} 데이터가 삭제되었습니다.`);
+                fetchByCategory(tabKey);
             } catch (err) { window.showAlert('통신 오류: ' + err.message); }
-        }
-
-        async function deleteNews(id) {
-            if (!confirm(`뉴스를 삭제하시겠습니까?`)) return;
-            try {
-                const response = await fetch(`/api/trends/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'x-admin-key': adminApiKey }
-                });
-                const result = await response.json();
-                if (result.success) fetchNews();
-            } catch (err) { window.showAlert('삭제 실패'); }
-        }
-
-        async function deleteSong(id) {
-            if (!confirm(`팝송 데이터를 삭제하시겠습니까?`)) return;
-            try {
-                const response = await fetch(`/api/trends/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'x-admin-key': adminApiKey }
-                });
-                const result = await response.json();
-                if (result.success) { window.showAlert('팝송 데이터가 삭제되었습니다.'); fetchSongs(); }
-            } catch (err) { window.showAlert('삭제 실패'); }
-        }
-
-        async function fetchPuzzles() {
-            const contentEl = document.getElementById('puzzle-content');
-            const loadingEl = document.getElementById('puzzle-loading');
-            const emptyEl = document.getElementById('puzzle-empty');
-
-            contentEl.innerHTML = '';
-            loadingEl.style.display = 'block';
-            emptyEl.style.display = 'none';
-
-            try {
-                const response = await fetch('/api/puzzles');
-                const data = await response.json();
-                loadingEl.style.display = 'none';
-
-                const puzzles = data.puzzles || [];
-                if (puzzles.length === 0) { emptyEl.style.display = 'block'; return; }
-
-                puzzles.sort((a, b) => b.date.localeCompare(a.date));
-
-                const section = document.createElement('div');
-                section.className = 'item-group';
-                section.innerHTML = `
-                    <div class="item-header">
-                        <span class="item-label">🧩 전체 퍼즐 리스트</span>
-                        <span style="font-size:12px; color:#95a5a6;">총 ${puzzles.length}개</span>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>제목</th>
-                                <th style="width:100px;">날짜</th>
-                                <th style="width:60px; text-align:center;">작업</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${puzzles.map(p => `
-                                <tr>
-                                    <td class="col-title" style="font-weight:600;">${p.title}</td>
-                                    <td style="color:#888;">${p.date}</td>
-                                    <td style="text-align:center;">
-                                        <button class="btn-delete" onclick="deletePuzzle('${p.id}')">삭제</button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-                contentEl.appendChild(section);
-            } catch (err) {
-                loadingEl.innerHTML = `<span style="color:red">오류: ${err.message}</span>`;
-            }
-        }
-
-        async function deletePuzzle(id) {
-            if (!confirm('퍼즐을 삭제하시겠습니까?')) return;
-            try {
-                const response = await fetch(`/api/puzzles/${id}`, { method: 'DELETE' });
-                const result = await response.json();
-                if (result.success) fetchPuzzles();
-                else window.showAlert('삭제 실패: ' + result.error);
-            } catch (err) { window.showAlert('삭제 실패'); }
         }
 
         // 데이터 동기화
@@ -401,7 +270,7 @@
             syncStatus.classList.remove('hidden');
             syncResult.classList.add('hidden');
             syncProgressFill.style.width = '0%';
-            syncStatusText.textContent = 'https://aieng.duckdns.org에 연결 중...';
+            syncStatusText.textContent = 'https://minohlee.mooo.com에 연결 중...';
 
             let progress = 0;
             const progressInterval = setInterval(() => {
