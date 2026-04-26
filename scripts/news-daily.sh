@@ -2,6 +2,11 @@
 # Trend Eng - 카테고리별 뉴스 학습 데이터 자동 생성 (Linux)
 # 사용법: ./scripts/news-daily.sh [개수]  (기본값: 각 카테고리당 2개)
 
+# nvm PATH
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+export PATH="$HOME/.nvm/versions/node/v24.15.0/bin:$PATH"
+
 set -e
 
 COUNT="${1:-1}"

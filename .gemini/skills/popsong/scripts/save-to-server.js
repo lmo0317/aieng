@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
-const SERVER_URL = process.env.SERVER_URL || 'http://minohlee.mooo.com';
+const SERVER_URL = process.env.SERVER_URL || 'https://minohlee.mooo.com';
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY || '';
 
 if (!ADMIN_API_KEY) {

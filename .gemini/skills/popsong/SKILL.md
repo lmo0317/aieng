@@ -46,7 +46,7 @@ description: >
 - **한글 문제 필수 (HARD RULE)**: 퀴즈 질문(`question`)은 반드시 한국어로 작성하며, 선택지는 반드시 4개여야 합니다.
 
 ### Phase 4: QA & Technical Save (운영 서버 저장 - 안전 프로토콜)
-- **환경 점검**: 실행 전 `.env` 파일의 `SERVER_URL`이 운영 서버(`http://minohlee.mooo.com`)를 가리키고 있는지 반드시 확인하십시오. 만약 `localhost`로 되어 있다면 운영 서버 주소를 우선적으로 사용하여 전송해야 합니다.
+- **환경 점검**: 실행 전 `.env` 파일의 `SERVER_URL`이 운영 서버(`https://minohlee.mooo.com`)를 가리키고 있는지 반드시 확인하십시오. 만약 `localhost`로 되어 있다면 운영 서버 주소를 우선적으로 사용하여 전송해야 합니다.
 - **안전 전송 (Windows Safe)**: 팝송 데이터는 가사가 많아 매우 깁니다. 윈도우 인코딩 및 명령어 길이 제한 오류를 방지하기 위해, **절대 긴 JSON 데이터를 명령어 인자로 직접 전달하지 마십시오.** 
     1. 반드시 데이터를 임시 JSON 파일(예: `temp_song_data.json`)로 먼저 작성하십시오.
     2. 해당 파일 경로를 인자로 하여 `save-to-server.js`를 실행하십시오.
@@ -55,45 +55,3 @@ description: >
 - **구조 검증**: `en`, `ko`, `sentence_structure`, `explanation`, `voca` 필드가 누락되지 않았는지 확인.
 - 서버 API(`/api/songs/save`) 형식을 준수하여 전송.
 
-### Phase 5: Telegram Notification (최종 보고)
-- 서버 저장이 성공하면 **반드시 즉시** 텔레그램 알림을 전송해야 합니다.
-- **서버 반영 확인**: 보고서에 반드시 "운영 서버(minohlee.mooo.com) 반영 완료" 문구를 포함하십시오.
-- **보고 내용**: 
-    - 🎵 **곡 제목** (Artist - Song Title)
-    - 📝 **분석 문장 수** (전체 가사 중 추출된 문장 수)
-    - 💡 **생성된 퀴즈 개수** (10개 확인 - 모두 객관식)
-    - ✨ **학습 포인트** (곡의 주제나 핵심 문법 요약)
-- **말투**: 학생의 성장을 진심으로 응원하는 열정적인 1타 강사의 말투로 정중하고 자세하게 작성하세요.
-
-## 📋 출력 JSON 데이터 스키마 (엄수)
-```json
-{
-  "title": "Artist - Song Title",
-  "lyrics": "전체 가사 텍스트 (또는 요약)",
-  "difficulty": "level3",
-  "sentences": [
-    {
-      "en": "English lyrics sentence",
-      "ko": "한글 번역",
-      "sentence_structure": "N형식 / S(주어: ...) + V(동사: ...) + ...",
-      "explanation": "1타 강사의 상세 강의 (4문장 이상)",
-      "voca": ["단어(품사): 뜻"]
-    }
-  ],
-  "quiz": [
-    {
-      "type": "multiple_choice",
-      "question": "한국어 퀴즈 질문",
-      "options": ["정답", "오답1", "오답2", "오답3"],
-      "answer": "정답"
-    }
-  ]
-}
-```
-
-## ⚠️ 절대 제약 사항
-1. **title**: 반드시 `Artist - Song Title` 영문 형식. 한국어 포함 시 수정.
-2. **explanation**: 4문장 미만 또는 단어 뜻만 적는 성의 없는 설명 엄격 금지.
-3. **quiz question**: 반드시 한국어.
-4. **multiple_choice only**: 빈칸 채우기 유형 절대 금지. 모든 퀴즈는 4지 선다형.
-5. **Hanja**: 발견 시 즉시 제거.

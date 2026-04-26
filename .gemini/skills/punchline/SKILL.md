@@ -61,7 +61,7 @@ description: >
 - **한글 문제 필수 (HARD RULE)**: 퀴즈 질문(`question`)은 반드시 한국어로 작성하며, 선택지는 반드시 4개여야 합니다.
 
 ### Phase 4: QA & Technical Save (운영 서버 저장 - 안전 프로토콜)
-- **환경 점검**: 실행 전 `.env` 파일의 `SERVER_URL`이 운영 서버(`http://minohlee.mooo.com`)를 가리키고 있는지 반드시 확인하십시오. 만약 `localhost`로 되어 있다면 운영 서버 주소를 우선적으로 사용하여 전송해야 합니다.
+- **환경 점검**: 실행 전 `.env` 파일의 `SERVER_URL`이 운영 서버(`https://minohlee.mooo.com`)를 가리키고 있는지 반드시 확인하십시오. 만약 `localhost`로 되어 있다면 운영 서버 주소를 우선적으로 사용하여 전송해야 합니다.
 - **안전 전송 (Windows Safe)**: 데이터를 명령어 인자로 직접 전달하지 마십시오.
     1. 반드시 데이터를 임시 JSON 파일(예: `temp_punchline_data.json`)로 먼저 작성하십시오.
     2. 해당 파일 경로를 인자로 하여 `save-to-server.js`를 실행하십시오. (`node .gemini/skills/punchline/scripts/save-to-server.js temp_punchline_data.json`)
@@ -69,15 +69,6 @@ description: >
 - **최종 검증**: 스크립트 출력 결과에서 `✅ Server Save SUCCESS!` 또는 `success: true` 메시지를 실제로 확인한 경우에만 성공으로 보고하십시오.
 - **구조 검증**: `en`, `ko`, `sentence_structure`, `explanation`, `voca` 필드가 누락되지 않았는지 확인.
 
-### Phase 5: Telegram Notification (최종 보고)
-- 서버 저장이 성공하면 **반드시 즉시** 텔레그램 알림을 전송해야 합니다.
-- **서버 반영 확인**: 보고서에 반드시 "운영 서버(minohlee.mooo.com) 반영 완료" 문구를 포함하십시오.
-- **보고 내용**:
-    - 🎬 **작품 제목** ([Type]: Title)
-    - 📝 **추출된 명대사 수** (5개 확인)
-    - 💡 **생성된 퀴즈 개수** (10개 확인 - 모두 객관식)
-    - ✨ **학습 포인트** (작품의 주제나 핵심 문법 요약)
-- **말투**: 학생의 성장을 진심으로 응원하는 열정적인 1타 강사의 말투로 정중하고 자세하게 작성하세요.
 
 ---
 
